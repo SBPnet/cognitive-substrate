@@ -1,0 +1,27 @@
+{
+  "name": "@cognitive-substrate/web",
+  "version": "0.1.0",
+  "description": "Cognitive workbench end-user UI for Cognitive Substrate",
+  "license": "Apache-2.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 3000",
+    "build": "next build",
+    "start": "next start --port 3000",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf .next"
+  },
+  "dependencies": {
+    "next": "^15.3.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.6",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "tailwindcss": "^4.1.6",
+    "typescript": "^5.5.0"
+  }
+}

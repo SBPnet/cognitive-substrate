@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+.next/
+**/.next/
+*.tsbuildinfo
+.tsbuildinfo
+
+# TypeScript incremental compilation
+*.d.ts.map
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+terraform.tfstate
+terraform.tfstate.backup
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+# POC-only Terraform overrides — keep out of SCM
+infra/aiven/poc.auto.tfvars
+infra/aiven/backend-override.tf
+infra/aiven/poc-outputs.json
+
+# IDE
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Test coverage
+coverage/
+.nyc_output/
+artifacts/
+
+# OTEL / observability runtime data
+otel-data/
+
+# Source chat transcripts (never committed — keep private)
+docs/source-chats/
