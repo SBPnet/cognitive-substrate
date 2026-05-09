@@ -1,5 +1,5 @@
 # Build arg for browser-facing API URL (baked at build time). Default matches kubectl port-forward to api on 3001.
-ARG NEXT_PUBLIC_API_URL=http://localhost:3001
+ARG NEXT_PUBLIC_API_URL=https://019e0aab-1067-7087-ac38-d191acca9b37-3001.eur-1.aiven.app
 
 FROM node:22-slim AS builder
 WORKDIR /workspace
