@@ -5,7 +5,7 @@ COPY package.json pnpm-workspace.yaml pnpm-lock.yaml tsconfig.base.json .npmrc .
 COPY packages/ packages/
 COPY apps/api/ apps/api/
 RUN pnpm install --frozen-lockfile
-RUN pnpm --filter api build
+RUN pnpm --filter @cognitive-substrate/api build
 
 FROM node:22-slim AS runtime
 WORKDIR /app
