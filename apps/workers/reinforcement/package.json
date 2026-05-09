@@ -2,7 +2,7 @@
   "name": "@cognitive-substrate/reinforcement-worker",
   "version": "0.1.0",
   "description": "Reinforcement worker — tracks operational recommendation outcomes and updates pattern library confidence via ClickHouse",
-  "license": "Apache-2.0",
+  "license": "PolyForm-Noncommercial-1.0.0",
   "private": true,
   "type": "module",
   "main": "./dist/main.js",

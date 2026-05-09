@@ -2,7 +2,7 @@
   "name": "@cognitive-substrate/kafka-bus",
   "version": "0.1.0",
   "description": "Typed Kafka producers, consumers, topic registry, and W3C trace propagation for Cognitive Substrate",
-  "license": "Apache-2.0",
+  "license": "PolyForm-Noncommercial-1.0.0",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

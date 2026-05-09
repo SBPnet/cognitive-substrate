@@ -2,7 +2,7 @@
   "name": "@cognitive-substrate/pattern-worker",
   "version": "0.1.0",
   "description": "Pattern detection worker — matches operational primitive streams against the pattern library and emits anomalies and recommendations",
-  "license": "Apache-2.0",
+  "license": "PolyForm-Noncommercial-1.0.0",
   "private": true,
   "type": "module",
   "main": "./dist/main.js",

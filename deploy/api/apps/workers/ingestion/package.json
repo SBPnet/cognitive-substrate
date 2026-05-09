@@ -2,7 +2,7 @@
   "name": "@cognitive-substrate/ingestion-worker",
   "version": "0.1.0",
   "description": "Stage 1: Experience ingestion worker for the Cognitive Substrate cognitive architecture",
-  "license": "Apache-2.0",
+  "license": "PolyForm-Noncommercial-1.0.0",
   "private": true,
   "type": "module",
   "main": "./dist/main.js",

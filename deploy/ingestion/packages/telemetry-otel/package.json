@@ -2,7 +2,7 @@
   "name": "@cognitive-substrate/telemetry-otel",
   "version": "0.1.0",
   "description": "OpenTelemetry bootstrap and cog.* semantic conventions for the Cognitive Substrate cognitive architecture",
-  "license": "Apache-2.0",
+  "license": "PolyForm-Noncommercial-1.0.0",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

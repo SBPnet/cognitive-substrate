@@ -2,7 +2,7 @@
   "name": "@cognitive-substrate/decay-engine",
   "version": "0.1.0",
   "description": "Stage 17 forgetting, suppression, and memory graph pruning for Cognitive Substrate",
-  "license": "Apache-2.0",
+  "license": "PolyForm-Noncommercial-1.0.0",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

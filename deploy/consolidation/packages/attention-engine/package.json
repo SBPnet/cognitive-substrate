@@ -2,7 +2,7 @@
   "name": "@cognitive-substrate/attention-engine",
   "version": "0.1.0",
   "description": "Stage 14 salience routing and attention budgeting for Cognitive Substrate",
-  "license": "Apache-2.0",
+  "license": "PolyForm-Noncommercial-1.0.0",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

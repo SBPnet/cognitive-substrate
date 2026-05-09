@@ -2,7 +2,7 @@
   "name": "@cognitive-substrate/orchestrator",
   "version": "0.1.0",
   "description": "Stage 5 cognitive loop orchestrator for the Cognitive Substrate architecture",
-  "license": "Apache-2.0",
+  "license": "PolyForm-Noncommercial-1.0.0",
   "private": true,
   "type": "module",
   "main": "./dist/main.js",

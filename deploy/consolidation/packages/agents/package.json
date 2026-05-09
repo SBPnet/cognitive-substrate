@@ -2,7 +2,7 @@
   "name": "@cognitive-substrate/agents",
   "version": "0.1.0",
   "description": "Stage 5 cognitive loop session and agent runtime primitives for Cognitive Substrate",
-  "license": "Apache-2.0",
+  "license": "PolyForm-Noncommercial-1.0.0",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
