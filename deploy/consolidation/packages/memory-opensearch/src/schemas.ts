@@ -15,7 +15,7 @@ interface KnnVectorField {
   readonly dimension: number;
   readonly method: {
     readonly name: "hnsw";
-    readonly engine: "nmslib";
+    readonly engine: "faiss";
     readonly space_type: "l2";
     readonly parameters: {
       readonly m: number;
@@ -29,7 +29,7 @@ const knnVectorField = (dimension: number = EMBEDDING_DIM): KnnVectorField => ({
   dimension,
   method: {
     name: "hnsw",
-    engine: "nmslib",
+    engine: "faiss",
     space_type: "l2",
     parameters: { m: 16, ef_construction: 128 },
   },
