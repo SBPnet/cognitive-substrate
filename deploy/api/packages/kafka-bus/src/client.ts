@@ -6,6 +6,7 @@
 
 import { Kafka, type SASLOptions, type KafkaConfig, logLevel } from "kafkajs";
 import type { ConnectionOptions } from "node:tls";
+import { TOPIC_CONFIGS, type TopicName } from "./topics.js";
 
 export interface KafkaClientConfig {
   /** Comma-separated broker addresses, e.g. "broker1:9092,broker2:9092" */
@@ -92,4 +93,54 @@ export function createKafkaClient(config: KafkaClientConfig): Kafka {
     ...(config.sasl !== undefined ? { sasl: config.sasl } : {}),
   };
   return new Kafka(kafkaConfig);
+}
+
+export async function ensureKafkaTopics(
+  config: KafkaClientConfig,
+  topicNames: ReadonlyArray<TopicName> = TOPIC_CONFIGS
+    .filter((topic) => !topic.diskless)
+    .map((topic) => topic.name),
+): Promise<void> {
+  const kafka = createKafkaClient({
+    ...config,
+    clientId: `${config.clientId}-topic-bootstrap`,
+  });
+  const admin = kafka.admin();
+  await admin.connect();
+
+  try {
+    const existing = await admin.listTopics();
+    const requested = new Set(topicNames);
+    const missing = TOPIC_CONFIGS.filter(
+      (topic) => requested.has(topic.name) && !existing.includes(topic.name),
+    );
+    if (missing.length === 0) return;
+
+    await admin.createTopics({
+      waitForLeaders: true,
+      topics: missing.map((topic) => ({
+        topic: topic.name,
+        numPartitions: topic.partitions,
+        replicationFactor: topicReplicationFactor(config, topic.replicationFactor),
+        configEntries: [
+          { name: "cleanup.policy", value: "delete" },
+          { name: "retention.ms", value: String(topic.retentionMs) },
+        ],
+      })),
+    });
+  } finally {
+    await admin.disconnect();
+  }
+}
+
+function topicReplicationFactor(
+  config: KafkaClientConfig,
+  configuredReplicationFactor: number,
+): number {
+  const override = Number(process.env["KAFKA_TOPIC_REPLICATION_FACTOR"]);
+  if (Number.isInteger(override) && override > 0) return override;
+
+  return config.brokers.includes("localhost") || config.brokers.includes("127.0.0.1")
+    ? 1
+    : configuredReplicationFactor;
 }

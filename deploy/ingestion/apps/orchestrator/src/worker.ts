@@ -4,6 +4,7 @@ import {
   CognitiveProducer,
   Topics,
   createKafkaClient,
+  ensureKafkaTopics,
   kafkaConfigFromEnv,
 } from "@cognitive-substrate/kafka-bus";
 import {
@@ -25,7 +26,11 @@ export async function startOrchestrator(): Promise<void> {
     process.stdout.write(`[orchestrator] ${new Date().toISOString()} ${msg}\n`);
   };
 
-  const kafka = createKafkaClient(kafkaConfigFromEnv());
+  const kafkaConfig = kafkaConfigFromEnv();
+  log("Ensuring Kafka topics exist...");
+  await ensureKafkaTopics(kafkaConfig);
+
+  const kafka = createKafkaClient(kafkaConfig);
   const openSearchClient = createOpenSearchClient(opensearchConfigFromEnv());
   const embedder = new ZeroEmbeddingClient(embeddingDimensionFromEnv());
 

@@ -14,7 +14,7 @@ import {
   initTelemetry,
   telemetryConfigFromEnv,
 } from "@cognitive-substrate/telemetry-otel";
-import { kafkaConfigFromEnv } from "@cognitive-substrate/kafka-bus";
+import { ensureKafkaTopics, kafkaConfigFromEnv } from "@cognitive-substrate/kafka-bus";
 import { startResponseConsumer } from "./kafka/response-consumer.js";
 import { startExperienceProducer } from "./kafka/experience-producer.js";
 import { startAuditConsumer } from "./kafka/audit-consumer.js";
@@ -44,6 +44,9 @@ async function main(): Promise<void> {
       await ensureIndexes(openSearchClient);
 
       const kafkaConfig = kafkaConfigFromEnv();
+      log("Ensuring Kafka topics exist...");
+      await ensureKafkaTopics(kafkaConfig);
+
       stopProducer = await startExperienceProducer(kafkaConfig);
       stopConsumer = await startResponseConsumer(kafkaConfig);
       stopAuditConsumer = await startAuditConsumer(kafkaConfig, openSearchClient);

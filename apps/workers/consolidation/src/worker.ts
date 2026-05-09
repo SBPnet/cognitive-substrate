@@ -7,6 +7,7 @@ import {
   CognitiveProducer,
   Topics,
   createKafkaClient,
+  ensureKafkaTopics,
   kafkaConfigFromEnv,
 } from "@cognitive-substrate/kafka-bus";
 import {
@@ -28,7 +29,11 @@ export async function startWorker(): Promise<void> {
     process.stdout.write(`[consolidation-worker] ${new Date().toISOString()} ${msg}\n`);
   };
 
-  const kafka = createKafkaClient(kafkaConfigFromEnv());
+  const kafkaConfig = kafkaConfigFromEnv();
+  log("Ensuring Kafka topics exist...");
+  await ensureKafkaTopics(kafkaConfig);
+
+  const kafka = createKafkaClient(kafkaConfig);
   const openSearchClient = createOpenSearchClient(opensearchConfigFromEnv());
   const engine = new ConsolidationEngine({ openSearch: openSearchClient });
 
