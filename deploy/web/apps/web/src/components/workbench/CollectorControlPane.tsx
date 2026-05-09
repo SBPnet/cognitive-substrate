@@ -30,7 +30,7 @@ export function CollectorControlPane() {
 
   const selectedCount = selected.size;
   const serviceCount = config?.services.length ?? 0;
-  const allSelected = serviceCount > 0 && selectedCount === serviceCount;
+  const collectAll = config !== null && selectedCount === 0;
 
   const servicesByType = useMemo(() => {
     const groups = new Map<string, NonNullable<CollectorConfigDto["services"]>>();
@@ -52,12 +52,8 @@ export function CollectorControlPane() {
   }, []);
 
   const toggleAll = useCallback(() => {
-    setSelected((current) => {
-      if (!config) return current;
-      if (current.size === config.services.length) return new Set();
-      return new Set(config.services.map((service) => service.name));
-    });
-  }, [config]);
+    setSelected(new Set());
+  }, []);
 
   const save = useCallback(async () => {
     setIsSaving(true);
@@ -82,7 +78,7 @@ export function CollectorControlPane() {
             Aiven Collector
           </h2>
           <p className="text-xs text-zinc-500 mt-0.5">
-            {selectedCount} of {serviceCount} services selected
+            {collectAll ? "all project services" : `${selectedCount} of ${serviceCount} services selected`}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -115,13 +111,20 @@ export function CollectorControlPane() {
               <label className="flex items-center gap-2 text-zinc-400 cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={allSelected}
+                  checked={collectAll}
                   onChange={toggleAll}
                   className="accent-indigo-500"
                 />
-                All
+                All project services
               </label>
             </div>
+
+            {collectAll ? (
+              <p className="rounded-lg border border-indigo-900/60 bg-indigo-950/30 px-3 py-2 text-indigo-200">
+                The collector will omit `AIVEN_SERVICES` and poll every visible service in
+                the Aiven project.
+              </p>
+            ) : null}
 
             {servicesByType.map(([type, services]) => (
               <section key={type} className="space-y-1.5">
