@@ -71,6 +71,24 @@ export interface AgentActivityDto {
   critique?: string | undefined;
 }
 
+export interface CollectorServiceDto {
+  name: string;
+  type: string;
+  state: string;
+  plan?: string | undefined;
+  cloud?: string | undefined;
+}
+
+export interface CollectorConfigDto {
+  project: string;
+  collectorService: string;
+  selectedServices: string[];
+  services: CollectorServiceDto[];
+  collectorState?: string | undefined;
+  deploymentStatus?: string | undefined;
+  buildStatus?: string | undefined;
+}
+
 export interface SseEnvelope<T = unknown> {
   type: string;
   payload: T;
@@ -160,4 +178,22 @@ export async function getAgentActivity(
   const res = await fetch(`${API_BASE}/sessions/${sessionId}/agents?limit=${limit}`);
   if (!res.ok) return { activities: [], total: 0 };
   return res.json() as Promise<{ activities: AgentActivityDto[]; total: number }>;
+}
+
+export async function getCollectorConfig(): Promise<CollectorConfigDto> {
+  const res = await fetch(`${API_BASE}/collector`);
+  if (!res.ok) throw new Error(`Failed to load collector config: ${res.status}`);
+  return res.json() as Promise<CollectorConfigDto>;
+}
+
+export async function updateCollectorServices(
+  services: string[],
+): Promise<CollectorConfigDto> {
+  const res = await fetch(`${API_BASE}/collector`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ services }),
+  });
+  if (!res.ok) throw new Error(`Failed to update collector config: ${res.status}`);
+  return res.json() as Promise<CollectorConfigDto>;
 }

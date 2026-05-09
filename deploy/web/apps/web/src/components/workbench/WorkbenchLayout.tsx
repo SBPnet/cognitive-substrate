@@ -7,6 +7,7 @@ import { ConversationPane } from "./ConversationPane";
 import { MemoryContextPane } from "./MemoryContextPane";
 import { SystemTracePane } from "./SystemTracePane";
 import { AgentActivityPane } from "./AgentActivityPane";
+import { CollectorControlPane } from "./CollectorControlPane";
 import type { InteractionResponseDto } from "@/lib/api-client";
 import { Spinner } from "@/components/ui/spinner";
 
@@ -126,7 +127,7 @@ export function WorkbenchLayout() {
       {/* Right column — memory context + system trace */}
       <div className="hidden lg:flex flex-col flex-1 min-w-0">
         {/* Memory context — top */}
-        <div className="flex flex-col" style={{ height: "40%" }}>
+        <div className="flex flex-col" style={{ height: "34%" }}>
           <MemoryContextPane
             memories={memories}
             sessionId={session?.sessionId}
@@ -135,20 +136,23 @@ export function WorkbenchLayout() {
           />
         </div>
 
-        <div className="flex flex-col border-t border-zinc-700" style={{ height: "30%" }}>
+        <div className="flex flex-col border-t border-zinc-700" style={{ height: "22%" }}>
           <AgentActivityPane
             activities={agentActivities}
             onRefresh={handleRefreshAgentActivity}
           />
         </div>
 
-        {/* System trace — bottom */}
-        <div className="flex flex-col border-t border-zinc-700" style={{ height: "30%" }}>
+        <div className="flex flex-col border-t border-zinc-700" style={{ height: "22%" }}>
           <SystemTracePane
             events={traceEvents}
             sessionId={session?.sessionId}
             onRefresh={handleRefreshTrace}
           />
+        </div>
+
+        <div className="flex flex-col border-t border-zinc-700" style={{ height: "22%" }}>
+          <CollectorControlPane />
         </div>
       </div>
     </div>

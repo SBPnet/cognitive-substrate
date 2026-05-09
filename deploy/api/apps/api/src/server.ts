@@ -18,6 +18,7 @@ import {
   createIdentityRouter,
   createGoalsRouter,
 } from "./routes/policy.js";
+import { createCollectorRouter } from "./routes/collector.js";
 
 export function createApp(openSearchClient: Client): Hono {
   const app = new Hono();
@@ -53,6 +54,9 @@ export function createApp(openSearchClient: Client): Hono {
 
   // Roadmap Stages 11-12: goal hierarchy (stub until Stage 12)
   app.route("/api/sessions/:sessionId/goals", createGoalsRouter(openSearchClient));
+
+  // Direct operational control surface for the hosted Aiven telemetry collector.
+  app.route("/api/collector", createCollectorRouter());
 
   return app;
 }
