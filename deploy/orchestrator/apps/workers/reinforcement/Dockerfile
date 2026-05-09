@@ -5,7 +5,7 @@ COPY package.json pnpm-workspace.yaml pnpm-lock.yaml tsconfig.base.json .npmrc .
 COPY packages/ packages/
 COPY apps/workers/reinforcement/ apps/workers/reinforcement/
 RUN pnpm install --frozen-lockfile --prod=false
-RUN pnpm --filter @cognitive-substrate/reinforcement-worker build
+RUN pnpm --filter @cognitive-substrate/reinforcement-worker... build
 
 FROM node:22-slim AS runtime
 RUN npm install -g pnpm@10
