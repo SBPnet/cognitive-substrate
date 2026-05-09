@@ -10,9 +10,9 @@ RUN pnpm --filter @cognitive-substrate/orchestrator... build
 FROM node:22-slim AS runtime
 WORKDIR /app
 COPY --from=builder /workspace/node_modules ./node_modules
-COPY --from=builder /workspace/apps/orchestrator/dist ./dist
-COPY --from=builder /workspace/apps/orchestrator/package.json ./package.json
 COPY --from=builder /workspace/packages ./packages
+COPY --from=builder /workspace/apps/orchestrator ./apps/orchestrator
+WORKDIR /app/apps/orchestrator
 ENV NODE_ENV=production
 EXPOSE 3000
 CMD ["node", "dist/main.js"]

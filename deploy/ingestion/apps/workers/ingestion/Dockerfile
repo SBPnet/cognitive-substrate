@@ -18,7 +18,7 @@ RUN pnpm install --frozen-lockfile --prod=false
 COPY packages/ ./packages/
 COPY apps/workers/ingestion/ ./apps/workers/ingestion/
 
-RUN pnpm -r build
+RUN pnpm --filter @cognitive-substrate/ingestion-worker... build
 
 # Runtime stage — minimal image
 FROM node:22-slim AS runtime
@@ -28,8 +28,7 @@ WORKDIR /app
 
 COPY --from=base /app/node_modules ./node_modules
 COPY --from=base /app/packages ./packages
-COPY --from=base /app/apps/workers/ingestion/dist ./apps/workers/ingestion/dist
-COPY --from=base /app/apps/workers/ingestion/package.json ./apps/workers/ingestion/
+COPY --from=base /app/apps/workers/ingestion ./apps/workers/ingestion
 
 WORKDIR /app/apps/workers/ingestion
 

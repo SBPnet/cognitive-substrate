@@ -10,9 +10,9 @@ RUN pnpm --filter @cognitive-substrate/api... build
 FROM node:22-slim AS runtime
 WORKDIR /app
 COPY --from=builder /workspace/node_modules ./node_modules
-COPY --from=builder /workspace/apps/api/dist ./dist
-COPY --from=builder /workspace/apps/api/package.json ./package.json
 COPY --from=builder /workspace/packages ./packages
+COPY --from=builder /workspace/apps/api ./apps/api
+WORKDIR /app/apps/api
 ENV NODE_ENV=production
 EXPOSE 3001
 CMD ["node", "dist/main.js"]

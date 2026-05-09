@@ -12,8 +12,7 @@ RUN npm install -g pnpm@10
 WORKDIR /app/apps/workers/consolidation
 COPY --from=base /app/node_modules /app/node_modules
 COPY --from=base /app/packages /app/packages
-COPY --from=base /app/apps/workers/consolidation/dist ./dist
-COPY --from=base /app/apps/workers/consolidation/package.json ./package.json
+COPY --from=base /app/apps/workers/consolidation /app/apps/workers/consolidation
 ENV NODE_ENV=production
 EXPOSE 3000
 CMD ["node", "dist/main.js"]
