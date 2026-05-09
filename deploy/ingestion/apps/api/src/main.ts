@@ -28,21 +28,30 @@ async function main(): Promise<void> {
   const shutdownTelemetry = await initTelemetry(telemetryConfigFromEnv("api-bff"));
 
   const openSearchClient = createOpenSearchClient(opensearchConfigFromEnv());
-  log("Ensuring OpenSearch indexes exist...");
-  await ensureIndexes(openSearchClient);
-
-  const kafkaConfig = kafkaConfigFromEnv();
-  const stopProducer = await startExperienceProducer(kafkaConfig);
-  const stopConsumer = await startResponseConsumer(kafkaConfig);
-  const stopAuditConsumer = await startAuditConsumer(kafkaConfig, openSearchClient);
-  log("Kafka producer and consumer connected.");
-
   const app = createApp(openSearchClient);
   const port = Number(process.env["PORT"] ?? process.env["API_PORT"] ?? "3001");
+  let stopProducer: () => Promise<void> = async () => {};
+  let stopConsumer: () => Promise<void> = async () => {};
+  let stopAuditConsumer: () => Promise<void> = async () => {};
 
   const server = serve({ fetch: app.fetch, hostname: "0.0.0.0", port }, () => {
     log(`Listening on http://localhost:${port}`);
   });
+
+  void (async () => {
+    try {
+      log("Ensuring OpenSearch indexes exist...");
+      await ensureIndexes(openSearchClient);
+
+      const kafkaConfig = kafkaConfigFromEnv();
+      stopProducer = await startExperienceProducer(kafkaConfig);
+      stopConsumer = await startResponseConsumer(kafkaConfig);
+      stopAuditConsumer = await startAuditConsumer(kafkaConfig, openSearchClient);
+      log("Kafka producer and consumer connected.");
+    } catch (err: unknown) {
+      process.stderr.write(`[api] Bootstrap error: ${String(err)}\n`);
+    }
+  })();
 
   const handleShutdown = async (): Promise<void> => {
     log("Shutting down...");
