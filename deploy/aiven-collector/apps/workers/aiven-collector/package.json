@@ -1,0 +1,25 @@
+{
+  "name": "@cognitive-substrate/aiven-collector-worker",
+  "version": "0.1.0",
+  "description": "Aiven telemetry collector that streams service metadata, logs, and metrics into the cognitive telemetry bus",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/main.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "start": "node dist/main.js",
+    "dev": "node --watch dist/main.js",
+    "clean": "rm -rf dist *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@cognitive-substrate/kafka-bus": "workspace:*",
+    "@cognitive-substrate/telemetry-otel": "workspace:*",
+    "@opentelemetry/api": "^1.9.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.5.0"
+  }
+}

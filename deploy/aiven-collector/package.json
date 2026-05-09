@@ -1,0 +1,38 @@
+{
+  "name": "cognitive-substrate",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Distributed cognitive infrastructure framework for persistent memory, adaptive retrieval, and event-driven AI systems",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=10"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "protobufjs",
+      "sharp"
+    ]
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "eslint . --max-warnings 0",
+    "test": "pnpm -r test",
+    "smoke:packages": "pnpm tsx scripts/smoke/check-node22.ts && pnpm -r build && pnpm -r typecheck && pnpm -r --if-present test && pnpm tsx scripts/smoke/package-baseline.ts",
+    "smoke:deep": "pnpm tsx scripts/smoke/deep-smoke.ts",
+    "clean": "pnpm -r clean",
+    "docs:diagram:article-01": "bash scripts/docs/render-article-01-diagrams.sh"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "concurrently": "^9.2.1",
+    "eslint": "^9.0.0",
+    "kafkajs": "^2.2.4",
+    "tsx": "^4.21.0",
+    "typescript": "^5.5.0"
+  }
+}
