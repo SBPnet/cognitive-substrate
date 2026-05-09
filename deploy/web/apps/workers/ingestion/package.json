@@ -1,0 +1,32 @@
+{
+  "name": "@cognitive-substrate/ingestion-worker",
+  "version": "0.1.0",
+  "description": "Stage 1: Experience ingestion worker for the Cognitive Substrate cognitive architecture",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/main.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "start": "node dist/main.js",
+    "dev": "node --watch dist/main.js",
+    "clean": "rm -rf dist *.tsbuildinfo",
+    "test": "NODE_OPTIONS=--experimental-vm-modules pnpm exec jest --testPathPattern=src/__tests__"
+  },
+  "dependencies": {
+    "@cognitive-substrate/core-types": "workspace:*",
+    "@cognitive-substrate/kafka-bus": "workspace:*",
+    "@cognitive-substrate/memory-objectstore": "workspace:*",
+    "@cognitive-substrate/memory-opensearch": "workspace:*",
+    "@cognitive-substrate/telemetry-otel": "workspace:*",
+    "@opentelemetry/api": "^1.9.0"
+  },
+  "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "@types/node": "^22.0.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.0",
+    "typescript": "^5.5.0"
+  }
+}

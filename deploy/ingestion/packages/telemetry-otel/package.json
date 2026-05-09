@@ -1,0 +1,31 @@
+{
+  "name": "@cognitive-substrate/telemetry-otel",
+  "version": "0.1.0",
+  "description": "OpenTelemetry bootstrap and cog.* semantic conventions for the Cognitive Substrate cognitive architecture",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "clean": "rm -rf dist *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.53.0",
+    "@opentelemetry/resources": "^1.26.0",
+    "@opentelemetry/sdk-node": "^0.53.0",
+    "@opentelemetry/sdk-trace-base": "^1.26.0",
+    "@opentelemetry/semantic-conventions": "^1.27.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0"
+  }
+}

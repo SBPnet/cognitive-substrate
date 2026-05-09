@@ -1,0 +1,27 @@
+{
+  "name": "@cognitive-substrate/memory-opensearch",
+  "version": "0.1.0",
+  "description": "OpenSearch index schemas, hybrid retrieval client, and query builder for the Cognitive Substrate memory substrate",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "clean": "rm -rf dist *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@cognitive-substrate/core-types": "workspace:*",
+    "@opensearch-project/opensearch": "^2.7.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0"
+  }
+}

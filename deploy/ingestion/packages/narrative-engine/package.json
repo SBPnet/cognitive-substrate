@@ -1,0 +1,28 @@
+{
+  "name": "@cognitive-substrate/narrative-engine",
+  "version": "0.1.0",
+  "description": "Stage 10 identity accumulation and narrative self-model synthesis for Cognitive Substrate",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "clean": "rm -rf dist *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@cognitive-substrate/core-types": "workspace:*",
+    "@cognitive-substrate/kafka-bus": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.5.0"
+  }
+}
