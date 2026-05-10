@@ -1,0 +1,7 @@
+flowchart LR
+  eventStream["Event stream"] -->|"sequence"| episodicSequence["Episodic sequence"]
+  goalHierarchy["Goal hierarchy"] -->|"assign"| planningHorizon["Planning horizon"]
+  deadlines["Deadlines and risk"] -->|"compute"| urgencyGradient["Urgency gradient"]
+  urgencyGradient -->|"modulate"| inferenceDepth["Inference depth"]
+  planningHorizon -->|"shape"| actionPlan["Action plan"]
+  episodicSequence -->|"contextualize"| actionPlan

@@ -1,0 +1,19 @@
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: cognitive-substrate-kafka-trigger-auth
+  namespace: cognitive
+spec:
+  secretTargetRef:
+    - parameter: tls
+      name: keda-kafka-auth
+      key: tls
+    - parameter: sasl
+      name: keda-kafka-auth
+      key: sasl
+    - parameter: username
+      name: keda-kafka-auth
+      key: username
+    - parameter: password
+      name: keda-kafka-auth
+      key: password

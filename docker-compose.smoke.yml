@@ -1,0 +1,195 @@
+# Local smoke-test stack for cognitive-substrate.
+# Provides all backing services on the same ports the .env.example files expect.
+#
+# Images are upstream OSS publishers only (apache/kafka, opensearchproject/opensearch,
+# library postgres, clickhouse/clickhouse-server, minio, otel). Do not swap in
+# Confluent Platform, Redpanda, or other vendor Kafka distribution images here.
+#
+# Usage:
+#   docker compose -f docker-compose.smoke.yml up -d
+#   docker compose -f docker-compose.smoke.yml down -v
+
+services:
+  # ---------------------------------------------------------------------------
+  # Kafka (KRaft, single broker: no ZooKeeper)
+  # Auto-create is enabled so init-kafka-topics.ts can upsert without errors.
+  # ---------------------------------------------------------------------------
+  kafka:
+    # Official Apache image (Bitnami tags are often unavailable on Docker Hub).
+    image: apache/kafka:latest
+    restart: unless-stopped
+    ports:
+      - "9092:9092"
+    environment:
+      # KRaft combined mode; dual listeners so host uses localhost:9092 and other
+      # containers use kafka:29092 (metadata must not advertise only localhost).
+      KAFKA_NODE_ID: "1"
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "1"
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: "0"
+      KAFKA_NUM_PARTITIONS: "1"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_LOG_RETENTION_HOURS: "24"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  # ---------------------------------------------------------------------------
+  # OpenSearch (single node, security disabled for local dev)
+  # ---------------------------------------------------------------------------
+  opensearch:
+    image: opensearchproject/opensearch:2.15.0
+    restart: unless-stopped
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      # 2.12+ Docker: prefer DISABLE_SECURITY_PLUGIN (plugins.security.disabled via env is unreliable).
+      discovery.type: single-node
+      DISABLE_SECURITY_PLUGIN: "true"
+      OPENSEARCH_JAVA_OPTS: "-Xms1g -Xmx1g"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health | grep -qE '\"status\":\"(green|yellow)\"'"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+
+  # ---------------------------------------------------------------------------
+  # PostgreSQL 16
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: cognitive-substrate
+      POSTGRES_USER: cognitive-substrate
+      POSTGRES_PASSWORD: cognitive-substrate
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cognitive-substrate -d cognitive-substrate"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # ---------------------------------------------------------------------------
+  # ClickHouse (HTTP on 8123, native on 9000)
+  # Default user with no password for local dev.
+  # ---------------------------------------------------------------------------
+  clickhouse:
+    image: clickhouse/clickhouse-server:24
+    restart: unless-stopped
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    environment:
+      CLICKHOUSE_DB: cognitive_substrate_telemetry
+      CLICKHOUSE_USER: default
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
+    healthcheck:
+      test: ["CMD-SHELL", "clickhouse-client --query 'SELECT 1'"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+
+  # ---------------------------------------------------------------------------
+  # MinIO: S3-compatible object store for episodic truth archive
+  # ---------------------------------------------------------------------------
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    ports:
+      - "9001:9001"
+      - "9002:9002"
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    command: server /data --address ":9001" --console-address ":9002"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9001/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - minio_data:/data
+
+  # One-shot container: create the episodic bucket after MinIO is healthy.
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+        mc alias set local http://minio:9001 minio minio123;
+        mc mb --ignore-existing local/cognitive-substrate-episodic;
+        echo 'Bucket cognitive-substrate-episodic ready.';
+      "
+
+  # ---------------------------------------------------------------------------
+  # OTEL Collector: routes traces/metrics to stdout for local inspection
+  # ---------------------------------------------------------------------------
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    restart: unless-stopped
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    command: ["--config=/etc/otel/config.yaml"]
+    volumes:
+      - ./scripts/smoke/otel-collector-config.yaml:/etc/otel/config.yaml:ro
+    depends_on:
+      opensearch:
+        condition: service_healthy
+
+  # ---------------------------------------------------------------------------
+  # Kafka UI: browse topics and messages at http://localhost:8080
+  # ---------------------------------------------------------------------------
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: smoke
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+    depends_on:
+      kafka:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  clickhouse_data:
+  minio_data:

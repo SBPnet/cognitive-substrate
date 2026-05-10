@@ -4,6 +4,7 @@ import type {
   PolicyState,
   RetrievalFeedback,
 } from "@cognitive-substrate/core-types";
+import type { RetrievalMode } from "@cognitive-substrate/memory-opensearch";
 
 export type RetrievalSearchIndex = Extract<
   MemoryIndex,
@@ -36,7 +37,14 @@ export interface RetrievalRequest {
   readonly requiredTags?: ReadonlyArray<string>;
   readonly minImportance?: number;
   readonly indexes?: ReadonlyArray<RetrievalSearchIndex>;
+  /**
+   * Which vector field to use for k-NN recall.
+   * Defaults to "legacy" (the original "embedding" field) for backward compat.
+   */
+  readonly retrievalMode?: RetrievalMode;
 }
+
+export { RetrievalMode };
 
 export interface RetrievalResult {
   readonly memories: ReadonlyArray<MemoryReference>;

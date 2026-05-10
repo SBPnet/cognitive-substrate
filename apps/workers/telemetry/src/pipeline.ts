@@ -29,6 +29,38 @@ export interface RawMetricMessage {
   environment: string;
 }
 
+/**
+ * A normalised telemetry event published to TELEMETRY_EVENTS_NORMALIZED.
+ * Carries the original metric fields augmented with the operational-primitive
+ * IDs that were resolved for the source system.
+ */
+export interface NormalizedTelemetryEvent {
+  readonly serviceId: string;
+  readonly serviceType: string;
+  readonly metricName: string;
+  readonly value: number;
+  readonly resolvedPrimitives: readonly string[];
+  readonly timestamp: string;
+  readonly environment: string;
+}
+
+/**
+ * A cognitive-primitive signal event published to COGNITION_PRIMITIVES.
+ * Each event is system-agnostic and carries intensity, trend, confidence,
+ * and correlation metadata.
+ */
+export interface CognitivePrimitiveEvent {
+  readonly primitiveId: string;
+  readonly intensity: number;
+  readonly trend: string;
+  readonly scope: string;
+  readonly confidence: number;
+  readonly sourceSystem: string;
+  readonly sourceSystemType: string;
+  readonly correlatedSignalIds: readonly string[];
+  readonly timestamp: string;
+}
+
 export interface TelemetryPipelineConfig {
   producer: CognitiveProducer;
   clickhouse: ClickHouseTelemetryClient;
@@ -69,8 +101,8 @@ export async function processTelemetryBatch(
   // 2. Normalise per source system
   const grouped = groupBySystem(messages);
   const cognitiveRows: CognitiveEventRow[] = [];
-  const primitiveEvents: unknown[] = [];
-  const normalizedEvents: unknown[] = [];
+  const primitiveEvents: CognitivePrimitiveEvent[] = [];
+  const normalizedEvents: NormalizedTelemetryEvent[] = [];
 
   for (const [systemId, systemMessages] of Object.entries(grouped)) {
     const mapping = resolveMapping(systemId, mappings);
@@ -142,9 +174,9 @@ export async function processTelemetryBatch(
   if (normalizedEvents.length > 0) {
     await producer.publish(Topics.TELEMETRY_EVENTS_NORMALIZED, normalizedEvents);
   }
-  for (const event of primitiveEvents) {
-    await producer.publish(Topics.COGNITION_PRIMITIVES, event);
-  }
+  await Promise.all(
+    primitiveEvents.map((event) => producer.publish(Topics.COGNITION_PRIMITIVES, event)),
+  );
 }
 
 function groupBySystem(messages: RawMetricMessage[]): Record<string, RawMetricMessage[]> {

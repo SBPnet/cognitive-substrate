@@ -4,6 +4,10 @@
  *
  * This module wires together the Kafka consumer, embedding client,
  * OpenSearch client, object store, and producer.
+ *
+ * Multi-profile mode: when EMBEDDING_LANES is set, one embedder is built
+ * per active profile (quality, efficient, hybrid) and the pipeline writes
+ * a separate vector field per model family into OpenSearch.
  */
 
 import type { ExperienceEvent } from "@cognitive-substrate/core-types";
@@ -19,6 +23,7 @@ import {
   createOpenSearchClient,
   ensureIndexes,
   opensearchConfigFromEnv,
+  embeddingProfilesFromEnv,
 } from "@cognitive-substrate/memory-opensearch";
 import {
   EpisodicObjectStore,
@@ -33,6 +38,7 @@ import {
   OpenAIEmbeddingClient,
   StubEmbeddingClient,
   VertexEmbeddingClient,
+  buildEmbeddersFromProfiles,
   openAIEmbeddingConfigFromEnv,
   vertexEmbeddingConfigFromEnv,
 } from "./embedder.js";
@@ -54,13 +60,27 @@ export async function startWorker(): Promise<void> {
   const kafka = createKafkaClient(kafkaConfig);
   const openSearchClient = createOpenSearchClient(opensearchConfigFromEnv());
   const objectStore = createObjectStore();
+
+  // Multi-profile mode: when EMBEDDING_LANES is set, build one embedder per
+  // active profile and write separate vector fields per model family.
+  const useLanes = process.env["EMBEDDING_LANES"] !== undefined;
+  const profiledEmbedders = useLanes ? buildEmbeddersFromProfiles(embeddingProfilesFromEnv()) : undefined;
+
+  // Legacy single-embedder path (used when EMBEDDING_LANES is not set).
   const embeddingConfig = openAIEmbeddingConfigFromEnv();
   const provider = process.env["EMBEDDING_PROVIDER"] ?? "openai";
-  const embedder = provider === "stub"
-    ? new StubEmbeddingClient(embeddingConfig.dimension)
-    : provider === "vertex"
-      ? new VertexEmbeddingClient(vertexEmbeddingConfigFromEnv())
-      : new OpenAIEmbeddingClient(embeddingConfig);
+  const legacyEmbedder = useLanes ? undefined
+    : provider === "stub"
+      ? new StubEmbeddingClient(embeddingConfig.dimension)
+      : provider === "vertex"
+        ? new VertexEmbeddingClient(vertexEmbeddingConfigFromEnv())
+        : new OpenAIEmbeddingClient(embeddingConfig);
+
+  if (useLanes) {
+    log(`Embedding profiles active: ${profiledEmbedders!.map((p) => `${p.profile.lane}(${p.profile.id})`).join(", ")}`);
+  } else {
+    log(`Embedding provider: ${provider}`);
+  }
 
   log("Ensuring OpenSearch indexes exist...");
   await ensureIndexes(openSearchClient);
@@ -83,7 +103,7 @@ export async function startWorker(): Promise<void> {
       log(`Processing event ${event.eventId} (type=${event.type})`);
 
       const enriched = await processEvent(event, {
-        embedder,
+        ...(profiledEmbedders ? { profiledEmbedders } : { embedder: legacyEmbedder! }),
         openSearch: openSearchClient,
         objectStore,
         producer,
@@ -111,10 +131,7 @@ export async function startWorker(): Promise<void> {
 
 function createObjectStore(): Pick<EpisodicObjectStore, "put"> {
   if (process.env["OBJECT_STORE_PROVIDER"] === "noop") {
-    return {
-      put: async () => undefined,
-    };
+    return { put: async () => undefined };
   }
-
   return new EpisodicObjectStore(objectStoreConfigFromEnv());
 }

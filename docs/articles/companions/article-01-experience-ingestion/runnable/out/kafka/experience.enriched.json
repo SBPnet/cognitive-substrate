@@ -1,0 +1,12 @@
+{
+  "eventId": "demo-event-001",
+  "timestamp": "2026-05-08T22:31:25.237Z",
+  "importanceScore": 0.79,
+  "embeddingDimension": 8,
+  "objectStorageKey": "events/2026/05/08/demo-event-001.json",
+  "tags": [
+    "memory",
+    "ingestion",
+    "demo"
+  ]
+}

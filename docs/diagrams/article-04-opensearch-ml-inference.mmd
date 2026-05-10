@@ -1,0 +1,8 @@
+flowchart LR
+  sourceDocument["Source document"] -->|"ingest"| embeddingPipeline["Embedding ingest pipeline"]
+  embeddingPipeline -->|"infer"| embeddingPool["Tier 1 embedding pool"]
+  embeddingPool -->|"write"| vectorIndex["Vector index"]
+  queryText["Query text"] -->|"recall"| vectorIndex
+  vectorIndex -->|"overfetch"| candidateSet["Candidate set"]
+  candidateSet -->|"rerank"| rerankerPool["Tier 2 reranker pool"]
+  rerankerPool -->|"return"| rankedMemory["Ranked memory"]

@@ -1,0 +1,8 @@
+flowchart LR
+  uncertaintyMap["Uncertainty map"] -->|"estimate"| informationGain["Information gain"]
+  noveltySignals["Novelty signals"] -->|"filter"| meaningfulNovelty["Meaningful novelty"]
+  meaningfulNovelty -->|"prioritize"| curiosityEngine["Curiosity engine"]
+  informationGain -->|"prioritize"| curiosityEngine
+  curiosityEngine -->|"propose"| experimentPlan["Experiment plan"]
+  experimentPlan -->|"gate"| safetyBudget["Safety and budget gate"]
+  safetyBudget -->|"execute"| learningProbe["Learning probe"]

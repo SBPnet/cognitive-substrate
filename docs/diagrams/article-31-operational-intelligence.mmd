@@ -1,0 +1,7 @@
+flowchart LR
+  vendorTelemetry["Vendor telemetry"] -->|"map"| operationalPrimitive["Operational primitive"]
+  operationalPrimitive -->|"window"| patternMatcher["Pattern matcher"]
+  patternMatcher -->|"recommend"| incidentRecommendation["Incident recommendation"]
+  incidentRecommendation -->|"evaluate"| outcomeFeedback["Outcome feedback"]
+  outcomeFeedback -->|"update"| patternConfidence["Pattern confidence"]
+  patternConfidence -->|"transfer"| newEnvironment["New environment"]

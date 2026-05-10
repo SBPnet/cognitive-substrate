@@ -1,0 +1,8 @@
+flowchart LR
+  memoryGraph["Memory graph"] -->|"evaluate"| forgettingEngine["Forgetting engine"]
+  retrievalFeedback["Retrieval feedback"] -->|"weight"| forgettingEngine
+  contradictionRecords["Contradiction records"] -->|"flag"| forgettingEngine
+  forgettingEngine -->|"suppress"| suppressedMemory["Suppressed memory"]
+  forgettingEngine -->|"compress"| compressedConcept["Compressed concept"]
+  forgettingEngine -->|"retire"| retiredBelief["Retired belief"]
+  forgettingEngine -->|"prune"| prunedGraph["Pruned graph"]

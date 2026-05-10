@@ -89,6 +89,12 @@ export const Topics = {
   /** Raw structured log records from monitored services. */
   TELEMETRY_LOGS_RAW: "telemetry.logs.raw",
 
+  /**
+   * Raw service metadata snapshots and project events collected from vendor
+   * management APIs (e.g. Aiven service state, project audit events).
+   */
+  TELEMETRY_METADATA_RAW: "telemetry.metadata.raw",
+
   /** Raw distributed trace spans from OTEL exporters. */
   TELEMETRY_TRACES_RAW: "telemetry.traces.raw",
 
@@ -166,6 +172,7 @@ export const TOPIC_CONFIGS: ReadonlyArray<TopicConfig> = [
   // Telemetry tier (Diskless)
   { name: Topics.TELEMETRY_METRICS_RAW, partitions: 24, retentionMs: 7 * 86_400_000, replicationFactor: 3, diskless: true },
   { name: Topics.TELEMETRY_LOGS_RAW, partitions: 24, retentionMs: 7 * 86_400_000, replicationFactor: 3, diskless: true },
+  { name: Topics.TELEMETRY_METADATA_RAW, partitions: 6, retentionMs: 30 * 86_400_000, replicationFactor: 3, diskless: true },
   { name: Topics.TELEMETRY_TRACES_RAW, partitions: 12, retentionMs: 3 * 86_400_000, replicationFactor: 3, diskless: true },
   { name: Topics.TELEMETRY_EVENTS_NORMALIZED, partitions: 12, retentionMs: 14 * 86_400_000, replicationFactor: 3, diskless: true },
 

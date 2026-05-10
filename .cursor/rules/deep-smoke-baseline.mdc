@@ -1,0 +1,17 @@
+---
+description: Keep the deep smoke baseline aligned with runtime development
+alwaysApply: true
+---
+
+# Deep Smoke Baseline
+
+When adding or changing apps, workers, packages, Kafka topics, storage schemas, or major runtime flows, update the automated deep smoke baseline as part of the same work.
+
+Maintain these entry points together:
+
+- `pnpm smoke:packages` for build, typecheck, unit-test, and package entrypoint import coverage.
+- `pnpm smoke:deep` for headless integration coverage, runtime assertions, logs, and baseline reports.
+- `scripts/smoke/deep-smoke.ts` for service orchestration, coverage evidence, assertions, and report generation.
+- Smoke traffic drivers under `scripts/smoke/`, especially when new flows need representative input.
+
+The deep smoke report must remain honest about evidence levels. Do not treat `entrypoint-import` as behavioral validation. Add runtime probes or focused tests when a package gains a new purpose that is not exercised by existing cognitive, consolidation, telemetry, pattern, or reinforcement flows.

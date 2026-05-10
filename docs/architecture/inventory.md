@@ -1,0 +1,120 @@
+---
+title: Stage Implementation Inventory
+category: architecture
+status: living
+---
+
+# Stage Implementation Inventory
+
+This matrix records the implementation status of each stage: the primary packages, corresponding architecture documentation, articles, and paper chapters. It is updated as each stage lands.
+
+**Status key:** `implemented` = TypeScript sources exist and build; `partial` = some packages present; `doc-only` = referenced in docs but no code on disk.
+
+**Evidence note:** `implemented` is a source and build status, not a claim of production readiness, behavioral completeness, or longitudinal validation. Runtime demonstrations, smoke coverage, and empirical evaluation are tracked separately in tests, smoke reports, companion demos, and paper evaluation notes.
+
+---
+
+## Series I: Self-Modifying Cognitive Architectures
+
+| Stage | Name | Primary packages / apps | Architecture doc(s) | Article | Paper chapter | Status |
+|-------|------|-------------------------|---------------------|-------|---------------|--------|
+| 1 | Experience Ingestion | `apps/workers/ingestion/`, `packages/core-types/`, `packages/kafka-bus/`, `packages/memory-opensearch/`, `packages/memory-objectstore/`, `packages/telemetry-otel/` | `kafka-pipeline.md`, `opensearch-schema.md`, `opensearch-topology.md`, `otel-observability.md`, `aiven-deployment.md` | `articles/article-01-experience-ingestion.md` | `paper/01-foundations.md` | implemented |
+| 2 | Memory Retrieval | `packages/memory-opensearch/`, `packages/retrieval-engine/` | `opensearch-schema.md`, `opensearch-topology.md` | pending | `paper/02-memory-substrate.md` | implemented |
+| 3 | Consolidation Worker | `apps/workers/consolidation/`, `packages/consolidation-engine/` | `consolidation-worker.md`, `kafka-pipeline.md` | pending | `paper/02-memory-substrate.md` (§2.6) | implemented |
+| 4 | Policy Engine | `packages/policy-engine/` | none | pending | `paper/03-policy-drift.md` | implemented |
+| 5 | Cognitive Agent Loop | `apps/orchestrator/`, `packages/agents/` | `agent-runtime.md` | pending | `paper/01-foundations.md` (§1.8) | implemented |
+| 6 | Multi-Agent Decomposition | `packages/agents/` | `agent-runtime.md` | pending | `paper/04-multi-agent.md` | implemented |
+| 7 | Internal Debate and Arbitration | `packages/agents/` | `agent-runtime.md` | pending | `paper/04-multi-agent.md` (§4.10) | implemented |
+| 8 | Self-Reflection Loop | `packages/metacog-engine/` | none | pending | `paper/14-meta-cognition.md` | implemented |
+| 9 | Reinforcement Scoring Engine | `packages/reinforcement-engine/` | `reinforcement-engine.md` | pending | `paper/03-policy-drift.md` (§3.5) | implemented |
+| 10 | Identity Formation | `packages/narrative-engine/` | none | pending | `paper/07-stability-emergence.md` | implemented |
+| 11 | World Model | `packages/world-model/` | none | pending | `paper/05-world-models-goals.md` | implemented |
+| 12 | Long-Horizon Goals | `packages/agents/` | none | pending | `paper/05-world-models-goals.md` (§5.8) | implemented |
+| 13 | Multi-Agent Society | `apps/orchestrator/`, `infra/k8s/` | `agent-runtime.md`, `aiven-deployment.md` | pending | `paper/04-multi-agent.md` (§4.14) | implemented |
+
+### Architecture coverage gaps: Series I
+
+The following stages have implemented code but no dedicated architecture document. Adding architecture docs for these stages is recommended before publishing the corresponding paper chapters.
+
+- Stage 4 (Policy Engine): policy vector store, reward delta computation, clamped drift update, version snapshots.
+- Stage 10 (Identity Formation): long-running identity vector accumulation, narrative self-model synthesis, coherence scoring.
+- Stage 11 (World Model): LLM-driven outcome simulation, risk scoring, prediction record schema.
+- Stage 12 (Long-Horizon Goals): goal hierarchy schema, decomposition strategy, progress event schema.
+
+The Series I table also references several planned cross-cutting architecture documents that are not yet present on disk. Until those documents exist, treat those references as doc debt rather than published specifications.
+
+---
+
+## Series II: Emergent Cognitive Systems
+
+| Stage | Name | Primary packages / apps | Architecture doc(s) | Article | Paper chapter | Status |
+|-------|------|-------------------------|---------------------|-------|---------------|--------|
+| 14 | Attention Engine | `packages/attention-engine/` | `attention-modes.md` | pending | `paper/08-attention.md` | implemented |
+| 15 | Temporal Cognition | `packages/temporal-engine/` | none | pending | `paper/09-temporal-cognition.md` | implemented |
+| 16 | Cognitive Economics | `packages/budget-engine/` | none | pending | `paper/10-cognitive-economics.md` | implemented |
+| 17 | Forgetting System | `packages/decay-engine/` | none | pending | `paper/11-forgetting.md` | implemented |
+| 18 | Affect Modulation | `packages/affect-engine/` | `multi-circuit-reward.md` | pending | `paper/12-emotional-modulation.md` | implemented |
+| 19 | Narrative Selfhood | `packages/narrative-engine/` | none | pending | `paper/13-narrative-selfhood.md` | implemented |
+| 20 | Meta-Cognition | `packages/metacog-engine/` | none | pending | `paper/14-meta-cognition.md` | implemented |
+| 21 | Social Cognition | `packages/social-engine/` | none | pending | `paper/15-social-intelligence.md` | implemented |
+| 22 | Grounded Cognition | `packages/grounding-engine/` | none | pending | `paper/16-grounded-cognition.md` | implemented |
+| 23 | Constitutional Stability | `packages/constitution-engine/` | none | pending | `paper/17-constitutional-stability.md` | implemented |
+| 24 | Causal Intelligence | `packages/causal-engine/` | none | pending | `paper/18-causal-intelligence.md` | implemented |
+| 25 | Curiosity Engine | `packages/curiosity-engine/` | none | pending | `paper/19-curiosity.md` | implemented |
+| 26 | Dreaming System | `packages/dream-engine/` | none | pending | `paper/20-dreaming.md` | implemented |
+| 27 | Recursive Abstraction | `packages/abstraction-engine/` | none | pending | `paper/21-recursive-abstraction.md` | implemented |
+| 28 | Developmental Cognition | `packages/development-engine/` | none | pending | `paper/22-developmental-cognition.md` | implemented |
+| 29 | Open-Ended Intelligence | `apps/orchestrator/` (open-ended mode) | none | pending | `paper/23-open-ended-intelligence.md` | implemented |
+
+### Architecture coverage gaps: Series II
+
+Stages 15 through 29 each have implemented TypeScript packages but no dedicated architecture document. Recommended additions before Series II publication:
+
+- `architecture/temporal-engine.md`: timescale planning, urgency gradients, subjective computational time.
+- `architecture/budget-engine.md`: compute quota schema, utility threshold gating, fast/slow cognition modes.
+- `architecture/decay-engine.md`: retrieval suppression, compression hierarchies, graph pruning strategy.
+- `architecture/affect-engine.md` (extends `multi-circuit-reward.md`): global affect vector schema, mood-like state representation.
+- `architecture/constitution-engine.md`: invariant policy layer, mutation quarantine, immune monitoring.
+
+---
+
+## Series III: Operational Intelligence
+
+| Stage | Name | Primary packages / apps | Architecture doc(s) | Article | Paper chapter | Status |
+|-------|------|-------------------------|---------------------|-------|---------------|--------|
+| 30 | Operational Primitives | `packages/abstraction-engine/src/primitives/` | `operational-primitives.md` | `articles/article-31-operational-intelligence.md` | `paper/24-operational-primitives.md` | implemented |
+| 31 | ClickHouse Telemetry Layer | `infra/aiven/clickhouse.tf`, `packages/clickhouse-telemetry/` | `clickhouse-telemetry.md`, `aiven-deployment.md` | see Stage 30 article | see Stage 30 paper | implemented |
+| 32 | Telemetry Ingestion Worker | `apps/workers/telemetry/` | `kafka-pipeline.md` | see Stage 30 article | see Stage 30 paper | implemented |
+| 33 | Pattern Detection Worker | `apps/workers/pattern/` | `operational-primitives.md` | see Stage 30 article | see Stage 30 paper | implemented |
+| 34 | Reinforcement Feedback Worker | `apps/workers/reinforcement/` | `reinforcement-engine.md` | see Stage 30 article | see Stage 30 paper | implemented |
+| 35 | OpenSearch ML Inference Nodes | `infra/aiven/opensearch.tf`, `packages/memory-opensearch/src/ml-inference.ts`, `packages/retrieval-engine/src/retriever.ts` | `opensearch-ml-nodes.md` | none | none | implemented |
+| 36 | Intelligence Transfer | `packages/abstraction-engine/src/primitives/mapping-layer.ts` | `operational-primitives.md` | see Stage 30 article | see Stage 30 paper | implemented |
+
+---
+
+## Cross-cutting architecture documents
+
+The following documents cover concerns that span multiple stages. Existing documents are linked from this directory; planned documents are listed as doc debt until they are written.
+
+| Document | Status | Stages covered |
+|----------|--------|---------------|
+| `inventory.md` | existing | Stage status, source surfaces, article/paper mapping, and architecture doc debt |
+| `operational-primitives.md` | existing | Operational primitive taxonomy, mapping layer, pattern detection, transfer |
+| `clickhouse-telemetry.md` | existing | Reference telemetry warehouse topology and ClickHouse schema |
+| `opensearch-ml-nodes.md` | existing | OpenSearch ML inference placement and embedding/reranking topology |
+| `attention-modes.md` | existing draft | Attention mode model and salience routing concepts |
+| `multi-circuit-reward.md` | existing draft | Reinforcement and modulation signal model |
+| `salience.md` | existing draft | Salience scoring and selection concepts |
+| `branching-cognition.md` | existing draft | Branching cognition concepts |
+| `../glossary.md` | existing | Canonical term definitions referenced by articles and paper chapters |
+
+### Cross-cutting doc debt
+
+The following documents are referenced by stage rows or remain necessary for architecture readers, but are not yet published in `docs/architecture/`:
+
+- `aiven-deployment.md`: deployment of Kafka, OpenSearch, PostgreSQL, ClickHouse, K8s/KEDA compute, and observability stack.
+- `kafka-pipeline.md`: cognitive bus topology, topic namespaces, and cross-stage event flows.
+- `otel-observability.md`: distributed tracing and metric conventions across all stages.
+- `opensearch-schema.md`: index schemas for episodic memory, semantic memory, goals, agents, and policies.
+- `opensearch-topology.md`: heterogeneous node topology and memory placement strategy.
+- `agent-runtime.md`, `consolidation-worker.md`, `reinforcement-engine.md`, and per-engine Series II documents listed above.

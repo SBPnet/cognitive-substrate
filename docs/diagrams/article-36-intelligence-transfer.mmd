@@ -1,0 +1,8 @@
+flowchart LR
+  sourceEnvironment["Source environment"] -->|"learn"| patternLibrary["Pattern library"]
+  targetTelemetry["Target telemetry"] -->|"adapt"| systemMapping["System mapping"]
+  systemMapping -->|"emit"| targetPrimitives["Target primitives"]
+  patternLibrary -->|"match"| targetPrimitives
+  targetPrimitives -->|"detect"| transferredPattern["Transferred pattern"]
+  transferredPattern -->|"recommend"| localRecommendation["Local recommendation"]
+  localRecommendation -->|"calibrate"| localConfidence["Local confidence"]

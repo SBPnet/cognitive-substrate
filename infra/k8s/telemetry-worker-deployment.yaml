@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cognitive-substrate-telemetry-worker
+  labels:
+    app.kubernetes.io/name: cognitive-substrate
+    app.kubernetes.io/component: telemetry-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cognitive-substrate
+      app.kubernetes.io/component: telemetry-worker
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cognitive-substrate
+        app.kubernetes.io/component: telemetry-worker
+    spec:
+      containers:
+        - name: telemetry-worker
+          image: cognitive-substrate/telemetry-worker:latest
+          imagePullPolicy: Never
+          env:
+            - name: ENVIRONMENT
+              value: dev
+            - name: KAFKA_GROUP_ID
+              value: telemetry-workers
+            - name: KAFKA_CLIENT_ID
+              value: telemetry-worker
+            - name: KAFKA_BROKERS
+              valueFrom:
+                secretKeyRef:
+                  name: cognitive-substrate-aiven
+                  key: kafka-brokers
+            - name: KAFKA_SSL
+              valueFrom:
+                secretKeyRef:
+                  name: cognitive-substrate-aiven
+                  key: kafka-ssl
+            - name: KAFKA_SASL_MECHANISM
+              valueFrom:
+                secretKeyRef:
+                  name: cognitive-substrate-aiven
+                  key: kafka-sasl-mechanism
+            - name: KAFKA_SASL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: cognitive-substrate-aiven
+                  key: kafka-username
+            - name: KAFKA_SASL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cognitive-substrate-aiven
+                  key: kafka-password
+            - name: CLICKHOUSE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: cognitive-substrate-aiven
+                  key: clickhouse-url
+            - name: CLICKHOUSE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: cognitive-substrate-aiven
+                  key: clickhouse-username
+            - name: CLICKHOUSE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cognitive-substrate-aiven
+                  key: clickhouse-password
+            - name: CLICKHOUSE_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: cognitive-substrate-aiven
+                  key: clickhouse-database
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi

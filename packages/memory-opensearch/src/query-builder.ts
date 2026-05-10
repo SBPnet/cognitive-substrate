@@ -14,6 +14,23 @@
 
 import type { PolicyState } from "@cognitive-substrate/core-types";
 
+/**
+ * Retrieval mode controls which vector field is used for k-NN recall.
+ *   quality   — embedding_qwen (Qwen3 family)
+ *   efficient — embedding_nomic (Nomic Embed Text v2)
+ *   hybrid    — embedding_bge_m3 (BGE-M3 dense vector)
+ *   legacy    — embedding (backward-compat single-vector field)
+ */
+export type RetrievalMode = "quality" | "efficient" | "hybrid" | "legacy";
+
+/** Maps each retrieval mode to its OpenSearch knn_vector field name. */
+export const RETRIEVAL_MODE_VECTOR_FIELD: Record<RetrievalMode, string> = {
+  quality:   "embedding_qwen",
+  efficient: "embedding_nomic",
+  hybrid:    "embedding_bge_m3",
+  legacy:    "embedding",
+};
+
 export interface HybridQueryOptions {
   /** Free-text query for BM25 matching. */
   readonly queryText: string;
@@ -47,6 +64,12 @@ export interface HybridQueryOptions {
 
   /** Whether the target index supports tag filtering. */
   readonly includeTagFilter?: boolean;
+
+  /**
+   * Retrieval mode — selects the knn_vector field for semantic recall.
+   * Defaults to "legacy" for backward compat.
+   */
+  readonly retrievalMode?: RetrievalMode;
 }
 
 /**
@@ -64,6 +87,7 @@ export function buildHybridQuery(options: HybridQueryOptions): Record<string, un
     textFields = ["summary", "generalization"],
     timestampField = "created_at",
     includeTagFilter = true,
+    retrievalMode = "legacy",
   } = options;
 
   const retrievalBias = policy?.retrievalBias ?? 0.5;
@@ -120,7 +144,9 @@ export function buildHybridQuery(options: HybridQueryOptions): Record<string, un
       },
     },
     _source: {
-      excludes: ["embedding"],
+      // Exclude all vector fields — large blobs not needed in result sources.
+      // retrievalMode is used by callers to select the right field for kNN queries.
+      excludes: [RETRIEVAL_MODE_VECTOR_FIELD[retrievalMode], "embedding", "embedding_qwen", "embedding_nomic", "embedding_bge_m3"],
     },
   };
 }

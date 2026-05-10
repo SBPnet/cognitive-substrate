@@ -32,12 +32,15 @@ export async function startWorker(): Promise<void> {
   log("Ensuring ClickHouse tables exist...");
   await clickhouse.ensureTables();
 
+  // High-volume metric tier: audit mirroring would re-publish every raw metric
+  // message onto the audit topic, doubling bus throughput for no diagnostic gain.
   const producer = new CognitiveProducer({ kafka, enableAuditMirror: false });
   await producer.connect();
 
+  const kafkaGroupId = process.env["KAFKA_GROUP_ID"] ?? "telemetry-workers";
   const consumer = new CognitiveConsumer({
     kafka,
-    groupId: process.env["KAFKA_GROUP_ID"] ?? "telemetry-workers",
+    groupId: kafkaGroupId,
   });
   await consumer.connect();
 

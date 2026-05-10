@@ -1,0 +1,8 @@
+flowchart LR
+  externalTelemetry["External telemetry"] -->|"ingest"| groundedExperience["Grounded experience"]
+  worldPrediction["World prediction"] -->|"compare"| predictionError["Prediction error"]
+  groundedExperience -->|"compare"| predictionError
+  predictionError -->|"correct"| worldModel["World model"]
+  predictionError -->|"update"| memorySubstrate["Memory substrate"]
+  uncertaintyGap["Uncertainty gap"] -->|"probe"| activeInference["Active inference probe"]
+  activeInference -->|"observe"| groundedExperience

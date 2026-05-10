@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cognitive-substrate-orchestrator
+  labels:
+    app.kubernetes.io/name: cognitive-substrate
+    app.kubernetes.io/component: orchestrator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cognitive-substrate
+      app.kubernetes.io/component: orchestrator
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cognitive-substrate
+        app.kubernetes.io/component: orchestrator
+    spec:
+      containers:
+        - name: orchestrator
+          image: cognitive-substrate/orchestrator:latest
+          imagePullPolicy: Never
+          env:
+            - name: KAFKA_GROUP_ID
+              value: orchestrators
+            - name: KAFKA_CLIENT_ID
+              value: orchestrator
+            - name: KAFKA_BROKERS
+              valueFrom:
+                secretKeyRef:
+                  name: cognitive-substrate-aiven
+                  key: kafka-brokers
+            - name: KAFKA_SSL
+              valueFrom:
+                secretKeyRef:
+                  name: cognitive-substrate-aiven
+                  key: kafka-ssl
+            - name: KAFKA_SASL_MECHANISM
+              valueFrom:
+                secretKeyRef:
+                  name: cognitive-substrate-aiven
+                  key: kafka-sasl-mechanism
+            - name: KAFKA_SASL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: cognitive-substrate-aiven
+                  key: kafka-username
+            - name: KAFKA_SASL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cognitive-substrate-aiven
+                  key: kafka-password
+            - name: OPENSEARCH_URL
+              valueFrom:
+                secretKeyRef:
+                  name: cognitive-substrate-aiven
+                  key: opensearch-url
+            - name: OPENSEARCH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: cognitive-substrate-aiven
+                  key: opensearch-username
+            - name: OPENSEARCH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cognitive-substrate-aiven
+                  key: opensearch-password
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: cognitive-substrate-aiven
+                  key: otel-endpoint
+                  optional: true
+            - name: EMBEDDING_DIMENSION
+              value: "1536"
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi

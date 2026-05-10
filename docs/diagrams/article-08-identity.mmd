@@ -1,0 +1,7 @@
+flowchart LR
+  reinforcementHistory["Reinforcement history"] -->|"accumulate"| identityVector["Identity vector"]
+  policyHistory["Policy history"] -->|"stabilize"| identityVector
+  identityVector -->|"synthesize"| narrativeModel["Narrative self model"]
+  narrativeModel -->|"score"| coherenceScore["Coherence score"]
+  coherenceScore -->|"emit"| identityUpdated["identity.updated"]
+  identityUpdated -->|"hydrate"| agentContext["Agent context"]

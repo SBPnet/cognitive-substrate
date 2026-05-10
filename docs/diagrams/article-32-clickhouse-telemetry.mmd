@@ -1,0 +1,9 @@
+flowchart LR
+  rawMetrics["Raw metrics"] -->|"append"| metricsRaw["metrics_raw"]
+  rawLogs["Raw logs"] -->|"append"| logsRaw["logs_raw"]
+  rawTraces["Raw traces"] -->|"append"| tracesRaw["traces_raw"]
+  primitiveEvents["Primitive events"] -->|"append"| cognitiveEvents["cognitive_events"]
+  recommendationOutcomes["Recommendation outcomes"] -->|"append"| patternOutcomes["pattern_outcomes"]
+  incidentSignals["Incident signals"] -->|"append"| incidentReconstruction["incident_reconstruction"]
+  cognitiveEvents -->|"analyze"| replayQueries["Replay queries"]
+  patternOutcomes -->|"analyze"| replayQueries

@@ -11,10 +11,28 @@ services on Kafka and OpenSearch, with a research paper and per-stage articles
 written alongside the code so the design and the implementation can keep each
 other honest.
 
-It is early. Stage 1 (experience ingestion) is implemented end to end. The
-later stages exist as package skeletons, architecture notes, and draft
-articles. The roadmap in `docs/roadmap.md` is the source of truth for what is
-actually wired up versus what is still on paper.
+It is early. Stage 1 (experience ingestion) has the strongest end-to-end
+evidence: Kafka consumption, embedding, OpenSearch indexing, object-store
+archive, downstream emission, and a runnable companion demo. Later stages range
+from buildable TypeScript surfaces to architecture drafts and article outlines.
+`docs/architecture/inventory.md` is the source of truth for implementation
+status, and its status labels distinguish source availability from behavioral
+validation.
+
+## Vendor-neutral infrastructure
+
+The core pipeline is bound to **protocols and URLs**, not to a single cloud or
+vendor. You need Kafka-compatible brokers, OpenSearch-compatible HTTP APIs,
+S3-compatible object storage, PostgreSQL for coordination, and ClickHouse (or
+another warehouse if you adapt the telemetry writers). Services are reached
+through ordinary connection strings and environment variables—there is no
+proprietary substrate SDK in the main path.
+
+For local development and CI, `docker-compose.smoke.yml` runs an OSS-shaped
+stack (Apache Kafka in KRaft mode, OpenSearch, PostgreSQL, ClickHouse, MinIO,
+plus optional helpers). For managed infrastructure, `infra/aiven/` is one
+reference Terraform layout the maintainer uses for testing; the same code runs
+elsewhere by swapping endpoints and credentials.
 
 ## Why "substrate" and not "agent framework"
 
@@ -47,16 +65,15 @@ equivalence, sentience, or AGI.
 
 ## What is actually working
 
-| Stage | Status | Notes |
-|-------|--------|-------|
-| 1. Experience ingestion | Implemented | Kafka consumer, embedding, OpenSearch index, object-store write, downstream emit. Has a runnable companion demo under `docs/articles/companions/article-01-experience-ingestion/`. |
-| 2. Memory retrieval | Skeleton | Hybrid retrieval client exists, full policy-weighted query path is in progress. |
-| 3. Consolidation | Skeleton | Worker scaffolded, replay/abstraction logic not implemented. |
-| 4-29. Everything else | Documented | Package directories, architecture notes, and draft articles exist. Code is mostly stubs. |
+| Stage range | Evidence level | Notes |
+|-------------|----------------|-------|
+| Stage 1 | Runtime-demonstrated | Kafka consumer, embedding, OpenSearch index, object-store write, downstream emit, and runnable companion demo under `docs/articles/companions/article-01-experience-ingestion/`. |
+| Stages 2-29 | Build-level implementation varies by package | TypeScript sources exist for many engines, but most stages still need deeper behavioral validation, architecture docs, and public article expansion. |
+| Stages 30-36 | Build-level implementation with focused operational flows | Telemetry, primitive mapping, pattern detection, reinforcement feedback, and transfer surfaces are present, but transfer and recommendation quality remain hypotheses until replay and longitudinal evaluation are complete. |
 
-If a package directory exists but the corresponding stage table entry above
-does not say "Implemented", treat it as a design surface, not a working
-component.
+If a package directory exists, treat that as evidence of a buildable design
+surface, not proof of production readiness. The inventory separates source
+presence from smoke coverage and behavioral evaluation.
 
 ## Repository layout
 
@@ -71,7 +88,7 @@ apps/
     reinforcement/       Stage 9: reinforcement scoring
     pattern/             Operational pattern detection
     telemetry/           Telemetry ingestion
-    aiven-collector/     Pull service metrics from Aiven into the pipeline
+    aiven-collector/     Optional collector for managed-service metrics APIs into the pipeline
 
 packages/
   core-types/            Shared event and policy types
@@ -89,7 +106,8 @@ packages/
   ... (more engines under packages/, mostly skeletons for later stages)
 
 infra/
-  aiven/                 Terraform for Kafka, OpenSearch, PostgreSQL, ClickHouse on Aiven
+  README.md              How portable runtime contracts map to example IaC
+  aiven/                 Example Terraform for managed Kafka, OpenSearch, PostgreSQL, ClickHouse
   k8s/                   Kubernetes manifests and KEDA scalers
   opensearch/            Index templates and ISM policies
   kafka/                 Topic and ACL declarations
@@ -103,7 +121,8 @@ docs/
   strategy/              OSS, partnership, and commercial strategy notes
   style-guide.md         Editorial rules for everything under docs/
   glossary.md            Canonical terminology
-  roadmap.md             Stage-by-stage plan with dependencies
+  architecture/inventory.md
+                          Stage-by-stage implementation status and doc debt
 ```
 
 ## Running it
@@ -112,9 +131,9 @@ docs/
 
 - Node.js 22 or newer
 - pnpm 10 or newer
-- Docker (for the local OpenSearch + Kafka smoke stack)
-- An Aiven account if you want to point at managed services instead of
-  local containers
+- Docker (for `docker-compose.smoke.yml`: full local stack used by smoke tests)
+- Optional: any reachable Kafka, OpenSearch, PostgreSQL, ClickHouse, and
+  S3-compatible storage matching your `.env` settings (managed or self-hosted)
 
 ### Install and build
 
@@ -169,31 +188,43 @@ pnpm --filter @cognitive-substrate/web dev
 
 If you want the design rationale, start here:
 
-- `docs/roadmap.md` for the stage list and what depends on what.
+- `docs/architecture/inventory.md` for the stage list, implementation status,
+  evidence level, and missing architecture docs.
 - `docs/paper/` for the research paper chapters (in progress).
 - `docs/articles/index.md` for the public reading order of the per-stage
   articles.
 - `docs/architecture/` for infrastructure deep dives, especially
-  `aiven-deployment.md`, `kafka-pipeline.md`, and `opensearch-schema.md`.
+  `inventory.md`, `operational-primitives.md`, `opensearch-ml-nodes.md`, and
+  `clickhouse-telemetry.md`.
 - `docs/glossary.md` if a term in the code or articles feels overloaded.
 
-## Reference deployment on Aiven
+## Deployment options
 
-The intended production target is a set of Aiven managed services. Local
-development uses Docker containers with the same shape.
+Swap implementations by changing environment variables; the code paths stay the
+same. The table below maps each concern to an interface, what the local compose
+file provides, and examples of where else it can run.
 
-| Service                       | Role                                                             |
-|-------------------------------|------------------------------------------------------------------|
-| Aiven for Apache Kafka        | Cognitive event bus                                              |
-| Aiven for OpenSearch          | Associative memory and operational pattern library               |
-| Aiven for ClickHouse          | Cognition observability warehouse                                |
-| Aiven for PostgreSQL          | Relational coordination store                                    |
-| S3-compatible object storage  | Episodic truth archive                                           |
+| Concern | Interface | Local reference (`docker-compose.smoke.yml`) | Other examples |
+|---------|-----------|---------------------------------------------|----------------|
+| Event bus | Kafka API | `kafka` → `localhost:9092` | MSK, Confluent Cloud, Redpanda (Kafka-compatible), self-hosted Kafka |
+| Associative memory | OpenSearch HTTP | `opensearch` → `localhost:9200` | Amazon OpenSearch Service, Elastic Cloud, self-hosted OpenSearch |
+| Episodic archive | S3 API | MinIO → port `9001` | AWS S3, Cloudflare R2, MinIO, any S3-compatible endpoint |
+| Telemetry warehouse | ClickHouse client / HTTP | `clickhouse` → `8123` / `9000` | ClickHouse Cloud, managed ClickHouse, self-hosted |
+| Coordination | PostgreSQL | `postgres` → `localhost:5432` | RDS, Cloud SQL, self-hosted Postgres |
 
-Terraform lives in `infra/aiven/`. Architectural notes live in
-`docs/architecture/aiven-deployment.md`.
+### Example Terraform (Aiven)
+
+The maintainer keeps Terraform under `infra/aiven/` as **one** convenient
+managed stack that matches the shape above. It is not the only valid
+production layout. Architectural notes are currently split between
+`infra/README.md`, `docs/architecture/inventory.md`, and the concrete Terraform
+under `infra/aiven/`.
 
 ## Contributing
+
+This project is maintained independently. It is not an official offering of any
+employer unless explicitly stated elsewhere. Product and service names appear
+only to identify compatible third-party implementations.
 
 Issues and discussion are welcome. Code contributions are welcome with one
 caveat: see the license. This is not Apache 2.0. It is intentionally limited

@@ -1,0 +1,8 @@
+flowchart LR
+  telemetryRaw["telemetry.metrics.raw"] -->|"persist"| metricsRaw["metrics_raw"]
+  telemetryRaw -->|"group"| serviceGroups["Service groups"]
+  serviceGroups -->|"map"| systemMapping["System mapping"]
+  systemMapping -->|"normalize"| primitiveEvents["Primitive events"]
+  primitiveEvents -->|"write"| cognitiveEvents["cognitive_events"]
+  primitiveEvents -->|"publish"| cognitionPrimitives["cognition.primitives"]
+  systemMapping -->|"publish"| telemetryNormalized["telemetry.events.normalized"]

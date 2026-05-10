@@ -32,6 +32,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@cognitive-substrate/aiven-client':
+        specifier: workspace:*
+        version: link:../../packages/aiven-client
       '@cognitive-substrate/core-types':
         specifier: workspace:*
         version: link:../../packages/core-types
@@ -137,6 +140,28 @@ importers:
       tailwindcss:
         specifier: ^4.1.6
         version: 4.2.4
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
+
+  apps/workers/aiven-collector:
+    dependencies:
+      '@cognitive-substrate/aiven-client':
+        specifier: workspace:*
+        version: link:../../../packages/aiven-client
+      '@cognitive-substrate/kafka-bus':
+        specifier: workspace:*
+        version: link:../../../packages/kafka-bus
+      '@cognitive-substrate/telemetry-otel':
+        specifier: workspace:*
+        version: link:../../../packages/telemetry-otel
+      '@opentelemetry/api':
+        specifier: ^1.9.0
+        version: 1.9.1
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.19.18
       typescript:
         specifier: ^5.5.0
         version: 5.9.3
@@ -273,6 +298,9 @@ importers:
       '@cognitive-substrate/clickhouse-telemetry':
         specifier: workspace:*
         version: link:../../../packages/clickhouse-telemetry
+      '@cognitive-substrate/core-types':
+        specifier: workspace:*
+        version: link:../../../packages/core-types
       '@cognitive-substrate/kafka-bus':
         specifier: workspace:*
         version: link:../../../packages/kafka-bus
@@ -339,6 +367,15 @@ importers:
       '@opensearch-project/opensearch':
         specifier: ^2.7.0
         version: 2.13.0
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.19.18
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
+
+  packages/aiven-client:
     devDependencies:
       '@types/node':
         specifier: ^22.0.0

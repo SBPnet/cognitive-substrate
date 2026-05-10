@@ -1,0 +1,9 @@
+from: markdown
+to: pdf
+standalone: true
+metadata:
+  title: Cognitive Substrate Whitepaper v0.1
+  author: Cognitive Substrate Contributors
+variables:
+  geometry: margin=1in
+  fontsize: 11pt

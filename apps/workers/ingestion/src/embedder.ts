@@ -4,10 +4,15 @@
  * The production implementation calls an OpenAI-compatible embeddings endpoint.
  * The interface is kept thin so that alternative embedding providers (local
  * models, Cohere, Vertex AI) can be substituted without changing the worker logic.
+ *
+ * Multi-profile factory: buildEmbeddersFromProfiles() builds one EmbeddingClient
+ * per active EmbeddingProfile so that multiple model families can be embedded and
+ * indexed in a single pipeline pass.
  */
 
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
+import type { EmbeddingProfile } from "@cognitive-substrate/memory-opensearch";
 
 const execFileAsync = promisify(execFile);
 
@@ -118,15 +123,8 @@ export class VertexEmbeddingClient implements EmbeddingClient {
         Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify({
-        instances: [
-          {
-            content: text,
-            task_type: "RETRIEVAL_DOCUMENT",
-          },
-        ],
-        parameters: {
-          outputDimensionality: this.config.dimension,
-        },
+        instances: [{ content: text, task_type: "RETRIEVAL_DOCUMENT" }],
+        parameters: { outputDimensionality: this.config.dimension },
       }),
     });
 
@@ -138,11 +136,7 @@ export class VertexEmbeddingClient implements EmbeddingClient {
     }
 
     const data = (await response.json()) as {
-      predictions?: Array<{
-        embeddings?: {
-          values?: number[];
-        };
-      }>;
+      predictions?: Array<{ embeddings?: { values?: number[] } }>;
     };
     const embedding = data.predictions?.[0]?.embeddings?.values;
     if (!embedding) throw new Error("Vertex embedding response contained no data");
@@ -175,4 +169,53 @@ export class StubEmbeddingClient implements EmbeddingClient {
   async embed(_text: string): Promise<ReadonlyArray<number>> {
     return new Array(this.dimension).fill(0) as number[];
   }
+}
+
+// ---------------------------------------------------------------------------
+// Multi-profile factory
+// ---------------------------------------------------------------------------
+
+export interface ProfiledEmbeddingClient {
+  readonly profile: EmbeddingProfile;
+  readonly client: EmbeddingClient;
+}
+
+/**
+ * Builds one EmbeddingClient per profile.  Falls back to StubEmbeddingClient
+ * for any profile whose provider is "stub" or "ml_commons" (ML Commons handles
+ * embedding inside OpenSearch; the worker passes zeros as a placeholder).
+ */
+export function buildEmbeddersFromProfiles(
+  profiles: EmbeddingProfile[],
+): ProfiledEmbeddingClient[] {
+  return profiles.map((profile) => ({
+    profile,
+    client: clientForProfile(profile),
+  }));
+}
+
+function clientForProfile(profile: EmbeddingProfile): EmbeddingClient {
+  if (profile.provider === "stub" || profile.provider === "ml_commons") {
+    return new StubEmbeddingClient(profile.dimension);
+  }
+
+  if (profile.provider === "openai_compat") {
+    return new OpenAIEmbeddingClient({
+      apiKey:    profile.apiKey ?? "",
+      model:     profile.modelId ?? "",
+      dimension: profile.dimension,
+      endpoint:  profile.endpoint ?? "http://localhost:11434/v1/embeddings",
+    });
+  }
+
+  if (profile.provider === "vertex") {
+    return new VertexEmbeddingClient({
+      projectId: process.env["GCP_PROJECT_ID"] ?? process.env["GOOGLE_CLOUD_PROJECT"] ?? "",
+      location:  process.env["GCP_LOCATION"] ?? "us-central1",
+      model:     profile.modelId ?? "gemini-embedding-001",
+      dimension: profile.dimension,
+    });
+  }
+
+  return new StubEmbeddingClient(profile.dimension);
 }

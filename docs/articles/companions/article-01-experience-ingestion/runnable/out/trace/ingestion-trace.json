@@ -1,0 +1,69 @@
+[
+  {
+    "stage": "receive_raw_experience",
+    "concept": "The pipeline starts from a structured event, not an untyped log line.",
+    "mirrorsProduction": "ExperienceEvent is the unit consumed by the ingestion worker.",
+    "fields": [
+      "eventId",
+      "timestamp",
+      "type",
+      "context",
+      "input",
+      "internalState",
+      "action",
+      "result",
+      "evaluation",
+      "importanceScore",
+      "tags"
+    ]
+  },
+  {
+    "stage": "embed_input",
+    "concept": "Text is converted into a vector so semantically related events can be retrieved.",
+    "mirrorsProduction": "The production worker calls config.embedder.embed(rawEvent.input.text).",
+    "simplification": "The demo uses a deterministic eight-dimensional vector rather than an external model.",
+    "embeddingDimension": 8,
+    "embeddingPreview": [
+      0.51,
+      0.68,
+      0.85,
+      0.02
+    ]
+  },
+  {
+    "stage": "score_importance",
+    "concept": "A provisional priority is computed before later consolidation and reinforcement.",
+    "mirrorsProduction": "The demo uses the same weighting scheme as the ingestion scorer.",
+    "importanceScore": 0.79,
+    "signals": {
+      "eventType": "user_input",
+      "tags": 3,
+      "hasAction": true,
+      "success": true
+    }
+  },
+  {
+    "stage": "derive_object_key",
+    "concept": "The full event is addressable by a deterministic key based on event ID and timestamp.",
+    "mirrorsProduction": "The key format matches the memory-objectstore eventKey helper.",
+    "objectStorageKey": "events/2026/05/08/demo-event-001.json"
+  },
+  {
+    "stage": "separate_truth_from_retrieval",
+    "concept": "The archive keeps full causal detail while the index keeps compact retrieval metadata.",
+    "mirrorsProduction": "The production worker writes the enriched event to object storage and metadata plus embedding to OpenSearch.",
+    "simplification": "Local JSON files stand in for S3 and OpenSearch.",
+    "archiveContainsReasoning": true,
+    "indexContainsPointer": true
+  },
+  {
+    "stage": "emit_downstream_messages",
+    "concept": "Compact Kafka-style messages announce enrichment and indexing without duplicating the full event.",
+    "mirrorsProduction": "The payload fields and topic names match the ingestion worker's downstream messages.",
+    "simplification": "The demo writes topic payloads to files rather than publishing to Kafka.",
+    "topics": [
+      "experience.enriched",
+      "memory.indexed"
+    ]
+  }
+]

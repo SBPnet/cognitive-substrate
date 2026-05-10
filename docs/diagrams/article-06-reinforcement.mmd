@@ -1,0 +1,7 @@
+flowchart LR
+  evaluatedExperience["Evaluated experience"] -->|"extract"| reinforcementFactors["Reinforcement factors"]
+  reinforcementFactors -->|"score"| reinforcementScore["Reinforcement score"]
+  reinforcementScore -->|"update"| retrievalPriority["Retrieval priority"]
+  reinforcementScore -->|"vote"| policyVote["Policy vote"]
+  reinforcementScore -->|"pressure"| identitySignal["Identity signal"]
+  retrievalPriority -->|"shape"| futureRecall["Future recall"]

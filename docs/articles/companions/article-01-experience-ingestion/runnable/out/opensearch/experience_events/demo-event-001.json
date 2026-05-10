@@ -1,0 +1,28 @@
+{
+  "event_id": "demo-event-001",
+  "timestamp": "2026-05-08T22:31:25.237Z",
+  "event_type": "user_input",
+  "session_id": "demo-session-001",
+  "summary": "Design a memory system that preserves complete experience while supporting fast associative retrieval.",
+  "embedding": [
+    0.51,
+    0.68,
+    0.85,
+    0.02,
+    0.19,
+    0.36,
+    0.53,
+    0.7
+  ],
+  "importance_score": 0.79,
+  "reward_score": 0.81,
+  "confidence": 0.72,
+  "retrieval_count": 0,
+  "decay_factor": 1,
+  "object_storage_key": "events/2026/05/08/demo-event-001.json",
+  "tags": [
+    "memory",
+    "ingestion",
+    "demo"
+  ]
+}

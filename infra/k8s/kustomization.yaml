@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: cognitive
+
+resources:
+  - cognitive-namespace.yaml
+  - api-deployment.yaml
+  - orchestrator-deployment.yaml
+  - consolidation-worker-deployment.yaml
+  - ingestion-worker-deployment.yaml
+  - telemetry-worker-deployment.yaml
+  - pattern-worker-deployment.yaml
+  - reinforcement-worker-deployment.yaml
+  - web-deployment.yaml

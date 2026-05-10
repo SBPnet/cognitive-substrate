@@ -1,0 +1,9 @@
+flowchart LR
+  cognitionPrimitives["cognition.primitives"] -->|"buffer"| primitiveWindow["Primitive window"]
+  operationalPatterns["operational_patterns"] -->|"load"| patternDetector["Pattern detector"]
+  primitiveWindow -->|"match"| patternDetector
+  seedPatterns["Seed patterns"] -->|"fallback"| patternDetector
+  patternDetector -->|"emit full"| patternMatch["Pattern match"]
+  patternDetector -->|"emit early"| precursorMatch["Precursor match"]
+  patternMatch -->|"recommend"| cognitionRecommendations["cognition.recommendations"]
+  precursorMatch -->|"recommend"| cognitionRecommendations

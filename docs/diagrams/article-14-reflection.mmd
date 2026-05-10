@@ -1,0 +1,8 @@
+flowchart LR
+  reasoningTrace["Reasoning trace"] -->|"inspect"| reflectionLoop["Reflection loop"]
+  debateTrace["Debate trace"] -->|"inspect"| reflectionLoop
+  outcomeRecord["Outcome record"] -->|"compare"| reflectionLoop
+  reflectionLoop -->|"classify"| failureMode["Failure mode"]
+  reflectionLoop -->|"estimate"| confidenceSignal["Confidence signal"]
+  failureMode -->|"propose"| selfmodProposal["selfmod.proposed"]
+  confidenceSignal -->|"propose"| selfmodProposal

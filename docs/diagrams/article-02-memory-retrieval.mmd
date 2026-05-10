@@ -1,0 +1,9 @@
+flowchart LR
+  queryInput["Current query"] -->|"lexical recall"| bm25Search["BM25 search"]
+  queryInput -->|"semantic recall"| vectorSearch["Vector search"]
+  bm25Search -->|"merge"| candidateSet["Candidate memories"]
+  vectorSearch -->|"merge"| candidateSet
+  policyState["Policy state"] -->|"weight"| rankingModel["Policy weighted ranking"]
+  candidateSet -->|"score"| rankingModel
+  rankingModel -->|"return"| activeContext["Active context"]
+  activeContext -->|"record"| retrievalFeedback["Retrieval feedback"]

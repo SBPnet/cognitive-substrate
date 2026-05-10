@@ -1,0 +1,9 @@
+flowchart LR
+  currentState["Current state"] -->|"condition"| worldModel["World model"]
+  candidateAction["Candidate action"] -->|"simulate"| worldModel
+  memoryContext["Memory context"] -->|"anchor"| worldModel
+  worldModel -->|"predict"| predictedOutcome["Predicted outcome"]
+  worldModel -->|"score"| riskScore["Risk score"]
+  worldModel -->|"estimate"| confidenceEstimate["Confidence estimate"]
+  predictedOutcome -->|"inform"| arbitration["Arbitration"]
+  riskScore -->|"penalize"| arbitration

@@ -1,0 +1,33 @@
+# ---------------------------------------------------------------------------
+# POC variable overrides for startup-tier Aiven services.
+# Copy this file to poc.auto.tfvars (git-ignored) and adjust as needed.
+#
+# Sensitive vars are set via environment:
+#   export TF_VAR_aiven_api_token="<token>"
+#   export TF_VAR_aiven_project="<project-name>"
+# ---------------------------------------------------------------------------
+
+environment = "dev"
+
+# Pick the Aiven cloud closest to your laptop to minimise RTT.
+# Options: aws-us-east-1, google-us-central1, google-europe-west1, etc.
+cloud_name = "aws-us-east-1"
+
+# Smallest viable plans for POC (check availability in your chosen cloud
+# via: aiven_service_type_plans in the MCP)
+kafka_plan      = "startup-4"  # startup-2 is deprecated for Kafka 3.9+
+opensearch_plan = "startup-4"
+postgres_plan   = "startup-4"   # hobbyist does not support pgbouncer config
+clickhouse_plan = "startup-16"
+
+# Replication factor: must be <= broker/shard count.
+# startup-2 Kafka has 2 brokers; rf=2 is valid. startup-4 supports rf=3.
+topic_replication        = 2
+topic_min_insync_replicas = 1
+
+# Disable ML node pools (Stage 35); set counts > 0 only when needed.
+opensearch_ml_embedding_node_count = 0
+opensearch_ml_reranker_node_count  = 0
+
+kafka_rest_enabled            = true
+kafka_schema_registry_enabled = true

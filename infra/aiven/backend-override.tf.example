@@ -1,0 +1,19 @@
+# ---------------------------------------------------------------------------
+# Local backend override for POC development.
+#
+# This file replaces the S3 backend declared in versions.tf so that
+# terraform state is stored on disk (terraform.tfstate) rather than in S3.
+#
+# Usage:
+#   cd infra/aiven
+#   terraform init -reconfigure
+#   terraform apply -var-file=poc.auto.tfvars
+#
+# DO NOT use this file in production; remove or rename it before
+# switching to the S3 backend.
+# ---------------------------------------------------------------------------
+terraform {
+  backend "local" {
+    path = "poc.tfstate"
+  }
+}

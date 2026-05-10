@@ -1,0 +1,46 @@
+{
+  "eventId": "demo-event-001",
+  "timestamp": "2026-05-08T22:31:25.237Z",
+  "type": "user_input",
+  "context": {
+    "sessionId": "demo-session-001",
+    "traceId": "demo-trace-001"
+  },
+  "input": {
+    "text": "Design a memory system that preserves complete experience while supporting fast associative retrieval.",
+    "embedding": [
+      0.51,
+      0.68,
+      0.85,
+      0.02,
+      0.19,
+      0.36,
+      0.53,
+      0.7
+    ]
+  },
+  "internalState": {
+    "confidence": 0.72,
+    "activePlan": "Compare object storage truth with OpenSearch retrieval metadata."
+  },
+  "action": {
+    "tool": "architecture_note",
+    "reasoning": "Capture the event before downstream learning changes its priority."
+  },
+  "result": {
+    "output": "Experience archived and indexed.",
+    "success": true,
+    "latencyMs": 42
+  },
+  "evaluation": {
+    "rewardScore": 0.81,
+    "selfAssessedQuality": 0.76
+  },
+  "importanceScore": 0.79,
+  "tags": [
+    "memory",
+    "ingestion",
+    "demo"
+  ],
+  "objectStorageKey": "events/2026/05/08/demo-event-001.json"
+}

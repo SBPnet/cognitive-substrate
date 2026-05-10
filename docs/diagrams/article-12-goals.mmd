@@ -1,0 +1,8 @@
+flowchart TD
+  metaGoals["Meta goals"] -->|"govern"| longGoals["Long goals"]
+  longGoals -->|"decompose"| midGoals["Mid goals"]
+  midGoals -->|"decompose"| shortGoals["Short goals"]
+  shortGoals -->|"decompose"| microGoals["Micro goals"]
+  microGoals -->|"guide"| nextAction["Next action"]
+  nextAction -->|"record"| goalProgress["goal.progress"]
+  goalProgress -->|"revise"| midGoals

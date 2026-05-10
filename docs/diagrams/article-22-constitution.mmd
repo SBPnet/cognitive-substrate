@@ -1,0 +1,8 @@
+flowchart LR
+  proposedAction["Proposed action"] -->|"check"| invariantLayer["Invariant policy layer"]
+  policyUpdate["Policy update"] -->|"check"| invariantLayer
+  selfmodProposal["Self modification proposal"] -->|"check"| invariantLayer
+  invariantLayer -->|"allow"| approvedChange["Approved change"]
+  invariantLayer -->|"quarantine"| quarantinedChange["Quarantined change"]
+  driftSignals["Drift signals"] -->|"monitor"| immuneMonitor["Cognitive immune monitor"]
+  immuneMonitor -->|"enforce"| invariantLayer

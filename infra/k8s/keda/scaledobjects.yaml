@@ -1,0 +1,110 @@
+# Bootstrap servers are substituted by scripts/k8s/apply-keda.sh (see BOOTSTRAP_SERVERS_PLACEHOLDER).
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: cognitive-substrate-ingestion-worker-scaler
+  namespace: cognitive
+spec:
+  scaleTargetRef:
+    name: cognitive-substrate-ingestion-worker
+  minReplicaCount: 1
+  maxReplicaCount: 5
+  pollingInterval: 30
+  triggers:
+    - type: kafka
+      metadata:
+        bootstrapServers: BOOTSTRAP_SERVERS_PLACEHOLDER
+        consumerGroup: ingestion-workers
+        topic: experience.raw
+        lagThreshold: "500"
+        offsetResetPolicy: latest
+      authenticationRef:
+        name: cognitive-substrate-kafka-trigger-auth
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: cognitive-substrate-consolidation-worker-scaler
+  namespace: cognitive
+spec:
+  scaleTargetRef:
+    name: cognitive-substrate-consolidation-worker
+  minReplicaCount: 1
+  maxReplicaCount: 5
+  pollingInterval: 30
+  triggers:
+    - type: kafka
+      metadata:
+        bootstrapServers: BOOTSTRAP_SERVERS_PLACEHOLDER
+        consumerGroup: consolidation-workers
+        topic: consolidation.request
+        lagThreshold: "500"
+        offsetResetPolicy: latest
+      authenticationRef:
+        name: cognitive-substrate-kafka-trigger-auth
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: cognitive-substrate-telemetry-worker-scaler
+  namespace: cognitive
+spec:
+  scaleTargetRef:
+    name: cognitive-substrate-telemetry-worker
+  minReplicaCount: 1
+  maxReplicaCount: 5
+  pollingInterval: 30
+  triggers:
+    - type: kafka
+      metadata:
+        bootstrapServers: BOOTSTRAP_SERVERS_PLACEHOLDER
+        consumerGroup: telemetry-workers
+        topic: telemetry.metrics.raw
+        lagThreshold: "500"
+        offsetResetPolicy: latest
+      authenticationRef:
+        name: cognitive-substrate-kafka-trigger-auth
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: cognitive-substrate-pattern-worker-scaler
+  namespace: cognitive
+spec:
+  scaleTargetRef:
+    name: cognitive-substrate-pattern-worker
+  minReplicaCount: 1
+  maxReplicaCount: 5
+  pollingInterval: 30
+  triggers:
+    - type: kafka
+      metadata:
+        bootstrapServers: BOOTSTRAP_SERVERS_PLACEHOLDER
+        consumerGroup: pattern-workers
+        topic: cognition.primitives
+        lagThreshold: "500"
+        offsetResetPolicy: latest
+      authenticationRef:
+        name: cognitive-substrate-kafka-trigger-auth
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: cognitive-substrate-reinforcement-worker-scaler
+  namespace: cognitive
+spec:
+  scaleTargetRef:
+    name: cognitive-substrate-reinforcement-worker
+  minReplicaCount: 1
+  maxReplicaCount: 5
+  pollingInterval: 30
+  triggers:
+    - type: kafka
+      metadata:
+        bootstrapServers: BOOTSTRAP_SERVERS_PLACEHOLDER
+        consumerGroup: reinforcement-workers
+        topic: cognition.recommendations
+        lagThreshold: "500"
+        offsetResetPolicy: latest
+      authenticationRef:
+        name: cognitive-substrate-kafka-trigger-auth

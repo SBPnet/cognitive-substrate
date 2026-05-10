@@ -1,0 +1,27 @@
+flowchart LR
+  aivenServices["Hosted services"] -->|"emit telemetry"| aivenCollector["Aiven collector"]
+
+  subgraph rawTopics["Raw telemetry topics"]
+    direction TB
+    metricsRaw["telemetry.metrics.raw"]
+    logsRaw["telemetry.logs.raw"]
+    metadataRaw["telemetry.metadata.raw"]
+  end
+
+  aivenCollector -->|"publish metrics"| metricsRaw
+  aivenCollector -->|"publish logs"| logsRaw
+  aivenCollector -->|"publish metadata"| metadataRaw
+
+  metricsRaw -->|"consume"| telemetryWorker["Telemetry worker"]
+  logsRaw -->|"consume"| telemetryWorker
+  metadataRaw -->|"consume"| telemetryWorker
+  telemetryWorker -->|"emit ExperienceEvent"| experienceRaw["experience.raw"]
+  experienceRaw -->|"consume"| ingestionWorker["Ingestion worker"]
+  ingestionWorker -->|"embed summary"| vertexEmbedding["Vertex embedding"]
+  vertexEmbedding -->|"return vector"| ingestionWorker
+  ingestionWorker -->|"index operational memory"| openSearch["OpenSearch experience_events"]
+
+  workbenchQuestion["Workbench question"] -->|"embed query"| orchestrator["Orchestrator"]
+  orchestrator -->|"retrieve memory"| openSearch
+  openSearch -->|"operational observation"| orchestrator
+  orchestrator -->|"memory-grounded answer"| workbenchResponse["Workbench response"]

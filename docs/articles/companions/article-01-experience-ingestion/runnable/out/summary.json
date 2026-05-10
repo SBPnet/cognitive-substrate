@@ -1,0 +1,53 @@
+{
+  "eventId": "demo-event-001",
+  "objectStorageKey": "events/2026/05/08/demo-event-001.json",
+  "importanceScore": 0.79,
+  "embeddingDimension": 8,
+  "emittedTopics": [
+    "experience.enriched",
+    "memory.indexed"
+  ],
+  "representationMap": [
+    {
+      "concept": "ExperienceEvent contract",
+      "demo": "A literal rawEvent object with context, input, state, action, result, evaluation, score, and tags.",
+      "production": "@cognitive-substrate/core-types ExperienceEvent."
+    },
+    {
+      "concept": "Embedding",
+      "demo": "A deterministic eight-dimensional vector derived from text characters.",
+      "production": "EmbeddingClient, usually backed by an OpenAI-compatible endpoint or a stub in tests."
+    },
+    {
+      "concept": "Importance scoring",
+      "demo": "The same four-signal heuristic: event type, tags, action presence, and result success.",
+      "production": "apps/workers/ingestion/src/scorer.ts."
+    },
+    {
+      "concept": "Object-storage key",
+      "demo": "The same events/YYYY/MM/DD/eventId.json key format.",
+      "production": "packages/memory-objectstore/src/keys.ts."
+    },
+    {
+      "concept": "Truth layer",
+      "demo": "A JSON file under runnable/out/object-store/.",
+      "production": "S3-compatible object storage through EpisodicObjectStore."
+    },
+    {
+      "concept": "Associative index",
+      "demo": "A JSON file under runnable/out/opensearch/experience_events/.",
+      "production": "OpenSearch experience_events document."
+    },
+    {
+      "concept": "Downstream signals",
+      "demo": "JSON payloads named experience.enriched and memory.indexed.",
+      "production": "Kafka messages published to the same topic names."
+    }
+  ],
+  "verifiedInvariants": [
+    "archive retains full reasoning context",
+    "index points back to archived payload",
+    "enriched payload reports embedding dimension",
+    "indexed payload confirms queryable memory reference"
+  ]
+}
