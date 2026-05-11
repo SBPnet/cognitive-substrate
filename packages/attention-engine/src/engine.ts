@@ -1,3 +1,15 @@
+/**
+ * Salience routing engine.
+ *
+ * `AttentionEngine.route` ranks candidates by `scoreSalience` and assigns
+ * them to lanes under a fixed budget. The salience score combines static
+ * candidate features (importance, relevance, urgency, novelty, risk) with
+ * runtime context (active focus, exploration policy, age decay). Items
+ * that exceed `interruptThreshold` bypass the budget and are emitted as
+ * interrupts; the remaining candidates are sliced into primary and
+ * background lanes, with anything past the budget marked `dropped`.
+ */
+
 import type {
   AttentionAllocation,
   AttentionBudget,
@@ -6,6 +18,11 @@ import type {
   AttentionRoutingResult,
 } from "./types.js";
 
+/**
+ * Conservative default budget. The values target a small working set
+ * (5 primary, 10 background) with an interrupt threshold close to but
+ * below 1.0 so that genuinely high-salience items can preempt focus.
+ */
 const DEFAULT_BUDGET: AttentionBudget = {
   maxPrimaryItems: 5,
   maxBackgroundItems: 10,
@@ -21,6 +38,11 @@ export class AttentionEngine {
     this.budget = { ...DEFAULT_BUDGET, ...budget };
   }
 
+  /**
+   * Routes a batch of candidates to lanes. The returned allocations are
+   * ranked globally by salience; lane assignment uses the budget plus
+   * the interrupt threshold.
+   */
   route(
     candidates: ReadonlyArray<AttentionCandidate>,
     context: AttentionContext = {},
@@ -62,6 +84,16 @@ export class AttentionEngine {
   }
 }
 
+/**
+ * Computes the per-candidate salience score.
+ *
+ * The weights reflect the design priorities: importance leads (35%),
+ * followed by relevance (20%), urgency (18%), and policy-modulated novelty
+ * (14% baseline, scaled by `explorationFactor`). Risk contributes a small
+ * positive term because risky-but-relevant items should not be dropped
+ * silently. Focus persistence and source-class boosts add small biases;
+ * age decay subtracts a time-dependent penalty.
+ */
 export function scoreSalience(
   candidate: AttentionCandidate,
   context: AttentionContext = {},
@@ -84,6 +116,7 @@ export function scoreSalience(
   );
 }
 
+/** Linear hourly decay applied to candidates that carry a timestamp. */
 function ageDecay(timestamp: string | undefined, decayRate: number): number {
   if (!timestamp) return 0;
   const ageMs = Date.now() - Date.parse(timestamp);

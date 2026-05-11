@@ -1,0 +1,107 @@
+{
+  "generatedAt": "2026-05-11T00:50:10.419Z",
+  "status": "baseline-passed",
+  "sections": [
+    {
+      "name": "retrieval",
+      "status": "needs-longitudinal-data",
+      "metrics": [
+        {
+          "name": "recall@3",
+          "value": 1,
+          "target": 1,
+          "passed": true
+        },
+        {
+          "name": "mrr",
+          "value": 1,
+          "target": 1,
+          "passed": true
+        },
+        {
+          "name": "ndcg@3",
+          "value": 1,
+          "target": 1,
+          "passed": true
+        }
+      ],
+      "notes": "Fixture-level retrieval baseline for hybrid BM25+kNN+rerank. Replace with a labelled corpus for publication claims."
+    },
+    {
+      "name": "consolidation",
+      "status": "needs-longitudinal-data",
+      "metrics": [
+        {
+          "name": "compression_ratio",
+          "value": 0.3333333333333333,
+          "target": 0.33,
+          "passed": true
+        },
+        {
+          "name": "contradiction_surface_rate",
+          "value": 0.16666666666666666,
+          "target": 0.1,
+          "passed": true
+        }
+      ],
+      "notes": "Replay fixture baseline for cluster compression and contradiction surfacing."
+    },
+    {
+      "name": "policy-drift",
+      "status": "needs-longitudinal-data",
+      "metrics": [
+        {
+          "name": "max_clamped_delta",
+          "value": 0.1,
+          "target": 0.1,
+          "passed": true
+        },
+        {
+          "name": "stability_retention",
+          "value": 0.9,
+          "target": 0.9,
+          "passed": true
+        }
+      ],
+      "notes": "Deterministic clamping baseline; longitudinal reward perturbation runs should replace the fixture."
+    },
+    {
+      "name": "pattern-transfer",
+      "status": "needs-longitudinal-data",
+      "metrics": [
+        {
+          "name": "zero_shot_hit_rate",
+          "value": 0.5,
+          "target": 0.5,
+          "passed": true
+        },
+        {
+          "name": "precision_fixture",
+          "value": 1,
+          "target": 1,
+          "passed": true
+        }
+      ],
+      "notes": "Fixture-level SystemMapping transfer baseline; real transfer claims require two environment corpora."
+    },
+    {
+      "name": "multi-agent-specialization",
+      "status": "needs-longitudinal-data",
+      "metrics": [
+        {
+          "name": "role_coverage",
+          "value": 1,
+          "target": 1,
+          "passed": true
+        },
+        {
+          "name": "arbitration_diversity",
+          "value": 0.8,
+          "target": 0.8,
+          "passed": true
+        }
+      ],
+      "notes": "Agent-role fixture baseline for paper Ch 4.9; production evidence requires repeated task traces."
+    }
+  ]
+}

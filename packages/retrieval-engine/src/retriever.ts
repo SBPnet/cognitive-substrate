@@ -1,3 +1,23 @@
+/**
+ * `MemoryRetriever`: hybrid associative recall.
+ *
+ * Retrieval is implemented as a three-stage pipeline:
+ *
+ *   1. Resolve a query embedding. If the request includes a pre-computed
+ *      embedding, use it directly; otherwise call the configured
+ *      `QueryEmbeddingClient`. The default production embedder targets an
+ *      OpenAI-compatible `/v1/embeddings` endpoint so that operators can
+ *      swap between OpenAI itself and a local model lane without code changes.
+ *   2. Issue one hybrid (BM25 + k-NN, policy-weighted) query per index in
+ *      parallel using `buildHybridQuery`. When a reranker is configured
+ *      the per-index page is over-fetched by `rerankOverfetchFactor` to
+ *      give the cross-encoder a richer pool.
+ *   3. Optionally re-score the merged candidate set with a Tier-2 cross
+ *      encoder (`OpenSearchMlClient.rerank`) and slice to `size`. When no
+ *      reranker is configured the merged candidates are sorted by their
+ *      OpenSearch score and sliced directly.
+ */
+
 import type { Client } from "@opensearch-project/opensearch";
 import {
   buildHybridQuery,
@@ -23,6 +43,7 @@ type RetrievalSearchClient = (
 export interface MemoryRetrieverConfig {
   readonly openSearch: Client;
   readonly embedder?: QueryEmbeddingClient;
+  /** Override hook for tests; defaults to the production search client. */
   readonly searchClient?: RetrievalSearchClient;
   /**
    * Optional Tier 2 reranker (cross-encoder).  When provided, the initial
@@ -59,6 +80,11 @@ export class MemoryRetriever {
     this.rerankOverfetchFactor = config.rerankOverfetchFactor ?? 3;
   }
 
+  /**
+   * Executes one retrieval request. Returns the resolved query embedding
+   * alongside the ranked memories so that callers can attach the embedding
+   * to OTel spans without recomputing it.
+   */
   async retrieve(request: RetrievalRequest): Promise<RetrievalResult> {
     const queryEmbedding = await this.resolveEmbedding(request);
     const indexes = request.indexes ?? DEFAULT_INDEXES;
@@ -114,6 +140,11 @@ export class MemoryRetriever {
     return { memories, queryEmbedding };
   }
 
+  /**
+   * Re-scores the candidate set with the Tier-2 cross-encoder. Candidates
+   * that the reranker did not score retain their original BM25/k-NN score
+   * so that they remain comparable in the final sort.
+   */
   private async applyReranking(
     query: string,
     candidates: RetrievalResult["memories"],
@@ -141,11 +172,18 @@ export class MemoryRetriever {
   }
 }
 
+/**
+ * Filters out undefined fields from the request before passing them to
+ * `buildHybridQuery`. Without this guard, exact-optional types in the
+ * query builder would treat `undefined` as a deliberate override.
+ */
 function definedHybridOptions(request: RetrievalRequest): Partial<{
   readonly policy: NonNullable<RetrievalRequest["policy"]>;
   readonly sinceTimestamp: string;
   readonly requiredTags: ReadonlyArray<string>;
   readonly minImportance: number;
+  readonly retrievalMode: NonNullable<RetrievalRequest["retrievalMode"]>;
+  readonly fusion: NonNullable<RetrievalRequest["fusion"]>;
 }> {
   return {
     ...(request.policy ? { policy: request.policy } : {}),
@@ -154,9 +192,17 @@ function definedHybridOptions(request: RetrievalRequest): Partial<{
     ...(request.minImportance !== undefined
       ? { minImportance: request.minImportance }
       : {}),
+    ...(request.retrievalMode ? { retrievalMode: request.retrievalMode } : {}),
+    ...(request.fusion ? { fusion: request.fusion } : {}),
   };
 }
 
+/**
+ * Returns the per-index field configuration for the hybrid query builder.
+ * `experience_events` indexes only carry a `summary` text field and a
+ * `timestamp` date; `memory_semantic` adds `generalization` and uses
+ * `created_at` as its date field.
+ */
 function queryOptionsForIndex(index: RetrievalSearchIndex): {
   readonly textFields: ReadonlyArray<string>;
   readonly timestampField: "created_at" | "timestamp";

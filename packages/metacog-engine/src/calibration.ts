@@ -1,3 +1,13 @@
+/**
+ * Confidence calibration and watchdog alerts.
+ *
+ * `CalibrationMonitor.evaluate` scores how well each operation's stated
+ * confidence matched its observed outcome. The aggregate calibration
+ * error feeds the reflection engine; the watchdog list flags when the
+ * introspection pass itself has exceeded its own budget so that the
+ * engine can be paused or scaled back.
+ */
+
 import type {
   CalibrationRecord,
   CalibrationReport,
@@ -37,6 +47,12 @@ export class CalibrationMonitor {
   }
 }
 
+/**
+ * Discounts the raw operation confidence by risk (up to 25%) and by
+ * latency (up to 20%, saturating at 60s). The discount captures the
+ * intuition that high-risk or slow operations are less trustworthy
+ * even when the agent reported high confidence.
+ */
 export function estimateOperationConfidence(trace: CognitiveOperationTrace): number {
   const riskPenalty = (trace.riskScore ?? 0) * 0.25;
   const latencyPenalty = Math.min(0.2, (trace.latencyMs ?? 0) / 60_000);

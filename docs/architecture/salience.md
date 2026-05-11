@@ -9,6 +9,10 @@ tags: [salience, retrieval, attention, reinforcement]
 
 Salience propagation is the substrate mechanism that determines which memories, traces, goals, and agent proposals compete for limited cognitive budget. It unifies importance scoring, novelty, reward history, contradiction risk, goal relevance, recency, and policy bias into a single routing surface.
 
+## Implementation Status
+
+This is a design draft for salience routing. The repository has implemented scoring inputs across ingestion, retrieval, policy, reinforcement, and attention packages, but the `salience.*` topics below are proposals. The source-of-truth runtime topic registry is `packages/kafka-bus/src/topics.ts`; only topics declared there should be treated as implemented runtime topics.
+
 ## Role In The Substrate
 
 Salience is not a presentation feature. It is an infrastructure signal used by ingestion, retrieval, arbitration, consolidation, and observability. The same experience can be stored permanently in the episodic truth layer while being suppressed, amplified, or routed differently in active cognition.

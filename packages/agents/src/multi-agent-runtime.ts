@@ -1,3 +1,17 @@
+/**
+ * Multi-agent runtime.
+ *
+ * `MultiAgentRuntime.run` invokes every configured agent in parallel,
+ * arbitrates the results, copies the critic agent's annotation onto
+ * the winning result, and records each trace to the configured
+ * activity store.
+ *
+ * `MultiAgentReasoningModel` adapts the runtime to the
+ * `ReasoningModel` interface so that the cognitive loop can use a
+ * multi-agent debate as its reasoning model without any special
+ * casing.
+ */
+
 import type { AgentContext, AgentResult } from "@cognitive-substrate/core-types";
 import { arbitrate, scoreAgentResult } from "./arbitration.js";
 import { NoopAgentActivityStore } from "./activity-store.js";

@@ -1,3 +1,18 @@
+/**
+ * Identity-vector accumulation, drift stabilisation, and coherence scoring.
+ *
+ * Three constraints govern the math here:
+ *
+ *   1. Each evidence batch is averaged before being scaled by the
+ *      `evidenceLearningRate`, so noisy single-batch swings are damped.
+ *   2. Drift is stabilised against the previous state with a per-trait
+ *      cap that depends on the existing `stabilityScore`: a more stable
+ *      identity is harder to move.
+ *   3. Coherence is reported as a single `[0, 1]` value blending
+ *      stability, curiosity/caution balance, drift inverse, and
+ *      evidence support, with a contradiction penalty.
+ */
+
 import type { IdentityState } from "@cognitive-substrate/core-types";
 import type {
   DriftStabilizationOptions,
@@ -36,6 +51,11 @@ interface IdentityVectorTotals {
   readonly stabilityScore: number;
 }
 
+/**
+ * Returns a neutral starting identity. All trait dimensions are set to
+ * 0.5 except `stabilityScore`, which starts at 0.65 so that the engine
+ * resists moving on the very first evidence batch.
+ */
 export function createDefaultIdentityState(
   identityId: string = "default-identity",
   timestamp: string = new Date().toISOString(),
@@ -52,6 +72,11 @@ export function createDefaultIdentityState(
   };
 }
 
+/**
+ * Folds a batch of evidence into the previous identity state. The
+ * average per-batch delta is scaled by `evidenceLearningRate` so that no
+ * single batch can saturate any dimension.
+ */
 export function accumulateIdentityVector(
   previous: IdentityState,
   evidence: ReadonlyArray<IdentityEvidence>,
@@ -75,6 +100,12 @@ export function accumulateIdentityVector(
   };
 }
 
+/**
+ * Caps per-trait drift between the previous state and the proposed
+ * state. The effective cap is `maxTraitStep * (1 - stabilityScore *
+ * stabilityDamping)`, so a highly stable identity can only move by a
+ * small fraction of `maxTraitStep` per cycle.
+ */
 export function stabilizeIdentityDrift(
   previous: IdentityState,
   proposed: IdentityState,
@@ -118,6 +149,7 @@ export function identityDelta(
   };
 }
 
+/** Root-mean-square difference between two identity vectors, in `[0, 1]`. */
 export function driftMagnitude(previous: IdentityState, next: IdentityState): number {
   const squaredDistance = IDENTITY_VECTOR_KEYS.reduce(
     (sum, key) => sum + Math.pow(next[key] - previous[key], 2),
@@ -126,6 +158,15 @@ export function driftMagnitude(previous: IdentityState, next: IdentityState): nu
   return clamp(Math.sqrt(squaredDistance / IDENTITY_VECTOR_KEYS.length));
 }
 
+/**
+ * Combined coherence score in `[0, 1]`. Weights:
+ *
+ *   - stabilityScore           : 35%
+ *   - curiosity/caution balance: 25%
+ *   - inverse drift magnitude  : 25%
+ *   - evidence support         : 15%
+ *   - contradiction penalty    : up to 25% subtracted directly
+ */
 export function scoreIdentityCoherence(
   previous: IdentityState,
   next: IdentityState,

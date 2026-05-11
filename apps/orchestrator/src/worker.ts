@@ -16,7 +16,7 @@ import {
   initTelemetry,
   telemetryConfigFromEnv,
 } from "@cognitive-substrate/telemetry-otel";
-import { ZeroEmbeddingClient, embeddingDimensionFromEnv } from "./embedder.js";
+import { queryEmbedderFromEnv } from "./embedder.js";
 import { createSocietyLoop } from "./society.js";
 
 export async function startOrchestrator(): Promise<void> {
@@ -32,7 +32,7 @@ export async function startOrchestrator(): Promise<void> {
 
   const kafka = createKafkaClient(kafkaConfig);
   const openSearchClient = createOpenSearchClient(opensearchConfigFromEnv());
-  const embedder = new ZeroEmbeddingClient(embeddingDimensionFromEnv());
+  const embedder = queryEmbedderFromEnv();
 
   log("Ensuring OpenSearch indexes exist...");
   await ensureIndexes(openSearchClient);

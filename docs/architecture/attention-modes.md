@@ -5,6 +5,10 @@ status: draft
 
 # Attention Mode Dynamics
 
+## Implementation Status
+
+This is a design draft. The implemented attention package is `packages/attention-engine/`, but most mode-controller, hyperfocus, swarm, and dopamine-drift topics named below are not runtime topics. The source-of-truth runtime topic registry is `packages/kafka-bus/src/topics.ts`; topic names absent from that file are proposals.
+
 ## Overview
 
 This document specifies a cognitive dynamics model that introduces high attentional volatility, associative breadth, and dual-mode processing into the cognitive agent architecture. The model is a computational parallel to volatile attention profiles, not a simulation of a clinical condition. When paired with executive stabilization mechanisms, the pattern supports broad associative recall, focused synthesis, and rapid context switching that generates novel combinations.
@@ -94,12 +98,12 @@ The hyperfocus compiler is a specialized processing pipeline that activates duri
 
 ```
 exploration stream
-  → associative graph (broad, noisy)
-  → cluster stabilization (identify dense regions)
-  → compression pass (semantic merge within clusters)
-  → causal structuring (infer dependencies)
-  → identity alignment check (validate against narrative state)
-  → artifact emission (semantic concepts, causal edges, narrative episodes)
+  -> associative graph (broad, noisy)
+  -> cluster stabilization (identify dense regions)
+  -> compression pass (semantic merge within clusters)
+  -> causal structuring (infer dependencies)
+  -> identity alignment check (validate against narrative state)
+  -> artifact emission (semantic concepts, causal edges, narrative episodes)
 ```
 
 Output artifacts are written to:
@@ -223,10 +227,10 @@ The swarm consists of multiple agent types with different dopamine circuit initi
 ### Swarm Interaction Pattern
 
 ```
-Explorers → generate noisy hypotheses → Kafka: agent.proposals
-Hyperfocus agents → compress proposals → Kafka: agent.abstractions
-Safety agents → validate abstractions → Kafka: agent.validated
-Social agents → align across agents → Kafka: reward.social
+Explorers -> generate noisy hypotheses -> Kafka: agent.proposals
+Hyperfocus agents -> compress proposals -> Kafka: agent.abstractions
+Safety agents -> validate abstractions -> Kafka: agent.validated
+Social agents -> align across agents -> Kafka: reward.social
 ```
 
 ### Emergent Specialization

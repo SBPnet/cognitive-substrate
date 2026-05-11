@@ -1,0 +1,831 @@
+openapi: 3.1.0
+info:
+  title: Cognitive Substrate API/BFF
+  version: 0.1.0
+  description: |
+    The API/BFF gateway for the Cognitive Substrate workbench. The gateway
+    bridges the front-end UI to the cognitive pipeline by:
+
+      - accepting user messages and publishing them to `experience.raw` Kafka,
+      - streaming `interaction.response` events back to subscribed clients
+        over Server-Sent Events,
+      - serving read-only views over OpenSearch indexes (memories, audit
+        traces, agent activity, policy snapshots),
+      - exposing collector control endpoints for Aiven-managed services.
+
+    The cognitive pipeline itself runs as a set of workers behind Kafka and
+    is not exposed directly. All write traffic enters via
+    `POST /api/sessions/{sessionId}/messages`; all read-back traffic returns
+    on `/stream` (SSE) or via the read-only routes listed below.
+
+    Roadmap status (see policy.ts for stage gates):
+      - Stage 4 routes (`/policy`) read live data from OpenSearch.
+      - Stage 6+ routes (`/agents`, `/selfmod`, `/identity`, `/goals`) return
+        stub responses until the corresponding backend stages land.
+  license:
+    name: PolyForm-Noncommercial-1.0.0
+    identifier: PolyForm-Noncommercial-1.0.0
+
+servers:
+  - url: http://localhost:8000
+    description: Local development
+  - url: https://{host}
+    description: Deployed environment
+    variables:
+      host:
+        default: api.cognitive-substrate.local
+        description: Deployed gateway host (override per environment).
+
+security: []
+
+tags:
+  - name: health
+    description: Liveness probes used by container orchestrators.
+  - name: sessions
+    description: Cognitive session lifecycle.
+  - name: messages
+    description: User input ingestion. Writes flow into the cognitive pipeline via Kafka.
+  - name: stream
+    description: Server-Sent Events stream of pipeline outputs for one session.
+  - name: memories
+    description: Read-only access to episodic and semantic memories.
+  - name: policy
+    description: Behavioural policy snapshot per session.
+  - name: agents
+    description: Multi-agent activity traces (Stage 6+).
+  - name: selfmod
+    description: Self-modification proposals (Stage 8+).
+  - name: identity
+    description: Identity state (Stage 10+).
+  - name: goals
+    description: Goal hierarchy (Stage 12+).
+  - name: collector
+    description: Aiven collector control plane.
+
+paths:
+  /health:
+    get:
+      tags: [health]
+      summary: Gateway health probe
+      description: |
+        Returns the liveness state of the API gateway process. The shape
+        matches the worker `/health` shape exported as
+        `HEALTH_OPENAPI_FRAGMENT` from
+        `@cognitive-substrate/telemetry-otel`, with a static `service`
+        value of `api`.
+      operationId: getHealth
+      responses:
+        "200":
+          description: Gateway is healthy.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GatewayHealth"
+
+  /api/sessions:
+    post:
+      tags: [sessions]
+      summary: Create a session
+      description: |
+        Creates a new cognitive session. The returned `sessionId` is used
+        as a path parameter for every other session-scoped route.
+      operationId: createSession
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSessionRequest"
+      responses:
+        "201":
+          description: Session created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+
+  /api/sessions/{sessionId}:
+    parameters:
+      - $ref: "#/components/parameters/SessionId"
+    get:
+      tags: [sessions]
+      summary: Fetch session metadata
+      operationId: getSession
+      responses:
+        "200":
+          description: Session metadata.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/sessions/{sessionId}/messages:
+    parameters:
+      - $ref: "#/components/parameters/SessionId"
+    post:
+      tags: [messages]
+      summary: Submit a user message
+      description: |
+        Constructs an `ExperienceEvent` from the supplied text and publishes
+        it to the `experience.raw` Kafka topic. The cognitive pipeline
+        processes the event asynchronously; the resulting
+        `InteractionResponseEvent` is delivered over SSE on
+        `GET /api/sessions/{sessionId}/stream`.
+
+        This endpoint returns `202 Accepted` because no response is
+        guaranteed at the time of the call; only that the message was
+        successfully queued.
+      operationId: sendMessage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendMessageRequest"
+      responses:
+        "202":
+          description: Message accepted and queued onto Kafka.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SendMessageResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "503":
+          description: Kafka producer was unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/sessions/{sessionId}/stream:
+    parameters:
+      - $ref: "#/components/parameters/SessionId"
+    get:
+      tags: [stream]
+      summary: SSE stream of pipeline outputs
+      description: |
+        Subscribes to all events published for `sessionId` by the
+        orchestrator. The connection emits a `connected` event once,
+        followed by zero or more `interaction_response` events, with a
+        `ping` event every 15 seconds to keep proxies from idling out
+        the connection.
+
+        Event types (SSE `event:` field):
+          - `connected`              — initial handshake; payload has session metadata.
+          - `interaction_response`   — wraps an `InteractionResponse`. SSE `id:` is set to the source `eventId`.
+          - `ping`                   — keepalive only; payload has a timestamp.
+
+        Each `data:` payload is JSON-encoded; for typed events it is
+        wrapped in an `SseEnvelope` with `type` and `payload` fields so
+        clients can route by `type` regardless of the SSE event name.
+      operationId: streamSession
+      responses:
+        "200":
+          description: SSE stream opened.
+          content:
+            text/event-stream:
+              schema:
+                $ref: "#/components/schemas/SseEnvelope"
+              examples:
+                interactionResponse:
+                  summary: Wrapping an InteractionResponse on the stream
+                  value:
+                    type: interaction_response
+                    payload:
+                      eventId: 5b1f9c3a-b7d3-4cda-9f3a-2c1d6e9a4b85
+                      sessionId: 9e4f7c2b-1d4a-4f3a-8a47-b6dc0a6f4d12
+                      traceId: 5e9d7a6c-1f3b-4d2c-9b8a-3a5e7c1b2d4f
+                      timestamp: "2026-05-10T20:00:00.000Z"
+                      status: complete
+                      responseText: Acknowledged.
+                      confidence: 0.78
+                      riskScore: 0.12
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /api/sessions/{sessionId}/memories:
+    parameters:
+      - $ref: "#/components/parameters/SessionId"
+    get:
+      tags: [memories]
+      summary: List session memories
+      description: Returns episodic memories scoped to `sessionId`, ordered by recency.
+      operationId: listSessionMemories
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            default: 20
+          description: Maximum number of memories to return.
+      responses:
+        "200":
+          description: Memory list.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MemoriesResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /api/sessions/{sessionId}/memories/search:
+    parameters:
+      - $ref: "#/components/parameters/SessionId"
+    get:
+      tags: [memories]
+      summary: Hybrid-search semantic memories
+      description: |
+        Runs a hybrid BM25 + k-NN query against `memory_semantic`. Empty
+        queries short-circuit to an empty result set.
+      operationId: searchMemories
+      parameters:
+        - in: query
+          name: q
+          required: true
+          schema:
+            type: string
+          description: Free-text query.
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+        - in: query
+          name: mode
+          schema:
+            type: string
+            enum: [quality, efficient, hybrid, legacy]
+            default: legacy
+          description: |
+            Retrieval lane that selects which `knn_vector` field is used.
+            See `packages/memory-opensearch/src/query-builder.ts`.
+      responses:
+        "200":
+          description: Search results.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MemoriesResponse"
+
+  /api/sessions/{sessionId}/memories/trace:
+    parameters:
+      - $ref: "#/components/parameters/SessionId"
+    get:
+      tags: [memories]
+      summary: Recent audit / trace events for the session
+      description: |
+        Reads recent records from the `audit_events` index and projects
+        them onto the BFF's `TraceEvent` shape so the workbench can
+        render the pipeline timeline.
+      operationId: listTraceEvents
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            default: 50
+      responses:
+        "200":
+          description: Trace event list.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TraceEventList"
+
+  /api/sessions/{sessionId}/policy:
+    parameters:
+      - $ref: "#/components/parameters/SessionId"
+    get:
+      tags: [policy]
+      summary: Current policy snapshot
+      description: |
+        Returns the most recent `policy_state` document. When no document
+        exists or the read fails, a static default snapshot is returned
+        so the workbench can render the policy panel from day one.
+      operationId: getPolicySnapshot
+      responses:
+        "200":
+          description: Policy snapshot.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PolicySnapshot"
+
+  /api/sessions/{sessionId}/agents:
+    parameters:
+      - $ref: "#/components/parameters/SessionId"
+    get:
+      tags: [agents]
+      summary: Recent multi-agent activity
+      description: |
+        Returns recent `agent_activity` traces ordered by recency. Each
+        entry records one agent's proposal during arbitration, with its
+        score and whether it was selected.
+      operationId: listAgentActivity
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            default: 30
+      responses:
+        "200":
+          description: Agent activity list.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentActivityList"
+
+  /api/sessions/{sessionId}/selfmod:
+    parameters:
+      - $ref: "#/components/parameters/SessionId"
+    get:
+      tags: [selfmod]
+      summary: Self-modification proposals (Stage 8 stub)
+      description: Returns a stub response until metacog-engine writes proposals.
+      operationId: listSelfmodProposals
+      responses:
+        "200":
+          description: Stub response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SelfmodStub"
+
+  /api/sessions/{sessionId}/identity:
+    parameters:
+      - $ref: "#/components/parameters/SessionId"
+    get:
+      tags: [identity]
+      summary: Identity state (Stage 10 stub)
+      operationId: getIdentityState
+      responses:
+        "200":
+          description: Stub response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdentityStub"
+
+  /api/sessions/{sessionId}/goals:
+    parameters:
+      - $ref: "#/components/parameters/SessionId"
+    get:
+      tags: [goals]
+      summary: Goal hierarchy (Stage 12 stub)
+      operationId: listGoals
+      responses:
+        "200":
+          description: Stub response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GoalsStub"
+
+  /api/collector:
+    get:
+      tags: [collector]
+      summary: Read collector configuration
+      description: |
+        Returns the current Aiven collector configuration: the project,
+        collector service identifier, the set of selected services, and
+        deployment metadata.
+      operationId: getCollectorConfig
+      responses:
+        "200":
+          description: Collector configuration.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollectorConfig"
+        "503":
+          description: Aiven control plane is not configured (no `AIVEN_TOKEN`).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      tags: [collector]
+      summary: Update the selected services list
+      description: |
+        Replaces the `AIVEN_SERVICES` environment variable on the
+        collector application config with the supplied list of service
+        names. Service names are validated against the project's actual
+        services.
+      operationId: updateCollectorServices
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CollectorUpdate"
+      responses:
+        "200":
+          description: Updated configuration.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollectorConfig"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "503":
+          description: Aiven control plane is not configured.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  parameters:
+    SessionId:
+      in: path
+      name: sessionId
+      required: true
+      schema:
+        type: string
+      description: Session identifier returned by `POST /api/sessions`.
+
+  responses:
+    BadRequest:
+      description: The request payload was invalid.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: The requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          description: Human-readable error message.
+      example:
+        error: "sessionId is required"
+
+    GatewayHealth:
+      type: object
+      required: [status, timestamp]
+      properties:
+        status:
+          type: string
+          enum: [ok]
+        timestamp:
+          type: string
+          format: date-time
+
+    CreateSessionRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+          description: Optional caller-supplied user identifier.
+        initialGoal:
+          type: string
+          description: Reserved for future use; ignored by the current implementation.
+
+    Session:
+      type: object
+      required: [sessionId, createdAt, messageCount, status]
+      properties:
+        sessionId:
+          type: string
+        userId:
+          type: [string, "null"]
+        createdAt:
+          type: string
+          format: date-time
+        messageCount:
+          type: integer
+          minimum: 0
+        status:
+          type: string
+          enum: [active, idle]
+
+    SendMessageRequest:
+      type: object
+      required: [text]
+      properties:
+        text:
+          type: string
+          minLength: 1
+          description: Trimmed user message text. Empty / whitespace-only values are rejected.
+        tags:
+          type: array
+          items:
+            type: string
+          description: |
+            Optional tags carried into the resulting `ExperienceEvent`.
+            Defaults to `["user_message"]` when omitted.
+
+    SendMessageResponse:
+      type: object
+      required: [eventId, sessionId, timestamp, status]
+      properties:
+        eventId:
+          type: string
+          description: ID of the queued `ExperienceEvent`. Used as the SSE `id:` field on the matching `interaction_response`.
+        sessionId:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [queued]
+
+    InteractionResponse:
+      type: object
+      required: [eventId, sessionId, traceId, timestamp, status, responseText, confidence, riskScore]
+      properties:
+        eventId:
+          type: string
+        sessionId:
+          type: string
+        traceId:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [processing, complete, partial, failed]
+        responseText:
+          type: string
+        confidence:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+        riskScore:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+        errorMessage:
+          type: [string, "null"]
+
+    Memory:
+      type: object
+      required: [memoryId, index, summary, importanceScore, score]
+      properties:
+        memoryId:
+          type: string
+        index:
+          type: string
+          description: OpenSearch index the memory was sourced from.
+        summary:
+          type: string
+        importanceScore:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+        score:
+          type: number
+          format: float
+          description: Search-time relevance score.
+        tags:
+          type: array
+          items:
+            type: string
+        lastRetrieved:
+          type: string
+          format: date-time
+
+    MemoriesResponse:
+      type: object
+      required: [memories, total]
+      properties:
+        memories:
+          type: array
+          items:
+            $ref: "#/components/schemas/Memory"
+        total:
+          type: integer
+          minimum: 0
+
+    TraceStage:
+      type: string
+      enum: [received, embedding, indexed, reasoning, arbitrating, complete, failed]
+
+    TraceEvent:
+      type: object
+      required: [eventId, sessionId, timestamp, stage]
+      properties:
+        eventId:
+          type: string
+        sessionId:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        stage:
+          $ref: "#/components/schemas/TraceStage"
+        detail:
+          type: string
+
+    TraceEventList:
+      type: object
+      required: [events, total]
+      properties:
+        events:
+          type: array
+          items:
+            $ref: "#/components/schemas/TraceEvent"
+        total:
+          type: integer
+          minimum: 0
+
+    PolicySnapshot:
+      type: object
+      required: [version, timestamp, retrievalBias, riskTolerance, explorationFactor]
+      properties:
+        version:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        retrievalBias:
+          type: number
+          minimum: 0
+          maximum: 1
+        riskTolerance:
+          type: number
+          minimum: 0
+          maximum: 1
+        explorationFactor:
+          type: number
+          minimum: 0
+          maximum: 1
+
+    AgentActivity:
+      type: object
+      required: [traceId, timestamp, agentType, inputSummary, proposedAction, confidence, score, selected]
+      properties:
+        traceId:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        agentType:
+          type: string
+          description: |
+            Logical agent role. See `AgentType` in
+            `@cognitive-substrate/core-types`. Common values: `planner`,
+            `executor`, `critic`, `memory`, `world_model`,
+            `meta_cognition`.
+        inputSummary:
+          type: string
+        proposedAction:
+          type: string
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+        score:
+          type: number
+          minimum: 0
+          maximum: 1
+        selected:
+          type: boolean
+        critique:
+          type: string
+
+    AgentActivityList:
+      type: object
+      required: [activities, total]
+      properties:
+        activities:
+          type: array
+          items:
+            $ref: "#/components/schemas/AgentActivity"
+        total:
+          type: integer
+          minimum: 0
+
+    SelfmodStub:
+      type: object
+      required: [message, proposals]
+      properties:
+        message:
+          type: string
+        proposals:
+          type: array
+          items: {}
+          maxItems: 0
+
+    IdentityStub:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+
+    GoalsStub:
+      type: object
+      required: [message, goals]
+      properties:
+        message:
+          type: string
+        goals:
+          type: array
+          items: {}
+          maxItems: 0
+
+    CollectorService:
+      type: object
+      required: [name, type, state]
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+          description: Aiven service type (e.g. `kafka`, `pg`, `opensearch`).
+        state:
+          type: string
+        plan:
+          type: string
+        cloud:
+          type: string
+
+    CollectorConfig:
+      type: object
+      required: [project, collectorService, selectedServices, services]
+      properties:
+        project:
+          type: string
+          description: Aiven project name.
+        collectorService:
+          type: string
+          description: Aiven service ID running the collector.
+        selectedServices:
+          type: array
+          items:
+            type: string
+          description: Service names currently being collected.
+        services:
+          type: array
+          items:
+            $ref: "#/components/schemas/CollectorService"
+        collectorState:
+          type: string
+        deploymentStatus:
+          type: string
+        buildStatus:
+          type: string
+
+    CollectorUpdate:
+      type: object
+      required: [services]
+      properties:
+        services:
+          type: array
+          items:
+            type: string
+            pattern: "^[a-zA-Z0-9_-]+$"
+          description: |
+            Replacement set of selected services. Names must match the
+            allowed character set; duplicates are deduplicated server-side.
+
+    SseEnvelope:
+      type: object
+      required: [type, payload]
+      description: |
+        JSON envelope written into each SSE `data:` field for typed
+        events. The SSE `event:` name and the envelope `type` field are
+        equivalent. `payload` is one of the documented event shapes
+        below; clients should switch on `type` to interpret it.
+      properties:
+        type:
+          type: string
+          enum: [interaction_response, trace, memory_update, policy_update, error, ping]
+        payload:
+          description: Event-specific payload. Shape depends on `type`.
+          oneOf:
+            - $ref: "#/components/schemas/InteractionResponse"
+            - $ref: "#/components/schemas/TraceEvent"
+            - $ref: "#/components/schemas/PolicySnapshot"
+            - $ref: "#/components/schemas/Error"
+            - type: object
+              description: Ping payload — only `timestamp` is guaranteed.
+              additionalProperties: false
+              required: [timestamp]
+              properties:
+                timestamp:
+                  type: string
+                  format: date-time

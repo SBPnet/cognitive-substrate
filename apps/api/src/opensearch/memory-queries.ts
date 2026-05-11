@@ -3,7 +3,11 @@
  */
 
 import type { Client } from "@opensearch-project/opensearch";
-import { search } from "@cognitive-substrate/memory-opensearch";
+import {
+  RETRIEVAL_MODE_VECTOR_FIELD,
+  search,
+  type RetrievalMode,
+} from "@cognitive-substrate/memory-opensearch";
 import type { MemoryDto } from "../types.js";
 
 interface ExperienceHit extends Record<string, unknown> {
@@ -57,7 +61,9 @@ export async function searchSemanticMemories(
   client: Client,
   queryText: string,
   limit = 10,
+  retrievalMode: RetrievalMode = "legacy",
 ): Promise<MemoryDto[]> {
+  const selectedVectorField = RETRIEVAL_MODE_VECTOR_FIELD[retrievalMode];
   const semanticQuery = {
     query: {
       multi_match: {
@@ -67,7 +73,10 @@ export async function searchSemanticMemories(
     },
     sort: [{ importance_score: { order: "desc" } }],
     size: limit,
-    _source: ["memory_id", "summary", "generalization", "importance_score", "last_retrieved"],
+    _source: {
+      includes: ["memory_id", "summary", "generalization", "importance_score", "last_retrieved"],
+      excludes: [selectedVectorField, ...Object.values(RETRIEVAL_MODE_VECTOR_FIELD)],
+    },
   };
 
   const hits = await search<SemanticHit>(client, "memory_semantic", semanticQuery);

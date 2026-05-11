@@ -1,3 +1,15 @@
+/**
+ * Default consolidation model.
+ *
+ * `ExtractiveConsolidationModel` produces the consolidation draft without
+ * calling any language model. It selects the top three highest-importance
+ * candidate summaries, builds a tag-driven generalisation sentence, and
+ * averages the embeddings to produce a centroid vector for the new
+ * semantic memory. The result is deterministic and testable; an LLM-backed
+ * abstractive model can be plugged in later by implementing
+ * `ConsolidationModel` and passing it to the engine.
+ */
+
 import type {
   ConsolidationDraft,
   ConsolidationModel,
@@ -23,6 +35,12 @@ export class ExtractiveConsolidationModel implements ConsolidationModel {
   }
 }
 
+/**
+ * Builds a one-sentence generalisation that names the dominant tags
+ * (capped at five) and the count of replayed experiences. The phrasing
+ * is deliberately formulaic so that the resulting record is easy to
+ * inspect during smoke tests.
+ */
 function buildGeneralization(
   summaries: ReadonlyArray<string>,
   tags: ReadonlyArray<string>,
@@ -32,6 +50,12 @@ function buildGeneralization(
   return `Consolidated pattern${tagPhrase} from ${evidenceCount} replayed experiences.`;
 }
 
+/**
+ * Centroid of the candidate embeddings. Returns an empty vector when the
+ * candidates have no embedding; downstream consumers should treat the
+ * empty vector as a signal that semantic recall cannot be performed for
+ * the resulting memory until a re-embedding pass populates it.
+ */
 function averageEmbedding(
   candidates: ReadonlyArray<ReplayCandidate>,
 ): ReadonlyArray<number> {

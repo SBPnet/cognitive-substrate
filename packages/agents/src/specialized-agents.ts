@@ -1,6 +1,26 @@
+/**
+ * Deterministic specialised agents.
+ *
+ * Each agent in this file produces an `AgentResult` from an
+ * `AgentContext` using fixed heuristics over the policy vector and
+ * available memory. They are intentionally cheap and predictable so
+ * that the multi-agent runtime can run them all on every cycle without
+ * blowing the compute budget. Production deployments often add or
+ * replace agents with LLM-backed variants; the contract is stable so
+ * that the arbitration layer does not need to change.
+ *
+ * The six default agents map onto the multi-agent debate roles
+ * described in the architecture: planner, executor, critic, memory,
+ * world-model, and meta-cognition.
+ */
+
 import type { AgentContext, AgentResult, AgentType } from "@cognitive-substrate/core-types";
 import type { CognitiveAgent } from "./types.js";
 
+/**
+ * Shared base class. Subclasses override `propose`; everything else has
+ * a sensible default keyed off the AgentContext.
+ */
 abstract class DeterministicAgent implements CognitiveAgent {
   protected abstract readonly agentId: string;
   protected abstract readonly agentType: AgentType;
@@ -122,6 +142,10 @@ export class MetaCognitionAgent extends DeterministicAgent {
   }
 }
 
+/**
+ * Returns the canonical six-agent default lineup used by
+ * `MultiAgentRuntime` when no explicit `agents` array is configured.
+ */
 export function createDefaultAgents(): ReadonlyArray<CognitiveAgent> {
   return [
     new PlannerAgent(),

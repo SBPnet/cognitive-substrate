@@ -46,7 +46,9 @@ const kafka = new Kafka({
 const log = (msg: string) =>
   process.stdout.write(`[telemetry-producer] ${msg}\n`);
 
-const TOPIC = "telemetry.metrics.raw";
+const METRICS_TOPIC = "telemetry.metrics.raw";
+const LOGS_TOPIC = "telemetry.logs.raw";
+const METADATA_TOPIC = "telemetry.metadata.raw";
 
 const SAMPLE_METRICS = [
   { metricName: "consumer_lag", serviceType: "kafka", baseline: 25 },
@@ -60,7 +62,7 @@ async function run() {
     createPartitioner: Partitioners.DefaultPartitioner,
   });
   await producer.connect();
-  log(`Connected. Producing ${COUNT} messages to ${TOPIC} at ${INTERVAL_MS}ms intervals.`);
+  log(`Connected. Producing ${COUNT} messages to ${METRICS_TOPIC} at ${INTERVAL_MS}ms intervals.`);
 
   for (let i = 0; i < COUNT; i++) {
     const sample = SAMPLE_METRICS[i % SAMPLE_METRICS.length];
@@ -77,7 +79,7 @@ async function run() {
     };
 
     await producer.send({
-      topic: TOPIC,
+      topic: METRICS_TOPIC,
       messages: [{ value: JSON.stringify(payload) }],
     });
     log(`[${i + 1}/${COUNT}] Sent metric: ${sample!.metricName} = ${payload.value.toFixed(2)}`);
@@ -86,6 +88,43 @@ async function run() {
       await new Promise((r) => setTimeout(r, INTERVAL_MS));
     }
   }
+
+  await producer.send({
+    topic: LOGS_TOPIC,
+    messages: [
+      {
+        value: JSON.stringify({
+          project: "smoke-project",
+          serviceId: "smoke-kafka-01",
+          serviceType: "kafka",
+          unit: "broker-1",
+          message: "warning: consumer lag breached smoke threshold",
+          timestamp: new Date().toISOString(),
+          observedAt: new Date().toISOString(),
+          environment: ENVIRONMENT,
+        }),
+      },
+    ],
+  });
+  log(`Sent one structured log to ${LOGS_TOPIC}`);
+
+  await producer.send({
+    topic: METADATA_TOPIC,
+    messages: [
+      {
+        value: JSON.stringify({
+          project: "smoke-project",
+          serviceId: "smoke-kafka-01",
+          serviceType: "kafka",
+          source: "aiven.collector",
+          snapshot: { state: "RUNNING", plan: "smoke" },
+          timestamp: new Date().toISOString(),
+          environment: ENVIRONMENT,
+        }),
+      },
+    ],
+  });
+  log(`Sent one metadata snapshot to ${METADATA_TOPIC}`);
 
   await producer.disconnect();
   log("Done.");

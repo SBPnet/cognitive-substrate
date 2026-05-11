@@ -1,3 +1,15 @@
+/**
+ * Structural causal model construction and intervention.
+ *
+ * The current implementation infers edges from text co-occurrence in
+ * recent experience events: if two variable labels frequently appear in
+ * the same event text, an edge is added with strength proportional to
+ * the joint mention rate. This is a placeholder for a real causal
+ * discovery algorithm; the public surface stays the same so that
+ * downstream callers do not need to change when the implementation is
+ * swapped.
+ */
+
 import type {
   CausalEdge,
   CausalInferenceInput,
@@ -8,6 +20,12 @@ import type {
 } from "./types.js";
 
 export class CausalEngine {
+  /**
+   * Builds a directed graph over the supplied variables. Edge strength
+   * is the joint mention count divided by the larger of the two
+   * marginal counts; edge confidence rises with the size of the input
+   * window, saturating at 10 events.
+   */
   inferModel(input: CausalInferenceInput): StructuralCausalModel {
     const edges: CausalEdge[] = [];
     for (const source of input.variables) {
@@ -27,6 +45,12 @@ export class CausalEngine {
     return { variables: input.variables, edges };
   }
 
+  /**
+   * Estimates the effect of `do(intervention)` on `targetId`. The
+   * counterfactual aggregates the strength of every direct edge from
+   * the intervened variable to the target. Indirect (path-based)
+   * effects are not modelled in the current implementation.
+   */
   intervene(
     model: StructuralCausalModel,
     intervention: Intervention,
@@ -49,6 +73,12 @@ export class CausalEngine {
     };
   }
 
+  /**
+   * Returns a thresholded copy of the model containing only edges with
+   * strength at or above `minStrength`. Useful for handing the model
+   * to higher-level engines that should only see well-supported
+   * causal links.
+   */
   abstract(model: StructuralCausalModel, minStrength: number = 0.35): StructuralCausalModel {
     return {
       variables: model.variables,

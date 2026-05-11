@@ -8,9 +8,9 @@ status: living
 
 This matrix records the implementation status of each stage: the primary packages, corresponding architecture documentation, articles, and paper chapters. It is updated as each stage lands.
 
-**Status key:** `implemented` = TypeScript sources exist and build; `partial` = some packages present; `doc-only` = referenced in docs but no code on disk.
+**Status key:** `implemented + behavioral` = TypeScript sources exist and a smoke/runtime probe exercises the stage; `implemented + focused tests` = source plus package-level or worker-level tests but no full runtime probe; `implemented + entrypoint-import only` = source exists and imports/builds, but no behavioral evidence; `partial` = source exists but documented wiring is incomplete; `doc-only` = referenced in docs but no code on disk.
 
-**Evidence note:** `implemented` is a source and build status, not a claim of production readiness, behavioral completeness, or longitudinal validation. Runtime demonstrations, smoke coverage, and empirical evaluation are tracked separately in tests, smoke reports, companion demos, and paper evaluation notes.
+**Evidence note:** `entrypoint-import` confirms module loadability only. It is not production readiness, behavioral completeness, or longitudinal validation. Runtime demonstrations, smoke coverage, and empirical evaluation are tracked separately in tests, smoke reports, companion demos, and paper evaluation notes.
 
 ---
 
@@ -18,19 +18,19 @@ This matrix records the implementation status of each stage: the primary package
 
 | Stage | Name | Primary packages / apps | Architecture doc(s) | Article | Paper chapter | Status |
 |-------|------|-------------------------|---------------------|-------|---------------|--------|
-| 1 | Experience Ingestion | `apps/workers/ingestion/`, `packages/core-types/`, `packages/kafka-bus/`, `packages/memory-opensearch/`, `packages/memory-objectstore/`, `packages/telemetry-otel/` | `kafka-pipeline.md`, `opensearch-schema.md`, `opensearch-topology.md`, `otel-observability.md`, `aiven-deployment.md` | `articles/article-01-experience-ingestion.md` | `paper/01-foundations.md` | implemented |
-| 2 | Memory Retrieval | `packages/memory-opensearch/`, `packages/retrieval-engine/` | `opensearch-schema.md`, `opensearch-topology.md` | pending | `paper/02-memory-substrate.md` | implemented |
-| 3 | Consolidation Worker | `apps/workers/consolidation/`, `packages/consolidation-engine/` | `consolidation-worker.md`, `kafka-pipeline.md` | pending | `paper/02-memory-substrate.md` (§2.6) | implemented |
-| 4 | Policy Engine | `packages/policy-engine/` | none | pending | `paper/03-policy-drift.md` | implemented |
-| 5 | Cognitive Agent Loop | `apps/orchestrator/`, `packages/agents/` | `agent-runtime.md` | pending | `paper/01-foundations.md` (§1.8) | implemented |
-| 6 | Multi-Agent Decomposition | `packages/agents/` | `agent-runtime.md` | pending | `paper/04-multi-agent.md` | implemented |
-| 7 | Internal Debate and Arbitration | `packages/agents/` | `agent-runtime.md` | pending | `paper/04-multi-agent.md` (§4.10) | implemented |
-| 8 | Self-Reflection Loop | `packages/metacog-engine/` | none | pending | `paper/14-meta-cognition.md` | implemented |
-| 9 | Reinforcement Scoring Engine | `packages/reinforcement-engine/` | `reinforcement-engine.md` | pending | `paper/03-policy-drift.md` (§3.5) | implemented |
-| 10 | Identity Formation | `packages/narrative-engine/` | none | pending | `paper/07-stability-emergence.md` | implemented |
-| 11 | World Model | `packages/world-model/` | none | pending | `paper/05-world-models-goals.md` | implemented |
-| 12 | Long-Horizon Goals | `packages/agents/` | none | pending | `paper/05-world-models-goals.md` (§5.8) | implemented |
-| 13 | Multi-Agent Society | `apps/orchestrator/`, `infra/k8s/` | `agent-runtime.md`, `aiven-deployment.md` | pending | `paper/04-multi-agent.md` (§4.14) | implemented |
+| 1 | Experience Ingestion | `apps/workers/ingestion/`, `packages/core-types/`, `packages/kafka-bus/`, `packages/memory-opensearch/`, `packages/memory-objectstore/`, `packages/telemetry-otel/` | `kafka-pipeline.md`, `opensearch-schema.md`, `opensearch-topology.md`, `otel-observability.md`, `aiven-deployment.md` | `articles/article-01-experience-ingestion.md` | `paper/01-foundations.md` | implemented + behavioral |
+| 2 | Memory Retrieval | `packages/memory-opensearch/`, `packages/retrieval-engine/` | `opensearch-schema.md`, `opensearch-topology.md` | pending | `paper/02-memory-substrate.md` | implemented + focused tests |
+| 3 | Consolidation Worker | `apps/workers/consolidation/`, `packages/consolidation-engine/` | `consolidation-worker.md`, `kafka-pipeline.md` | pending | `paper/02-memory-substrate.md` (§2.6) | implemented + behavioral |
+| 4 | Policy Engine | `packages/policy-engine/` | none | pending | `paper/03-policy-drift.md` | implemented + behavioral |
+| 5 | Cognitive Agent Loop | `apps/orchestrator/`, `packages/agents/` | `agent-runtime.md` | pending | `paper/01-foundations.md` (§1.8) | implemented + behavioral |
+| 6 | Multi-Agent Decomposition | `packages/agents/` | `agent-runtime.md` | pending | `paper/04-multi-agent.md` | implemented + behavioral |
+| 7 | Internal Debate and Arbitration | `packages/agents/` | `agent-runtime.md` | pending | `paper/04-multi-agent.md` (§4.10) | implemented + behavioral |
+| 8 | Self-Reflection Loop | `packages/metacog-engine/` | none | pending | `paper/14-meta-cognition.md` | implemented + entrypoint-import only |
+| 9 | Reinforcement Scoring Engine | `packages/reinforcement-engine/` | `reinforcement-engine.md` | pending | `paper/03-policy-drift.md` (§3.5) | partial |
+| 10 | Identity Formation | `packages/narrative-engine/` | none | pending | `paper/07-stability-emergence.md` | implemented + entrypoint-import only |
+| 11 | World Model | `packages/world-model/` | none | pending | `paper/05-world-models-goals.md` | implemented + behavioral |
+| 12 | Long-Horizon Goals | `packages/agents/` | none | pending | `paper/05-world-models-goals.md` (§5.8) | implemented + behavioral |
+| 13 | Multi-Agent Society | `apps/orchestrator/`, `infra/k8s/` | `agent-runtime.md`, `aiven-deployment.md` | pending | `paper/04-multi-agent.md` (§4.14) | implemented + behavioral |
 
 ### Architecture coverage gaps: Series I
 
@@ -49,22 +49,22 @@ The Series I table also references several planned cross-cutting architecture do
 
 | Stage | Name | Primary packages / apps | Architecture doc(s) | Article | Paper chapter | Status |
 |-------|------|-------------------------|---------------------|-------|---------------|--------|
-| 14 | Attention Engine | `packages/attention-engine/` | `attention-modes.md` | pending | `paper/08-attention.md` | implemented |
-| 15 | Temporal Cognition | `packages/temporal-engine/` | none | pending | `paper/09-temporal-cognition.md` | implemented |
-| 16 | Cognitive Economics | `packages/budget-engine/` | none | pending | `paper/10-cognitive-economics.md` | implemented |
-| 17 | Forgetting System | `packages/decay-engine/` | none | pending | `paper/11-forgetting.md` | implemented |
-| 18 | Affect Modulation | `packages/affect-engine/` | `multi-circuit-reward.md` | pending | `paper/12-emotional-modulation.md` | implemented |
-| 19 | Narrative Selfhood | `packages/narrative-engine/` | none | pending | `paper/13-narrative-selfhood.md` | implemented |
-| 20 | Meta-Cognition | `packages/metacog-engine/` | none | pending | `paper/14-meta-cognition.md` | implemented |
-| 21 | Social Cognition | `packages/social-engine/` | none | pending | `paper/15-social-intelligence.md` | implemented |
-| 22 | Grounded Cognition | `packages/grounding-engine/` | none | pending | `paper/16-grounded-cognition.md` | implemented |
-| 23 | Constitutional Stability | `packages/constitution-engine/` | none | pending | `paper/17-constitutional-stability.md` | implemented |
-| 24 | Causal Intelligence | `packages/causal-engine/` | none | pending | `paper/18-causal-intelligence.md` | implemented |
-| 25 | Curiosity Engine | `packages/curiosity-engine/` | none | pending | `paper/19-curiosity.md` | implemented |
-| 26 | Dreaming System | `packages/dream-engine/` | none | pending | `paper/20-dreaming.md` | implemented |
-| 27 | Recursive Abstraction | `packages/abstraction-engine/` | none | pending | `paper/21-recursive-abstraction.md` | implemented |
-| 28 | Developmental Cognition | `packages/development-engine/` | none | pending | `paper/22-developmental-cognition.md` | implemented |
-| 29 | Open-Ended Intelligence | `apps/orchestrator/` (open-ended mode) | none | pending | `paper/23-open-ended-intelligence.md` | implemented |
+| 14 | Attention Engine | `packages/attention-engine/` | `attention-modes.md` | pending | `paper/08-attention.md` | implemented + entrypoint-import only |
+| 15 | Temporal Cognition | `packages/temporal-engine/` | none | pending | `paper/09-temporal-cognition.md` | implemented + entrypoint-import only |
+| 16 | Cognitive Economics | `packages/budget-engine/` | none | pending | `paper/10-cognitive-economics.md` | implemented + entrypoint-import only |
+| 17 | Forgetting System | `packages/decay-engine/` | none | pending | `paper/11-forgetting.md` | implemented + entrypoint-import only |
+| 18 | Affect Modulation | `packages/affect-engine/` | `multi-circuit-reward.md` | pending | `paper/12-emotional-modulation.md` | implemented + entrypoint-import only |
+| 19 | Narrative Selfhood | `packages/narrative-engine/` | none | pending | `paper/13-narrative-selfhood.md` | implemented + entrypoint-import only |
+| 20 | Meta-Cognition | `packages/metacog-engine/` | none | pending | `paper/14-meta-cognition.md` | implemented + entrypoint-import only |
+| 21 | Social Cognition | `packages/social-engine/` | none | pending | `paper/15-social-intelligence.md` | implemented + entrypoint-import only |
+| 22 | Grounded Cognition | `packages/grounding-engine/` | none | pending | `paper/16-grounded-cognition.md` | implemented + entrypoint-import only |
+| 23 | Constitutional Stability | `packages/constitution-engine/` | none | pending | `paper/17-constitutional-stability.md` | implemented + focused tests |
+| 24 | Causal Intelligence | `packages/causal-engine/` | none | pending | `paper/18-causal-intelligence.md` | implemented + entrypoint-import only |
+| 25 | Curiosity Engine | `packages/curiosity-engine/` | none | pending | `paper/19-curiosity.md` | implemented + entrypoint-import only |
+| 26 | Dreaming System | `packages/dream-engine/` | none | pending | `paper/20-dreaming.md` | implemented + entrypoint-import only |
+| 27 | Recursive Abstraction | `packages/abstraction-engine/` | none | pending | `paper/21-recursive-abstraction.md` | implemented + behavioral |
+| 28 | Developmental Cognition | `packages/development-engine/` | none | pending | `paper/22-developmental-cognition.md` | implemented + focused tests |
+| 29 | Open-Ended Intelligence | `apps/orchestrator/` (open-ended mode) | none | pending | `paper/23-open-ended-intelligence.md` | implemented + focused tests |
 
 ### Architecture coverage gaps: Series II
 
@@ -82,13 +82,13 @@ Stages 15 through 29 each have implemented TypeScript packages but no dedicated 
 
 | Stage | Name | Primary packages / apps | Architecture doc(s) | Article | Paper chapter | Status |
 |-------|------|-------------------------|---------------------|-------|---------------|--------|
-| 30 | Operational Primitives | `packages/abstraction-engine/src/primitives/` | `operational-primitives.md` | `articles/article-31-operational-intelligence.md` | `paper/24-operational-primitives.md` | implemented |
-| 31 | ClickHouse Telemetry Layer | `infra/aiven/clickhouse.tf`, `packages/clickhouse-telemetry/` | `clickhouse-telemetry.md`, `aiven-deployment.md` | see Stage 30 article | see Stage 30 paper | implemented |
-| 32 | Telemetry Ingestion Worker | `apps/workers/telemetry/` | `kafka-pipeline.md` | see Stage 30 article | see Stage 30 paper | implemented |
-| 33 | Pattern Detection Worker | `apps/workers/pattern/` | `operational-primitives.md` | see Stage 30 article | see Stage 30 paper | implemented |
-| 34 | Reinforcement Feedback Worker | `apps/workers/reinforcement/` | `reinforcement-engine.md` | see Stage 30 article | see Stage 30 paper | implemented |
-| 35 | OpenSearch ML Inference Nodes | `infra/aiven/opensearch.tf`, `packages/memory-opensearch/src/ml-inference.ts`, `packages/retrieval-engine/src/retriever.ts` | `opensearch-ml-nodes.md` | none | none | implemented |
-| 36 | Intelligence Transfer | `packages/abstraction-engine/src/primitives/mapping-layer.ts` | `operational-primitives.md` | see Stage 30 article | see Stage 30 paper | implemented |
+| 30 | Operational Primitives | `packages/abstraction-engine/src/primitives/` | `operational-primitives.md` | `articles/article-31-operational-intelligence.md` | `paper/24-operational-primitives.md` | implemented + behavioral |
+| 31 | ClickHouse Telemetry Layer | `infra/aiven/clickhouse.tf`, `packages/clickhouse-telemetry/` | `clickhouse-telemetry.md`, `aiven-deployment.md` | see Stage 30 article | see Stage 30 paper | partial |
+| 32 | Telemetry Ingestion Worker | `apps/workers/telemetry/` | `kafka-pipeline.md` | see Stage 30 article | see Stage 30 paper | partial |
+| 33 | Pattern Detection Worker | `apps/workers/pattern/` | `operational-primitives.md` | see Stage 30 article | see Stage 30 paper | partial |
+| 34 | Reinforcement Feedback Worker | `apps/workers/reinforcement/` | `reinforcement-engine.md` | see Stage 30 article | see Stage 30 paper | partial |
+| 35 | OpenSearch ML Inference Nodes | `infra/aiven/opensearch.tf`, `packages/memory-opensearch/src/ml-inference.ts`, `packages/retrieval-engine/src/retriever.ts` | `opensearch-ml-nodes.md` | none | none | implemented + focused tests |
+| 36 | Intelligence Transfer | `packages/abstraction-engine/src/primitives/mapping-layer.ts` | `operational-primitives.md` | see Stage 30 article | see Stage 30 paper | partial |
 
 ---
 
@@ -118,3 +118,16 @@ The following documents are referenced by stage rows or remain necessary for arc
 - `opensearch-schema.md`: index schemas for episodic memory, semantic memory, goals, agents, and policies.
 - `opensearch-topology.md`: heterogeneous node topology and memory placement strategy.
 - `agent-runtime.md`, `consolidation-worker.md`, `reinforcement-engine.md`, and per-engine Series II documents listed above.
+
+### Current implementation gaps
+
+These gaps are tracked separately from stage source availability:
+
+- `apps/workers/telemetry/src/experience-bridge.ts` is wired when `TELEMETRY_EXPERIENCE_ENABLED=true`; keep deep smoke coverage current so this does not regress.
+- `apps/workers/telemetry/` consumes `telemetry.metrics.raw`, `telemetry.logs.raw`, and `telemetry.metadata.raw`. Metrics feed primitive normalisation, logs are written to `logs_raw`, and all three can contribute to telemetry-as-experience summaries.
+- `packages/clickhouse-telemetry/` defines insert paths for traces and incident reconstruction tables that are not yet populated by shipped workers.
+- `packages/reinforcement-engine/` is buildable, but the reinforcement worker does not currently import it. Stage 9 therefore remains partial until that package participates in the runtime scoring path.
+- `apps/workers/pattern/` has a seed-loading path that needs a regression test: an empty `operational_patterns` index should be populated from built-in seed patterns.
+- `apps/orchestrator/` must keep its query embedder aligned with ingestion. A zero-vector query embedder is only valid for stub-mode smoke runs.
+- `apps/api/src/routes/policy.ts` exposes self-modification, identity, and goals route groups that are placeholders until backed by real indices or explicitly returned as `501 Not Implemented`.
+- `deploy/` currently contains generated package/app mirrors used for deployment packaging. Treat it as build output for audit and grep purposes; source-of-truth edits belong under top-level `apps/`, `packages/`, `docs/`, `infra/`, and `scripts/`.

@@ -12,6 +12,9 @@ import { dirname, join, relative, resolve } from "node:path";
 import process from "node:process";
 import { setTimeout as sleep } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
+import {
+  EpisodicObjectStore,
+} from "../../packages/memory-objectstore/src/client.js";
 
 type Status = "passed" | "failed" | "skipped";
 
@@ -126,6 +129,8 @@ const localSmokeEnv: Record<string, string> = {
   OTEL_EXPORTER_OTLP_ENDPOINT: "http://localhost:4318",
   EMBEDDING_PROVIDER: "stub",
   ENVIRONMENT: "smoke",
+  TELEMETRY_EXPERIENCE_ENABLED: "true",
+  TELEMETRY_EXPERIENCE_WINDOW_MS: "1000",
 };
 
 const hostedEnvKeys = [
@@ -145,6 +150,21 @@ const appServices = [
   { name: "telemetry", cwd: "apps/workers/telemetry", command: "node", args: ["dist/main.js"] },
   { name: "pattern", cwd: "apps/workers/pattern", command: "node", args: ["dist/main.js"] },
   { name: "reinforcement", cwd: "apps/workers/reinforcement", command: "node", args: ["dist/main.js"] },
+  {
+    name: "aiven-collector",
+    cwd: "apps/workers/aiven-collector",
+    command: "node",
+    args: ["dist/main.js"],
+    env: {
+      AIVEN_TOKEN: "smoke-token",
+      AIVEN_PROJECT: "smoke-project",
+      AIVEN_API_BASE_URL: "http://127.0.0.1:9",
+      AIVEN_METADATA_INTERVAL_MS: "60000",
+      AIVEN_LOGS_INTERVAL_MS: "60000",
+      AIVEN_METRICS_INTERVAL_MS: "60000",
+      AIVEN_EVENTS_INTERVAL_MS: "60000",
+    },
+  },
   { name: "orchestrator", cwd: "apps/orchestrator", command: "node", args: ["dist/main.js"] },
   { name: "api", cwd: "apps/api", command: "node", args: ["dist/main.js"] },
   {
@@ -156,6 +176,31 @@ const appServices = [
   },
 ] as const;
 
+const runtimeProbePackages = new Set([
+  "@cognitive-substrate/ingestion-worker",
+  "@cognitive-substrate/consolidation-worker",
+  "@cognitive-substrate/telemetry-worker",
+  "@cognitive-substrate/pattern-worker",
+  "@cognitive-substrate/reinforcement-worker",
+  "@cognitive-substrate/aiven-collector-worker",
+  "@cognitive-substrate/orchestrator",
+  "@cognitive-substrate/api",
+  "@cognitive-substrate/web",
+  "@cognitive-substrate/core-types",
+  "@cognitive-substrate/kafka-bus",
+  "@cognitive-substrate/memory-opensearch",
+  "@cognitive-substrate/memory-objectstore",
+  "@cognitive-substrate/clickhouse-telemetry",
+  "@cognitive-substrate/telemetry-otel",
+  "@cognitive-substrate/abstraction-engine",
+  "@cognitive-substrate/agents",
+  "@cognitive-substrate/consolidation-engine",
+  "@cognitive-substrate/policy-engine",
+  "@cognitive-substrate/reinforcement-engine",
+  "@cognitive-substrate/retrieval-engine",
+  "@cognitive-substrate/world-model",
+]);
+
 async function main(): Promise<void> {
   await mkdir(logsDir, { recursive: true });
   report.gitSha = await captureCommand("git", ["rev-parse", "--short", "HEAD"]).catch(() => "unknown");
@@ -165,10 +210,23 @@ async function main(): Promise<void> {
     await runPhase("package-baseline", () =>
       runCommand("package-baseline", "pnpm", ["smoke:packages"]),
     );
+    await runPhase("aiven-collector-contract", () =>
+      runCommand("aiven-collector-contract", "pnpm", ["tsx", "scripts/smoke/aiven-collector-contract.ts"]),
+    );
+    await runPhase("telemetry-experience-bridge-contract", () =>
+      runCommand("telemetry-experience-bridge-contract", "pnpm", [
+        "tsx",
+        "scripts/smoke/telemetry-experience-bridge-contract.ts",
+      ]),
+    );
     await runPhase("open-ended-probe", () =>
       runCommand("open-ended-probe", "node", ["dist/main.js"], {
         cwd: join(repoRoot, "apps/orchestrator"),
-        env: { ...localSmokeEnv, COGNITIVE_SUBSTRATE_MODE: "open-ended" },
+        env: {
+          ...localSmokeEnv,
+          COGNITIVE_SUBSTRATE_MODE: "open-ended",
+          DISABLE_HEALTH_SERVER: "true",
+        },
       }),
     );
     await runPhase("copy-env-examples", copyEnvExamples);
@@ -176,6 +234,7 @@ async function main(): Promise<void> {
       runCommand("infra-start", "docker", ["compose", "-f", "docker-compose.smoke.yml", "up", "-d"]),
     );
     await runPhase("infra-readiness", waitForInfrastructure);
+    await runPhase("embedding-model-swap", runEmbeddingModelSwap);
     await runPhase("init-kafka-topics", () =>
       runCommand("init-kafka-topics", "pnpm", ["tsx", "scripts/smoke/init-kafka-topics.ts"], {
         env: localSmokeEnv,
@@ -207,6 +266,7 @@ async function main(): Promise<void> {
         },
       });
       await waitForClickHouseMinimum("metrics_raw", Number(process.env["MIN_METRICS_RAW_COUNT"] ?? "1"));
+      await waitForClickHouseMinimum("logs_raw", Number(process.env["MIN_LOGS_RAW_COUNT"] ?? "1"));
       await waitForClickHouseMinimum("cognitive_events", Number(process.env["MIN_COGNITIVE_EVENTS_COUNT"] ?? "1"));
     });
     await runPhase("assertions", runAssertions);
@@ -345,6 +405,61 @@ async function waitForApplications(): Promise<void> {
   await waitForHttp("web", "http://localhost:3000", 120_000);
 }
 
+async function runEmbeddingModelSwap(): Promise<void> {
+  const embeddingArtifactDir = join(report.artifactDir, "embedding-model-swap");
+  await runCommand("embedding-model-swap", "pnpm", ["smoke:embedding"], {
+    env: {
+      ...localSmokeEnv,
+      EMBEDDING_LANES: "quality,efficient",
+      QUALITY_EMBEDDING_PROVIDER: "stub",
+      EFFICIENT_EMBEDDING_PROVIDER: "stub",
+      EMBEDDING_SMOKE_ARTIFACT_DIR: embeddingArtifactDir,
+    },
+  });
+
+  const reportPath = join(repoRoot, embeddingArtifactDir, "report.json");
+  const raw = await readFile(reportPath, "utf8");
+  const embeddingReport = JSON.parse(raw) as {
+    readonly activeLanes?: string[];
+    readonly profiles?: Array<{
+      readonly profile?: { readonly lane?: string; readonly vectorField?: string };
+      readonly vectorFieldPresent?: boolean;
+      readonly queryResults?: Array<{ readonly topK?: unknown[] }>;
+    }>;
+    readonly assertions?: Array<{ readonly name: string; readonly passed: boolean; readonly actual: string }>;
+  };
+
+  report.metrics["embedding_model_swap.active_lanes"] = embeddingReport.activeLanes?.join(",") ?? "";
+  report.metrics["embedding_model_swap.profile_count"] = embeddingReport.profiles?.length ?? 0;
+
+  for (const profile of embeddingReport.profiles ?? []) {
+    const lane = profile.profile?.lane ?? "unknown";
+    report.metrics[`embedding_model_swap.${lane}.vector_field`] = profile.profile?.vectorField ?? "unknown";
+    report.metrics[`embedding_model_swap.${lane}.query_count`] = profile.queryResults?.length ?? 0;
+    report.assertions.push({
+      name: `embedding ${lane} vector field present`,
+      status: profile.vectorFieldPresent ? "passed" : "failed",
+      expected: "profile vector field exists",
+      actual: String(profile.vectorFieldPresent),
+    });
+    report.assertions.push({
+      name: `embedding ${lane} retrieval results`,
+      status: (profile.queryResults ?? []).every((result) => (result.topK?.length ?? 0) > 0) ? "passed" : "failed",
+      expected: "each model-swap query returns at least one result",
+      actual: (profile.queryResults ?? []).map((result) => String(result.topK?.length ?? 0)).join(","),
+    });
+  }
+
+  for (const assertion of embeddingReport.assertions ?? []) {
+    report.assertions.push({
+      name: `embedding report ${assertion.name}`,
+      status: assertion.passed ? "passed" : "failed",
+      expected: "passed",
+      actual: assertion.actual,
+    });
+  }
+}
+
 async function waitForHttp(name: string, url: string, timeoutMs: number): Promise<void> {
   const deadline = Date.now() + timeoutMs;
   let lastError = "";
@@ -394,6 +509,7 @@ async function startApplications(): Promise<void> {
     const env = {
       ...parseEnvFile(await readOptionalFile(join(cwd, ".env"))),
       ...localSmokeEnv,
+      ...(service.name === "api" || service.name === "web" ? {} : { DISABLE_HEALTH_SERVER: "true" }),
       ...("env" in service ? service.env : {}),
     };
     const handle = await startService(service.name, cwd, service.command, service.args, env);
@@ -461,7 +577,9 @@ async function runAssertions(): Promise<void> {
   const auditCount = await getOpenSearchCount("audit_events");
   const agentActivityCount = await getOpenSearchCount("agent_activity");
   const metricsRawCount = await getClickHouseCount("metrics_raw");
+  const logsRawCount = await getClickHouseCount("logs_raw");
   const cognitiveEventsCount = await getClickHouseCount("cognitive_events");
+  const objectStoreEventCount = await getObjectStoreEventCount();
   const sessionId = await smokeSessionId();
   const traceTotal = sessionId ? await getApiTotal(`/api/sessions/${sessionId}/memories/trace?limit=20`) : 0;
   const agentTotal = sessionId ? await getApiTotal(`/api/sessions/${sessionId}/agents?limit=20`, "activities") : 0;
@@ -471,7 +589,9 @@ async function runAssertions(): Promise<void> {
   report.metrics["opensearch.audit_events"] = auditCount;
   report.metrics["opensearch.agent_activity"] = agentActivityCount;
   report.metrics["clickhouse.metrics_raw"] = metricsRawCount;
+  report.metrics["clickhouse.logs_raw"] = logsRawCount;
   report.metrics["clickhouse.cognitive_events"] = cognitiveEventsCount;
+  report.metrics["objectstore.events"] = objectStoreEventCount;
   report.metrics["api.trace_events"] = traceTotal;
   report.metrics["api.agent_activities"] = agentTotal;
 
@@ -480,7 +600,9 @@ async function runAssertions(): Promise<void> {
   addMinimumAssertion("opensearch audit_events", auditCount, 1);
   addMinimumAssertion("opensearch agent_activity", agentActivityCount, 1);
   addMinimumAssertion("clickhouse metrics_raw", metricsRawCount, 1);
+  addMinimumAssertion("clickhouse logs_raw", logsRawCount, 1);
   addMinimumAssertion("clickhouse cognitive_events", cognitiveEventsCount, 1);
+  addMinimumAssertion("object store event payloads", objectStoreEventCount, 1);
   addMinimumAssertion("api trace events", traceTotal, 1);
   addMinimumAssertion("api agent activities", agentTotal, 1);
   addProcessAssertion();
@@ -559,6 +681,26 @@ async function getClickHouseCount(table: string): Promise<number> {
   return typeof rawCount === "number" ? rawCount : Number(rawCount);
 }
 
+async function getObjectStoreEventCount(): Promise<number> {
+  const store = new EpisodicObjectStore({
+    bucket: localSmokeEnv.S3_BUCKET,
+    region: localSmokeEnv.S3_REGION,
+    endpoint: localSmokeEnv.S3_ENDPOINT,
+    credentials: {
+      accessKeyId: localSmokeEnv.S3_ACCESS_KEY_ID,
+      secretAccessKey: localSmokeEnv.S3_SECRET_ACCESS_KEY,
+    },
+    forcePathStyle: localSmokeEnv.S3_FORCE_PATH_STYLE === "true",
+  });
+  const keys = await store.list("events/");
+  if (keys.length === 0) return 0;
+
+  const sample = await store.get<unknown>(keys[0]!);
+  if (!sample) return 0;
+  report.metrics["objectstore.sample_key"] = keys[0]!;
+  return keys.length;
+}
+
 async function buildCoverageModel(): Promise<PackageCoverage[]> {
   const packages = await discoverWorkspacePackages();
   const byName = new Map(packages.map((pkg) => [pkg.packageJson.name, pkg]));
@@ -568,6 +710,7 @@ async function buildCoverageModel(): Promise<PackageCoverage[]> {
 
   for (const service of appServices) {
     const pkg = packages.find((candidate) => candidate.path === service.cwd);
+    if (!pkg) continue;
     if (!pkg.packageJson.name) continue;
     launchedAppNames.add(pkg.packageJson.name);
     const sourceImports = await sourceImportedWorkspacePackages(join(repoRoot, service.cwd, "src"));
@@ -591,6 +734,9 @@ async function buildCoverageModel(): Promise<PackageCoverage[]> {
     if (pkg.kind === "package") evidence.add("entrypoint-import");
     if (pkg.packageJson.name && launchedAppNames.has(pkg.packageJson.name)) {
       evidence.add("launched-service");
+    }
+    if (pkg.packageJson.name && runtimeProbePackages.has(pkg.packageJson.name)) {
+      evidence.add("runtime-probe");
     }
     if (pkg.packageJson.name && runtimeDirect.has(pkg.packageJson.name)) {
       evidence.add("runtime-direct");
@@ -755,8 +901,18 @@ async function stopServices(): Promise<void> {
 async function writeReports(): Promise<void> {
   await mkdir(artifactDir, { recursive: true });
   await writeFile(reportJsonPath, `${JSON.stringify(report, null, 2)}\n`);
-  await writeFile(reportMarkdownPath, renderMarkdownReport());
+  const markdown = renderMarkdownReport();
+  await writeFile(reportMarkdownPath, markdown);
+  await writeBaselineSnapshot(markdown);
   process.stdout.write(`[deep-smoke] report: ${relative(repoRoot, reportMarkdownPath)}\n`);
+}
+
+async function writeBaselineSnapshot(markdown: string): Promise<void> {
+  if (process.env["SMOKE_WRITE_BASELINE"] === "false") return;
+  const baselineDir = join(repoRoot, "artifacts", "baselines");
+  await mkdir(baselineDir, { recursive: true });
+  await writeFile(join(baselineDir, "deep-smoke-report.latest.json"), `${JSON.stringify(report, null, 2)}\n`);
+  await writeFile(join(baselineDir, "deep-smoke-report.latest.md"), markdown);
 }
 
 function renderMarkdownReport(): string {

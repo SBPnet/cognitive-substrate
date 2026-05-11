@@ -29,6 +29,7 @@ import { fileURLToPath } from "node:url";
 import { embeddingProfilesFromEnv } from "../../packages/memory-opensearch/src/profiles.js";
 import { RETRIEVAL_MODE_VECTOR_FIELD } from "../../packages/memory-opensearch/src/query-builder.js";
 import { createOpenSearchClient } from "../../packages/memory-opensearch/src/client.js";
+import { modelRegistrySchema } from "../../packages/memory-opensearch/src/schemas.js";
 import { buildEmbeddersFromProfiles } from "../../apps/workers/ingestion/src/embedder.js";
 import type { EmbeddingProfile } from "../../packages/memory-opensearch/src/profiles.js";
 import type { RetrievalMode } from "../../packages/memory-opensearch/src/query-builder.js";
@@ -37,7 +38,9 @@ type OpenSearchClient = ReturnType<typeof createOpenSearchClient>;
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot   = join(scriptDir, "../..");
-const artifactDir = join(repoRoot, "artifacts/smoke/embedding-model-swap");
+const artifactDir = process.env["EMBEDDING_SMOKE_ARTIFACT_DIR"]
+  ? join(repoRoot, process.env["EMBEDDING_SMOKE_ARTIFACT_DIR"])
+  : join(repoRoot, "artifacts/smoke/embedding-model-swap");
 
 // ---------------------------------------------------------------------------
 // Config
@@ -144,6 +147,7 @@ interface Report {
   readonly profiles: ProfileReport[];
   readonly mlNodeSettingVerified: boolean;
   readonly mlNodeSettingValue: string;
+  readonly assertions: Array<{ name: string; passed: boolean; actual: string }>;
 }
 
 // ---------------------------------------------------------------------------
@@ -174,6 +178,7 @@ async function main(): Promise<void> {
 
   // Build a shared index that holds all profile vectors.
   await ensureTestIndex(client, profiles);
+  await recordProfiles(client, profiles);
 
   // Index the corpus through every active profile in one pass.
   log(`Indexing ${CORPUS.length} artifacts across ${profiles.length} profile(s)...`);
@@ -227,11 +232,29 @@ async function main(): Promise<void> {
     profiles: profileReports,
     mlNodeSettingVerified,
     mlNodeSettingValue,
+    assertions: buildAssertions(profileReports),
   };
 
   await writeReports(report);
   log("\n=== Done ===");
   log(`Report written to ${artifactDir}/report.json`);
+}
+
+function buildAssertions(profileReports: ProfileReport[]): Array<{ name: string; passed: boolean; actual: string }> {
+  const assertions: Array<{ name: string; passed: boolean; actual: string }> = [];
+  for (const profileReport of profileReports) {
+    assertions.push({
+      name: `${profileReport.profile.lane} vector field present`,
+      passed: profileReport.vectorFieldPresent,
+      actual: String(profileReport.vectorFieldPresent),
+    });
+    assertions.push({
+      name: `${profileReport.profile.lane} retrieval returned results`,
+      passed: profileReport.queryResults.every((result) => result.topK.length > 0),
+      actual: profileReport.queryResults.map((result) => `${result.query}:${result.topK.length}`).join(", "),
+    });
+  }
+  return assertions;
 }
 
 // ---------------------------------------------------------------------------
@@ -328,6 +351,36 @@ async function ensureTestIndex(
   });
 
   log(`Test index "${INDEX_NAME}" created with ${profiles.length} vector field(s).`);
+}
+
+async function recordProfiles(client: OpenSearchClient, profiles: EmbeddingProfile[]): Promise<void> {
+  const registryIndex = "model_registry";
+  const exists = await client.indices.exists({ index: registryIndex });
+  if (!exists.body) {
+    await client.indices.create({ index: registryIndex, body: modelRegistrySchema });
+  }
+
+  for (const profile of profiles) {
+    await client.index({
+      index: registryIndex,
+      id: `embedding-model-swap-${profile.id}`,
+      body: {
+        profile_id: profile.id,
+        lane: profile.lane,
+        model_id: profile.modelId ?? profile.id,
+        model_name: profile.name,
+        provider: profile.provider,
+        vector_field: profile.vectorField,
+        dimension: profile.dimension,
+        endpoint: profile.endpoint ?? "",
+        ml_commons_model_id: profile.mlCommonsModelId ?? "",
+        deployment_status: "smoke-tested",
+        license_notes: "see upstream model card",
+        registered_at: new Date().toISOString(),
+      },
+      refresh: "wait_for",
+    });
+  }
 }
 
 async function indexCorpus(
@@ -484,6 +537,13 @@ async function writeReports(report: Report): Promise<void> {
       mdLines.push("");
     }
   }
+
+  mdLines.push("## Assertions");
+  mdLines.push("");
+  for (const assertion of report.assertions) {
+    mdLines.push(`- ${assertion.passed ? "passed" : "failed"}: ${assertion.name}, actual ${assertion.actual}`);
+  }
+  mdLines.push("");
 
   const mdPath = join(artifactDir, "report.md");
   await writeFile(mdPath, mdLines.join("\n"));

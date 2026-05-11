@@ -1,3 +1,15 @@
+/**
+ * Reference outcome-simulation model.
+ *
+ * `HeuristicOutcomeSimulationModel` is the deterministic fallback used
+ * when no LLM-backed simulator is wired in. It scores risk from a small
+ * lexicon of dangerous-sounding tokens, scores confidence from the size
+ * of the supporting memory and goal context, and labels the predicted
+ * outcome with coarse risk/confidence bands. The model is intentionally
+ * conservative: it errs toward "moderate-risk moderate-confidence" so
+ * that downstream arbitration does not treat it as authoritative.
+ */
+
 import type { OutcomeSimulationModel, SimulatedOutcome, WorldModelSimulationInput } from "./types.js";
 
 export class HeuristicOutcomeSimulationModel implements OutcomeSimulationModel {
@@ -19,6 +31,7 @@ export class HeuristicOutcomeSimulationModel implements OutcomeSimulationModel {
   }
 }
 
+/** Builds the predicted-outcome string from the risk and confidence bands. */
 function summarizeOutcome(
   input: WorldModelSimulationInput,
   riskScore: number,
@@ -29,6 +42,11 @@ function summarizeOutcome(
   return `${riskBand} ${confidenceBand} outcome forecast for action: ${input.actionSummary}`;
 }
 
+/**
+ * Lexical risk score: counts how many risk-laden tokens appear in the
+ * input text and normalises by an arbitrary cap of three so that the
+ * resulting score saturates at 1.0 once a few risk tokens are present.
+ */
 function lexicalRisk(text: string): number {
   const normalized = text.toLowerCase();
   const riskTerms = ["delete", "overwrite", "external", "credential", "destructive", "irreversible", "unsafe"];

@@ -9,6 +9,10 @@ tags: [branching, sessions, attention, trace, replay]
 
 Branching cognition models divergent lines of reasoning, interrupted tasks, and competing contextual continuations as first-class runtime structures. A branch is a traceable reasoning path with its own working context, retrieved memory set, salience state, and policy snapshot.
 
+## Implementation Status
+
+This is a design draft. Branch records and the `branch.*` event topics below are proposals unless and until they are added to runtime schemas and producers. The source-of-truth runtime topic registry is `packages/kafka-bus/src/topics.ts`.
+
 ## Branch Entity
 
 A branch records:

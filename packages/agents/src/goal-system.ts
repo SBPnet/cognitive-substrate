@@ -1,3 +1,14 @@
+/**
+ * Goal system: hierarchy management, selection, and progress tracking.
+ *
+ * The goal system is the long-horizon counterpart to the temporal
+ * engine. Goals are persisted (via a `GoalStore`), ranked for
+ * selection by combined priority, horizon weight, progress
+ * opportunity, and event relevance, and decomposed into subgoals at
+ * the next-lower horizon. Progress events are mirrored onto Kafka
+ * via an optional `GoalProgressPublisher`.
+ */
+
 import { randomUUID } from "node:crypto";
 import type {
   ExperienceEvent,
@@ -8,6 +19,7 @@ import type {
   PolicyState,
 } from "@cognitive-substrate/core-types";
 
+/** Canonical horizon ordering used for monotonic decomposition. */
 const HORIZON_ORDER: ReadonlyArray<GoalHorizon> = ["micro", "short", "mid", "long", "meta"];
 
 const HORIZON_PRIORITY_WEIGHT: Record<GoalHorizon, number> = {
@@ -40,12 +52,14 @@ export interface GoalProgressInput {
   readonly sourceExperienceId?: string;
 }
 
+/** Persistence contract for goals. */
 export interface GoalStore {
   save(goal: Goal): Promise<void>;
   get(goalId: string): Promise<Goal | undefined>;
   listActive(): Promise<ReadonlyArray<Goal>>;
 }
 
+/** Optional fan-out hook used to broadcast progress events on Kafka. */
 export interface GoalProgressPublisher {
   publish(event: GoalProgressEvent): Promise<void>;
 }

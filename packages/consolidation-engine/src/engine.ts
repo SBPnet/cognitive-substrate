@@ -1,3 +1,19 @@
+/**
+ * Consolidation engine orchestrator.
+ *
+ * One `consolidate()` call runs the full sleep cycle:
+ *   1. Select replay candidates from `experience_events` using a decay-aware
+ *      query (`buildReplaySelectionQuery`).
+ *   2. Hand them to the configured `ConsolidationModel` to produce a draft.
+ *   3. Materialise the draft as a `SemanticMemory` and write it into the
+ *      `memory_semantic` index with a fresh `decay_factor` of 1.0.
+ *   4. Bump the source events' `retrieval_count` so that future replay
+ *      cycles do not re-select them as aggressively.
+ *
+ * The engine takes a `ConsolidationEngineConfig` to allow injection of a
+ * custom search client, model, or index writer for tests.
+ */
+
 import { randomUUID } from "node:crypto";
 import type { Client } from "@opensearch-project/opensearch";
 import type { SemanticMemory } from "@cognitive-substrate/core-types";
@@ -20,8 +36,11 @@ type ReplaySearchClient = typeof search<ExperienceReplayDocument>;
 
 export interface ConsolidationEngineConfig {
   readonly openSearch: Client;
+  /** Defaults to `ExtractiveConsolidationModel`. */
   readonly model?: ConsolidationModel;
+  /** Override hook for tests; defaults to the production `search` client. */
   readonly searchClient?: ReplaySearchClient;
+  /** Override hook for tests; defaults to the production `indexDocument`. */
   readonly indexMemory?: typeof indexDocument;
 }
 
@@ -38,6 +57,10 @@ export class ConsolidationEngine {
     this.indexMemory = config.indexMemory ?? indexDocument;
   }
 
+  /**
+   * Runs one consolidation cycle. Throws when no candidates are eligible,
+   * since downstream subscribers expect a non-empty `sourceEventIds` list.
+   */
   async consolidate(request: ConsolidationRequest): Promise<ConsolidationResult> {
     const candidates = await this.selectReplayCandidates(request);
     if (candidates.length === 0) {
@@ -90,6 +113,11 @@ export class ConsolidationEngine {
     };
   }
 
+  /**
+   * Queries `experience_events` for replay candidates ordered by decay
+   * factor and importance. The returned shape projects raw hits into the
+   * `ReplayCandidate` interface used by the consolidation model.
+   */
   async selectReplayCandidates(
     request: ConsolidationRequest,
   ): Promise<ReadonlyArray<ReplayCandidate>> {
@@ -117,6 +145,11 @@ export class ConsolidationEngine {
     });
   }
 
+  /**
+   * Increments the source events' `retrieval_count`. Errors are swallowed
+   * because partial failure of this bookkeeping step should not invalidate
+   * the consolidated memory that has already been written.
+   */
   private async markCandidatesConsolidated(
     candidates: ReadonlyArray<ReplayCandidate>,
   ): Promise<void> {
@@ -135,12 +168,23 @@ function average(values: ReadonlyArray<number>): number {
   return values.reduce((sum, value) => sum + value, 0) / values.length;
 }
 
+/**
+ * Coarse stability proxy: average of importance and reward across the
+ * replayed candidates. Used to seed the new semantic memory's
+ * `stabilityScore` until later reinforcement cycles refine it.
+ */
 function stabilityScore(candidates: ReadonlyArray<ReplayCandidate>): number {
   const importance = average(candidates.map((candidate) => candidate.importanceScore));
   const reward = average(candidates.map((candidate) => candidate.rewardScore));
   return clamp((importance + reward) / 2);
 }
 
+/**
+ * Heuristic detection of contradictions by scanning the replayed summary
+ * text for negative-signal words. The score reports the fraction of
+ * candidates that hit the regex; later passes can replace this with a
+ * proper semantic-contradiction check.
+ */
 function contradictionScore(candidates: ReadonlyArray<ReplayCandidate>): number {
   const negativeSignals = candidates.filter((candidate) =>
     /\b(contradict|conflict|failed|error)\b/i.test(candidate.summary),

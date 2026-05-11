@@ -22,7 +22,6 @@
     "@cognitive-substrate/kafka-bus": "workspace:*",
     "@cognitive-substrate/memory-opensearch": "workspace:*",
     "@cognitive-substrate/policy-engine": "workspace:*",
-    "@cognitive-substrate/retrieval-engine": "workspace:*",
     "@opensearch-project/opensearch": "^2.7.0"
   },
   "devDependencies": {

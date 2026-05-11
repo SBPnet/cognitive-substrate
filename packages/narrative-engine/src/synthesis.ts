@@ -1,3 +1,11 @@
+/**
+ * Narrative synthesis: turns the numeric identity vector and supporting
+ * evidence into a `NarrativeSelfModel` carrying a free-text summary,
+ * dominant traits, and themes. Theme synthesis uses tag co-occurrence
+ * counts; the summary is templated so the resulting record is stable
+ * enough for tests and operator inspection.
+ */
+
 import type { IdentityState } from "@cognitive-substrate/core-types";
 import {
   dominantIdentityTraits,

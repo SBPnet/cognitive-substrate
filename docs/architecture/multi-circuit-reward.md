@@ -5,6 +5,10 @@ status: draft
 
 # Multi-Circuit Reward Architecture
 
+## Implementation Status
+
+This is a design draft that extends the implemented reinforcement and affect package surfaces. The `reward.*` topics and dopamine-vector OpenSearch extension described below are proposals unless present in `packages/kafka-bus/src/topics.ts` and `packages/memory-opensearch/src/schemas.ts`. The source-of-truth runtime topics live in `packages/kafka-bus/src/topics.ts`.
+
 ## Overview
 
 The reinforcement scoring engine described in the base architecture uses a single scalar reward signal. This document specifies a multi-circuit value system where competing reward circuits negotiate the final reinforcement signal. The model is inspired by biological neuromodulatory systems but implemented as a computational architecture. It does not simulate subjective states, only functional regulatory dynamics.
@@ -19,14 +23,14 @@ The system maintains five independent reward circuits, each computing a scalar s
 
 ```
 event
-  → feature extraction
-  → [novelty circuit]     D_novelty
-  → [reward circuit]      D_reward
-  → [threat circuit]      D_threat
-  → [social circuit]      D_social
-  → [compression circuit] D_compression
-  → arbitration layer
-  → D_fused (final signal)
+  -> feature extraction
+  -> [novelty circuit]     D_novelty
+  -> [reward circuit]      D_reward
+  -> [threat circuit]      D_threat
+  -> [social circuit]      D_social
+  -> [compression circuit] D_compression
+  -> arbitration layer
+  -> D_fused (final signal)
 ```
 
 ### Circuit Definitions

@@ -1,3 +1,14 @@
+/**
+ * Development planner.
+ *
+ * `DevelopmentEngine.assess` infers the current phase from the mean
+ * capability score, unlocks any subsystems that the new phase exposes,
+ * and selects the next curriculum slice. `selectCurriculum` ranks items
+ * by expected gain and a "readiness" term that prefers items whose
+ * difficulty is close to the current capability score, avoiding both
+ * under-stretch and over-reach.
+ */
+
 import type {
   CapabilityMetric,
   CurriculumItem,
@@ -6,6 +17,7 @@ import type {
   DevelopmentState,
 } from "./types.js";
 
+/** Canonical phase ordering used for monotonic subsystem unlocks. */
 const PHASES: ReadonlyArray<DevelopmentPhase> = ["seed", "novice", "apprentice", "integrative", "open_ended"];
 
 export class DevelopmentEngine {
@@ -29,6 +41,7 @@ export class DevelopmentEngine {
   }
 }
 
+/** Maps mean capability score to a phase via fixed thresholds. */
 export function inferPhase(capabilities: ReadonlyArray<CapabilityMetric>): DevelopmentPhase {
   const meanScore = mean(capabilities.map((capability) => capability.score));
   if (meanScore >= 0.85) return "open_ended";

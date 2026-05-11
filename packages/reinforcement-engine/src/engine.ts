@@ -1,3 +1,16 @@
+/**
+ * Reinforcement-engine orchestrator.
+ *
+ * `ReinforcementEngine.evaluate` runs the scoring function, optionally
+ * persists the new retrieval priority and decay factor on the underlying
+ * memory document, and returns a `ReinforcementUpdate` containing both the
+ * policy vote and the identity-impact signal for downstream fan-out.
+ *
+ * The engine intentionally does not own a Kafka producer: callers decide
+ * whether the policy vote is sent to the policy worker synchronously or
+ * batched onto the `policy.evaluation` topic.
+ */
+
 import type { Client } from "@opensearch-project/opensearch";
 import { updateDocument } from "@cognitive-substrate/memory-opensearch";
 import { scoreReinforcement } from "./scoring.js";
@@ -8,7 +21,9 @@ import type {
 } from "./types.js";
 
 export interface ReinforcementEngineConfig {
+  /** Optional OpenSearch client. When omitted, scoring runs without persistence. */
   readonly openSearch?: Client;
+  /** Override hook for tests; defaults to the production `updateDocument`. */
   readonly updateMemory?: typeof updateDocument;
 }
 
@@ -21,6 +36,12 @@ export class ReinforcementEngine {
     this.updateMemory = config.updateMemory ?? updateDocument;
   }
 
+  /**
+   * Runs scoring for one reinforcement input. When a client is configured,
+   * the memory document is updated in place with the new retrieval priority,
+   * decay factor, and reinforcement score so that subsequent retrieval
+   * passes see the change immediately.
+   */
   async evaluate(input: ReinforcementInput): Promise<ReinforcementUpdate> {
     const result = scoreReinforcement(input.signal);
     if (this.openSearch) {
@@ -48,6 +69,12 @@ export class ReinforcementEngine {
   }
 }
 
+/**
+ * Splits the scalar `identityImpact` from `scoreReinforcement` into the
+ * three identity dimensions consumed by the narrative engine. Positive
+ * impact accumulates curiosity, negative impact accumulates caution,
+ * and the magnitude reduces stability proportionally.
+ */
 function identityImpact(
   sourceMemoryId: string,
   impact: number,

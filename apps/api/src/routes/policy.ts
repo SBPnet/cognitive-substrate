@@ -72,7 +72,8 @@ export function createPolicyRouter(openSearchClient: Client): Hono {
 }
 
 // ---------------------------------------------------------------------------
-// Stub exports for Stages 6-13 — add implementations as backend stages land
+// Route groups for Stages 6-13. Unwired surfaces return 501 rather than
+// placeholder success payloads so the UI and smoke reports do not overclaim.
 // ---------------------------------------------------------------------------
 
 interface AgentActivityDoc extends Record<string, unknown> {
@@ -135,10 +136,14 @@ export function createAgentActivityRouter(client: Client): Hono {
 export function createSelfmodRouter(_client: Client): Hono {
   const router = new Hono();
   router.get("/", (c) =>
-    c.json({
-      message: "Self-modification view available from Stage 8",
-      proposals: [],
-    }),
+    c.json(
+      {
+        error: "not_implemented",
+        message: "Self-modification proposals are not backed by a runtime index yet.",
+        proposals: [],
+      },
+      501,
+    ),
   );
   return router;
 }
@@ -150,9 +155,13 @@ export function createSelfmodRouter(_client: Client): Hono {
 export function createIdentityRouter(_client: Client): Hono {
   const router = new Hono();
   router.get("/", (c) =>
-    c.json({
-      message: "Identity state available from Stage 10",
-    }),
+    c.json(
+      {
+        error: "not_implemented",
+        message: "Identity state is not backed by a runtime index yet.",
+      },
+      501,
+    ),
   );
   return router;
 }
@@ -164,7 +173,14 @@ export function createIdentityRouter(_client: Client): Hono {
 export function createGoalsRouter(_client: Client): Hono {
   const router = new Hono();
   router.get("/", (c) =>
-    c.json({ message: "Goal hierarchy available from Stage 12", goals: [] }),
+    c.json(
+      {
+        error: "not_implemented",
+        message: "Goal hierarchy is not backed by a runtime index yet.",
+        goals: [],
+      },
+      501,
+    ),
   );
   return router;
 }

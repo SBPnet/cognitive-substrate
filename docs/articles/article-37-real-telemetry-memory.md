@@ -34,6 +34,8 @@ The hosted configuration was then updated for ingestion and orchestrator with `E
 
 ## Telemetry-to-experience bridge
 
+Implementation note: the telemetry-to-experience bridge is now wired through the telemetry worker when `TELEMETRY_EXPERIENCE_ENABLED=true`. The bridge remains configuration-gated, so deployments must enable that flag before raw telemetry summaries enter the normal `ExperienceEvent` memory path.
+
 The plan initially considered a separate telemetry summary worker. That design was intentionally reduced. The existing telemetry worker already owned the OTEL-native path from raw telemetry into operational primitive streams and ClickHouse. Creating another worker would have duplicated ownership of telemetry semantics. The better design was to extend the existing worker into a telemetry-to-experience bridge.
 
 The telemetry worker now consumes all three raw telemetry topics: `telemetry.metrics.raw`, `telemetry.logs.raw`, and `telemetry.metadata.raw`. It still preserves the existing metrics pipeline when ClickHouse is configured. ClickHouse can also be disabled, in which case the worker remains useful as an operational experience publisher. This matters for experiments where the goal is memory retrieval rather than analytical storage.

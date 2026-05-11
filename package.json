@@ -21,8 +21,11 @@
     "typecheck": "pnpm -r typecheck",
     "lint": "eslint . --max-warnings 0",
     "test": "pnpm -r test",
-    "smoke:packages": "pnpm tsx scripts/smoke/check-node22.ts && pnpm -r build && pnpm -r typecheck && pnpm -r --if-present test && pnpm tsx scripts/smoke/package-baseline.ts",
+    "smoke:packages": "pnpm tsx scripts/smoke/check-node22.ts && pnpm -r build && pnpm -r typecheck && pnpm -r --if-present test && pnpm tsx scripts/smoke/engine-behavioral-contracts.ts && pnpm tsx scripts/smoke/check-workspace-contracts.ts && pnpm tsx scripts/smoke/package-baseline.ts",
     "smoke:deep": "pnpm tsx scripts/smoke/deep-smoke.ts",
+    "smoke:embedding": "pnpm tsx scripts/smoke/embedding-model-swap.ts",
+    "smoke:aiven-ml-node": "pnpm tsx scripts/smoke/aiven-ml-node-validation.ts",
+    "eval:baseline": "pnpm tsx scripts/eval/run-evaluations.ts",
     "clean": "pnpm -r clean",
     "docs:diagram:article-01": "bash scripts/docs/render-article-01-diagrams.sh"
   },

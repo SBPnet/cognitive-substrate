@@ -106,6 +106,31 @@ export async function loadPatterns(
 }
 
 /**
+ * Persist built-in seed patterns when the index is empty, so confidence updates
+ * have a durable document to patch later.
+ */
+export async function seedBuiltinPatternsIfEmpty(
+  openSearch: OpenSearchClient,
+): Promise<number> {
+  const response = await openSearch.search({
+    index: OPERATIONAL_PATTERNS_INDEX,
+    body: {
+      query: { match_all: {} },
+      size: 1,
+    },
+  });
+
+  const body = response.body as { hits?: { hits?: unknown[] } };
+  const hits = body["hits"]?.["hits"];
+  if (hits && hits.length > 0) return 0;
+
+  for (const pattern of SEED_PATTERNS) {
+    await upsertPattern(openSearch, pattern);
+  }
+  return SEED_PATTERNS.length;
+}
+
+/**
  * Upsert an operational pattern into OpenSearch, updating confidence and counts.
  */
 export async function upsertPattern(

@@ -1,3 +1,21 @@
+/**
+ * Compute-budget gate.
+ *
+ * `BudgetEngine` enforces three constraints on every reasoning request:
+ *   1. The decision-rule utility (expectedUtility minus cost minus an
+ *      uncertainty penalty) must clear `utilityThreshold`.
+ *   2. Aggregate exhaustion across token, tool, and latency pressure must
+ *      remain below 0.9.
+ *   3. The requested tokens and tool calls must fit within the remaining
+ *      per-agent quota.
+ *
+ * When the decision is approved, the engine also classifies the request
+ * into `fast` or `slow` mode so that agents can switch between heuristic
+ * and deliberative paths. Spend is recorded after each successful run via
+ * `recordSpend`, and `reset` clears the per-agent (or all) load state at
+ * the end of a window.
+ */
+
 import type { AgentType } from "@cognitive-substrate/core-types";
 import type {
   BudgetDecision,
@@ -7,6 +25,7 @@ import type {
   ComputeQuota,
 } from "./types.js";
 
+/** Fallback quota used when no agent-specific quota is registered. */
 const DEFAULT_QUOTA: ComputeQuota = {
   agentType: "executor",
   maxTokens: 4_000,
@@ -30,6 +49,11 @@ export class BudgetEngine {
     this.utilityThreshold = options.utilityThreshold ?? 0.35;
   }
 
+  /**
+   * Evaluates one BudgetRequest against the agent's quota and current load.
+   * The decision is returned but not recorded; callers should invoke
+   * `recordSpend` once the actual spend is known.
+   */
   decide(request: BudgetRequest): BudgetDecision {
     const quota = this.quotaFor(request.agentType);
     const load = this.load.get(request.agentType) ?? emptyLoad();
@@ -57,6 +81,10 @@ export class BudgetEngine {
     };
   }
 
+  /**
+   * Records actual spend after an agent completes its work. The recorded
+   * exhaustion is used by the next `decide` call for the same agent.
+   */
   recordSpend(agentType: AgentType, spentTokens: number, spentToolCalls: number, latencyMs: number): CognitiveLoadState {
     const current = this.load.get(agentType) ?? emptyLoad();
     const quota = this.quotaFor(agentType);
@@ -78,6 +106,10 @@ export class BudgetEngine {
     return next;
   }
 
+  /**
+   * Clears load state. With no argument, resets every agent. Should be
+   * driven by an external scheduler aligned with `resetIntervalMs`.
+   */
   reset(agentType?: AgentType): void {
     if (agentType) {
       this.load.delete(agentType);
@@ -91,6 +123,12 @@ export class BudgetEngine {
   }
 }
 
+/**
+ * Combined exhaustion across token (45%), tool (35%), and latency (20%)
+ * pressure. The weighting reflects the assumption that token spend is the
+ * dominant cost driver, with tool calls and latency providing secondary
+ * pressure signals.
+ */
 export function computeExhaustion(load: CognitiveLoadState, quota: ComputeQuota): number {
   const tokenPressure = load.spentTokens / Math.max(1, quota.maxTokens);
   const toolPressure = load.spentToolCalls / Math.max(1, quota.maxToolCalls);
@@ -98,6 +136,12 @@ export function computeExhaustion(load: CognitiveLoadState, quota: ComputeQuota)
   return clamp(tokenPressure * 0.45 + toolPressure * 0.35 + latencyPressure * 0.2);
 }
 
+/**
+ * Picks `slow` mode only when utility is high, uncertainty is non-trivial,
+ * and the agent still has headroom. Otherwise the request is served by
+ * the fast (heuristic) path so that exhausted or low-stakes requests do
+ * not drain remaining budget.
+ */
 function selectMode(utility: number, exhaustion: number, uncertainty: number): CognitionMode {
   if (utility > 0.65 && uncertainty > 0.35 && exhaustion < 0.7) return "slow";
   return "fast";

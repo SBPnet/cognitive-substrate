@@ -43,6 +43,10 @@ This approach preserves the value of biological curiosity while satisfying the s
 
 For Cognitive Substrate, this means describing memory as selection, attention as budgeted routing, affect as runtime modulation, identity as longitudinal policy continuity, and consolidation as offline compression and reinforcement. These are computational mechanisms. Biological language is useful only when it helps explain why those mechanisms are worth considering.
 
+## Project Usage Note
+
+Across Cognitive Substrate docs, terms such as memory, attention, affect, identity, dream, and self-reflection name computational roles implemented by packages, workers, indexes, and event flows. They should not be read as claims of consciousness, sentience, biological fidelity, or human-like subjective experience.
+
 ## Conclusion
 
 The AI community's reluctance to accept biological analogy is not simply conservatism. It is a response to real risks: mechanistic confusion, anthropomorphic overclaiming, weak empirical grounding, and misplaced appeals to biological authority. Those risks should be taken seriously.

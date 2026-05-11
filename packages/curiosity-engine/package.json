@@ -17,9 +17,6 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "clean": "rm -rf dist *.tsbuildinfo"
   },
-  "dependencies": {
-    "@cognitive-substrate/core-types": "workspace:*"
-  },
   "devDependencies": {
     "@types/node": "^22.0.0",
     "typescript": "^5.5.0"

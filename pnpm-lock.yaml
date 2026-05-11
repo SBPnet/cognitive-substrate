@@ -171,9 +171,6 @@ importers:
       '@cognitive-substrate/consolidation-engine':
         specifier: workspace:*
         version: link:../../../packages/consolidation-engine
-      '@cognitive-substrate/core-types':
-        specifier: workspace:*
-        version: link:../../../packages/core-types
       '@cognitive-substrate/kafka-bus':
         specifier: workspace:*
         version: link:../../../packages/kafka-bus
@@ -336,9 +333,6 @@ importers:
       '@cognitive-substrate/attention-engine':
         specifier: workspace:*
         version: link:../attention-engine
-      '@cognitive-substrate/core-types':
-        specifier: workspace:*
-        version: link:../core-types
     devDependencies:
       '@types/node':
         specifier: ^22.0.0
@@ -361,9 +355,6 @@ importers:
       '@cognitive-substrate/policy-engine':
         specifier: workspace:*
         version: link:../policy-engine
-      '@cognitive-substrate/retrieval-engine':
-        specifier: workspace:*
-        version: link:../retrieval-engine
       '@opensearch-project/opensearch':
         specifier: ^2.7.0
         version: 2.13.0
@@ -475,10 +466,6 @@ importers:
         version: 5.9.3
 
   packages/curiosity-engine:
-    dependencies:
-      '@cognitive-substrate/core-types':
-        specifier: workspace:*
-        version: link:../core-types
     devDependencies:
       '@types/node':
         specifier: ^22.0.0
@@ -501,10 +488,6 @@ importers:
         version: 5.9.3
 
   packages/development-engine:
-    dependencies:
-      '@cognitive-substrate/core-types':
-        specifier: workspace:*
-        version: link:../core-types
     devDependencies:
       '@types/node':
         specifier: ^22.0.0
@@ -534,9 +517,6 @@ importers:
       '@cognitive-substrate/core-types':
         specifier: workspace:*
         version: link:../core-types
-      '@cognitive-substrate/world-model':
-        specifier: workspace:*
-        version: link:../world-model
     devDependencies:
       '@types/node':
         specifier: ^22.0.0
@@ -547,9 +527,6 @@ importers:
 
   packages/kafka-bus:
     dependencies:
-      '@cognitive-substrate/core-types':
-        specifier: workspace:*
-        version: link:../core-types
       kafkajs:
         specifier: ^2.2.4
         version: 2.2.4
@@ -563,9 +540,6 @@ importers:
       '@aws-sdk/client-s3':
         specifier: ^3.600.0
         version: 3.1045.0
-      '@cognitive-substrate/core-types':
-        specifier: workspace:*
-        version: link:../core-types
     devDependencies:
       '@types/node':
         specifier: ^22.0.0

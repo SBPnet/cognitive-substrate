@@ -1,0 +1,849 @@
+{
+  "runId": "2026-05-11T01-15-17-223Z",
+  "status": "passed",
+  "startedAt": "2026-05-11T01:15:17.224Z",
+  "artifactDir": "artifacts/smoke/deep-smoke-2026-05-11T01-15-17-223Z",
+  "phases": [
+    {
+      "name": "package-baseline",
+      "status": "passed",
+      "startedAt": "2026-05-11T01:15:17.254Z",
+      "finishedAt": "2026-05-11T01:15:35.614Z",
+      "durationMs": 18360,
+      "logPath": "artifacts/smoke/deep-smoke-2026-05-11T01-15-17-223Z/logs/package-baseline.log"
+    },
+    {
+      "name": "aiven-collector-contract",
+      "status": "passed",
+      "startedAt": "2026-05-11T01:15:35.614Z",
+      "finishedAt": "2026-05-11T01:15:35.883Z",
+      "durationMs": 269,
+      "logPath": "artifacts/smoke/deep-smoke-2026-05-11T01-15-17-223Z/logs/aiven-collector-contract.log"
+    },
+    {
+      "name": "telemetry-experience-bridge-contract",
+      "status": "passed",
+      "startedAt": "2026-05-11T01:15:35.883Z",
+      "finishedAt": "2026-05-11T01:15:36.172Z",
+      "durationMs": 289,
+      "logPath": "artifacts/smoke/deep-smoke-2026-05-11T01-15-17-223Z/logs/telemetry-experience-bridge-contract.log"
+    },
+    {
+      "name": "open-ended-probe",
+      "status": "passed",
+      "startedAt": "2026-05-11T01:15:36.172Z",
+      "finishedAt": "2026-05-11T01:15:36.303Z",
+      "durationMs": 131,
+      "logPath": "artifacts/smoke/deep-smoke-2026-05-11T01-15-17-223Z/logs/open-ended-probe.log"
+    },
+    {
+      "name": "copy-env-examples",
+      "status": "passed",
+      "startedAt": "2026-05-11T01:15:36.303Z",
+      "finishedAt": "2026-05-11T01:15:36.303Z",
+      "durationMs": 0,
+      "logPath": "artifacts/smoke/deep-smoke-2026-05-11T01-15-17-223Z/logs/copy-env-examples.log"
+    },
+    {
+      "name": "infra-start",
+      "status": "passed",
+      "startedAt": "2026-05-11T01:15:36.303Z",
+      "finishedAt": "2026-05-11T01:15:43.229Z",
+      "durationMs": 6926,
+      "logPath": "artifacts/smoke/deep-smoke-2026-05-11T01-15-17-223Z/logs/infra-start.log"
+    },
+    {
+      "name": "infra-readiness",
+      "status": "passed",
+      "startedAt": "2026-05-11T01:15:43.229Z",
+      "finishedAt": "2026-05-11T01:15:44.313Z",
+      "durationMs": 1084,
+      "logPath": "artifacts/smoke/deep-smoke-2026-05-11T01-15-17-223Z/logs/infra-readiness.log"
+    },
+    {
+      "name": "embedding-model-swap",
+      "status": "passed",
+      "startedAt": "2026-05-11T01:15:44.313Z",
+      "finishedAt": "2026-05-11T01:15:56.761Z",
+      "durationMs": 12448,
+      "logPath": "artifacts/smoke/deep-smoke-2026-05-11T01-15-17-223Z/logs/embedding-model-swap.log"
+    },
+    {
+      "name": "init-kafka-topics",
+      "status": "passed",
+      "startedAt": "2026-05-11T01:15:56.761Z",
+      "finishedAt": "2026-05-11T01:15:57.255Z",
+      "durationMs": 494,
+      "logPath": "artifacts/smoke/deep-smoke-2026-05-11T01-15-17-223Z/logs/init-kafka-topics.log"
+    },
+    {
+      "name": "init-clickhouse",
+      "status": "passed",
+      "startedAt": "2026-05-11T01:15:57.256Z",
+      "finishedAt": "2026-05-11T01:15:57.627Z",
+      "durationMs": 371,
+      "logPath": "artifacts/smoke/deep-smoke-2026-05-11T01-15-17-223Z/logs/init-clickhouse.log"
+    },
+    {
+      "name": "app-start",
+      "status": "passed",
+      "startedAt": "2026-05-11T01:15:57.627Z",
+      "finishedAt": "2026-05-11T01:16:02.637Z",
+      "durationMs": 5010,
+      "logPath": "artifacts/smoke/deep-smoke-2026-05-11T01-15-17-223Z/logs/app-start.log"
+    },
+    {
+      "name": "app-readiness",
+      "status": "passed",
+      "startedAt": "2026-05-11T01:16:02.637Z",
+      "finishedAt": "2026-05-11T01:16:03.187Z",
+      "durationMs": 550,
+      "logPath": "artifacts/smoke/deep-smoke-2026-05-11T01-15-17-223Z/logs/app-readiness.log"
+    },
+    {
+      "name": "cognitive-flow",
+      "status": "passed",
+      "startedAt": "2026-05-11T01:16:03.187Z",
+      "finishedAt": "2026-05-11T01:16:16.683Z",
+      "durationMs": 13496,
+      "logPath": "artifacts/smoke/deep-smoke-2026-05-11T01-15-17-223Z/logs/cognitive-flow.log"
+    },
+    {
+      "name": "telemetry-flow",
+      "status": "passed",
+      "startedAt": "2026-05-11T01:16:16.683Z",
+      "finishedAt": "2026-05-11T01:16:23.880Z",
+      "durationMs": 7197,
+      "logPath": "artifacts/smoke/deep-smoke-2026-05-11T01-15-17-223Z/logs/telemetry-flow.log"
+    },
+    {
+      "name": "assertions",
+      "status": "passed",
+      "startedAt": "2026-05-11T01:16:23.880Z",
+      "finishedAt": "2026-05-11T01:16:23.966Z",
+      "durationMs": 86,
+      "logPath": "artifacts/smoke/deep-smoke-2026-05-11T01-15-17-223Z/logs/assertions.log"
+    }
+  ],
+  "assertions": [
+    {
+      "name": "embedding quality vector field present",
+      "status": "passed",
+      "expected": "profile vector field exists",
+      "actual": "true"
+    },
+    {
+      "name": "embedding quality retrieval results",
+      "status": "passed",
+      "expected": "each model-swap query returns at least one result",
+      "actual": "3,3,3,3,3,3"
+    },
+    {
+      "name": "embedding efficient vector field present",
+      "status": "passed",
+      "expected": "profile vector field exists",
+      "actual": "true"
+    },
+    {
+      "name": "embedding efficient retrieval results",
+      "status": "passed",
+      "expected": "each model-swap query returns at least one result",
+      "actual": "3,3,3,3,3,3"
+    },
+    {
+      "name": "embedding report quality vector field present",
+      "status": "passed",
+      "expected": "passed",
+      "actual": "true"
+    },
+    {
+      "name": "embedding report quality retrieval returned results",
+      "status": "passed",
+      "expected": "passed",
+      "actual": "authentication latency spike during peak load:3, database connection exhaustion timeout:3, deployment causing elevated error rates:3, HTTP_504 auth-service us-east-1:3, DISK_FULL storage-node us-west-2:3, JWT_EXPIRED clock-drift v2.4.1:3"
+    },
+    {
+      "name": "embedding report efficient vector field present",
+      "status": "passed",
+      "expected": "passed",
+      "actual": "true"
+    },
+    {
+      "name": "embedding report efficient retrieval returned results",
+      "status": "passed",
+      "expected": "passed",
+      "actual": "authentication latency spike during peak load:3, database connection exhaustion timeout:3, deployment causing elevated error rates:3, HTTP_504 auth-service us-east-1:3, DISK_FULL storage-node us-west-2:3, JWT_EXPIRED clock-drift v2.4.1:3"
+    },
+    {
+      "name": "opensearch experience_events",
+      "status": "passed",
+      "expected": ">= 1",
+      "actual": "7"
+    },
+    {
+      "name": "opensearch memory_semantic",
+      "status": "passed",
+      "expected": ">= 1",
+      "actual": "1"
+    },
+    {
+      "name": "opensearch audit_events",
+      "status": "passed",
+      "expected": ">= 1",
+      "actual": "20"
+    },
+    {
+      "name": "opensearch agent_activity",
+      "status": "passed",
+      "expected": ">= 1",
+      "actual": "12"
+    },
+    {
+      "name": "clickhouse metrics_raw",
+      "status": "passed",
+      "expected": ">= 1",
+      "actual": "16"
+    },
+    {
+      "name": "clickhouse logs_raw",
+      "status": "passed",
+      "expected": ">= 1",
+      "actual": "1"
+    },
+    {
+      "name": "clickhouse cognitive_events",
+      "status": "passed",
+      "expected": ">= 1",
+      "actual": "32"
+    },
+    {
+      "name": "object store event payloads",
+      "status": "passed",
+      "expected": ">= 1",
+      "actual": "7"
+    },
+    {
+      "name": "api trace events",
+      "status": "passed",
+      "expected": ">= 1",
+      "actual": "8"
+    },
+    {
+      "name": "api agent activities",
+      "status": "passed",
+      "expected": ">= 1",
+      "actual": "12"
+    },
+    {
+      "name": "service processes alive",
+      "status": "passed",
+      "expected": "all services alive through assertion phase",
+      "actual": "all alive"
+    }
+  ],
+  "services": [
+    {
+      "name": "ingestion",
+      "cwd": "apps/workers/ingestion",
+      "logPath": "artifacts/smoke/deep-smoke-2026-05-11T01-15-17-223Z/logs/service-ingestion.log",
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "consolidation",
+      "cwd": "apps/workers/consolidation",
+      "logPath": "artifacts/smoke/deep-smoke-2026-05-11T01-15-17-223Z/logs/service-consolidation.log",
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "telemetry",
+      "cwd": "apps/workers/telemetry",
+      "logPath": "artifacts/smoke/deep-smoke-2026-05-11T01-15-17-223Z/logs/service-telemetry.log",
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "pattern",
+      "cwd": "apps/workers/pattern",
+      "logPath": "artifacts/smoke/deep-smoke-2026-05-11T01-15-17-223Z/logs/service-pattern.log",
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "reinforcement",
+      "cwd": "apps/workers/reinforcement",
+      "logPath": "artifacts/smoke/deep-smoke-2026-05-11T01-15-17-223Z/logs/service-reinforcement.log",
+      "exitCode": null,
+      "signal": "SIGKILL"
+    },
+    {
+      "name": "aiven-collector",
+      "cwd": "apps/workers/aiven-collector",
+      "logPath": "artifacts/smoke/deep-smoke-2026-05-11T01-15-17-223Z/logs/service-aiven-collector.log",
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "orchestrator",
+      "cwd": "apps/orchestrator",
+      "logPath": "artifacts/smoke/deep-smoke-2026-05-11T01-15-17-223Z/logs/service-orchestrator.log",
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "api",
+      "cwd": "apps/api",
+      "logPath": "artifacts/smoke/deep-smoke-2026-05-11T01-15-17-223Z/logs/service-api.log",
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "web",
+      "cwd": "apps/web",
+      "logPath": "artifacts/smoke/deep-smoke-2026-05-11T01-15-17-223Z/logs/service-web.log",
+      "exitCode": 0,
+      "signal": null
+    }
+  ],
+  "coverage": [
+    {
+      "name": "@cognitive-substrate/api",
+      "path": "apps/api",
+      "kind": "app",
+      "evidence": [
+        "build",
+        "launched-service",
+        "runtime-probe",
+        "typecheck"
+      ],
+      "runtimeSources": []
+    },
+    {
+      "name": "@cognitive-substrate/orchestrator",
+      "path": "apps/orchestrator",
+      "kind": "app",
+      "evidence": [
+        "build",
+        "launched-service",
+        "runtime-probe",
+        "typecheck"
+      ],
+      "runtimeSources": []
+    },
+    {
+      "name": "@cognitive-substrate/web",
+      "path": "apps/web",
+      "kind": "app",
+      "evidence": [
+        "build",
+        "launched-service",
+        "runtime-probe",
+        "typecheck"
+      ],
+      "runtimeSources": []
+    },
+    {
+      "name": "@cognitive-substrate/aiven-collector-worker",
+      "path": "apps/workers/aiven-collector",
+      "kind": "app",
+      "evidence": [
+        "build",
+        "launched-service",
+        "runtime-probe",
+        "typecheck"
+      ],
+      "runtimeSources": []
+    },
+    {
+      "name": "@cognitive-substrate/consolidation-worker",
+      "path": "apps/workers/consolidation",
+      "kind": "app",
+      "evidence": [
+        "build",
+        "launched-service",
+        "runtime-probe",
+        "typecheck"
+      ],
+      "runtimeSources": []
+    },
+    {
+      "name": "@cognitive-substrate/ingestion-worker",
+      "path": "apps/workers/ingestion",
+      "kind": "app",
+      "evidence": [
+        "build",
+        "launched-service",
+        "runtime-probe",
+        "typecheck",
+        "unit-test"
+      ],
+      "runtimeSources": []
+    },
+    {
+      "name": "@cognitive-substrate/pattern-worker",
+      "path": "apps/workers/pattern",
+      "kind": "app",
+      "evidence": [
+        "build",
+        "launched-service",
+        "runtime-probe",
+        "typecheck"
+      ],
+      "runtimeSources": []
+    },
+    {
+      "name": "@cognitive-substrate/reinforcement-worker",
+      "path": "apps/workers/reinforcement",
+      "kind": "app",
+      "evidence": [
+        "build",
+        "launched-service",
+        "runtime-probe",
+        "typecheck"
+      ],
+      "runtimeSources": []
+    },
+    {
+      "name": "@cognitive-substrate/telemetry-worker",
+      "path": "apps/workers/telemetry",
+      "kind": "app",
+      "evidence": [
+        "build",
+        "launched-service",
+        "runtime-probe",
+        "typecheck"
+      ],
+      "runtimeSources": []
+    },
+    {
+      "name": "@cognitive-substrate/abstraction-engine",
+      "path": "packages/abstraction-engine",
+      "kind": "package",
+      "evidence": [
+        "build",
+        "entrypoint-import",
+        "runtime-direct",
+        "runtime-probe",
+        "typecheck"
+      ],
+      "runtimeSources": [
+        "pattern",
+        "telemetry"
+      ]
+    },
+    {
+      "name": "@cognitive-substrate/affect-engine",
+      "path": "packages/affect-engine",
+      "kind": "package",
+      "evidence": [
+        "build",
+        "entrypoint-import",
+        "typecheck"
+      ],
+      "runtimeSources": []
+    },
+    {
+      "name": "@cognitive-substrate/agents",
+      "path": "packages/agents",
+      "kind": "package",
+      "evidence": [
+        "build",
+        "entrypoint-import",
+        "runtime-direct",
+        "runtime-probe",
+        "typecheck"
+      ],
+      "runtimeSources": [
+        "orchestrator"
+      ]
+    },
+    {
+      "name": "@cognitive-substrate/aiven-client",
+      "path": "packages/aiven-client",
+      "kind": "package",
+      "evidence": [
+        "build",
+        "entrypoint-import",
+        "runtime-direct",
+        "typecheck"
+      ],
+      "runtimeSources": [
+        "aiven-collector",
+        "api"
+      ]
+    },
+    {
+      "name": "@cognitive-substrate/attention-engine",
+      "path": "packages/attention-engine",
+      "kind": "package",
+      "evidence": [
+        "build",
+        "entrypoint-import",
+        "typecheck"
+      ],
+      "runtimeSources": []
+    },
+    {
+      "name": "@cognitive-substrate/budget-engine",
+      "path": "packages/budget-engine",
+      "kind": "package",
+      "evidence": [
+        "build",
+        "entrypoint-import",
+        "typecheck"
+      ],
+      "runtimeSources": []
+    },
+    {
+      "name": "@cognitive-substrate/causal-engine",
+      "path": "packages/causal-engine",
+      "kind": "package",
+      "evidence": [
+        "build",
+        "entrypoint-import",
+        "typecheck"
+      ],
+      "runtimeSources": []
+    },
+    {
+      "name": "@cognitive-substrate/clickhouse-telemetry",
+      "path": "packages/clickhouse-telemetry",
+      "kind": "package",
+      "evidence": [
+        "build",
+        "entrypoint-import",
+        "runtime-direct",
+        "runtime-probe",
+        "typecheck"
+      ],
+      "runtimeSources": [
+        "pattern",
+        "reinforcement",
+        "telemetry"
+      ]
+    },
+    {
+      "name": "@cognitive-substrate/consolidation-engine",
+      "path": "packages/consolidation-engine",
+      "kind": "package",
+      "evidence": [
+        "build",
+        "entrypoint-import",
+        "runtime-direct",
+        "runtime-probe",
+        "typecheck"
+      ],
+      "runtimeSources": [
+        "consolidation"
+      ]
+    },
+    {
+      "name": "@cognitive-substrate/constitution-engine",
+      "path": "packages/constitution-engine",
+      "kind": "package",
+      "evidence": [
+        "build",
+        "entrypoint-import",
+        "runtime-direct",
+        "typecheck"
+      ],
+      "runtimeSources": [
+        "open-ended-probe",
+        "orchestrator"
+      ]
+    },
+    {
+      "name": "@cognitive-substrate/core-types",
+      "path": "packages/core-types",
+      "kind": "package",
+      "evidence": [
+        "build",
+        "entrypoint-import",
+        "runtime-direct",
+        "runtime-probe",
+        "runtime-transitive",
+        "typecheck"
+      ],
+      "runtimeSources": [
+        "api",
+        "consolidation",
+        "ingestion",
+        "orchestrator",
+        "pattern",
+        "reinforcement",
+        "telemetry"
+      ]
+    },
+    {
+      "name": "@cognitive-substrate/curiosity-engine",
+      "path": "packages/curiosity-engine",
+      "kind": "package",
+      "evidence": [
+        "build",
+        "entrypoint-import",
+        "typecheck"
+      ],
+      "runtimeSources": []
+    },
+    {
+      "name": "@cognitive-substrate/decay-engine",
+      "path": "packages/decay-engine",
+      "kind": "package",
+      "evidence": [
+        "build",
+        "entrypoint-import",
+        "typecheck"
+      ],
+      "runtimeSources": []
+    },
+    {
+      "name": "@cognitive-substrate/development-engine",
+      "path": "packages/development-engine",
+      "kind": "package",
+      "evidence": [
+        "build",
+        "entrypoint-import",
+        "runtime-direct",
+        "typecheck"
+      ],
+      "runtimeSources": [
+        "open-ended-probe",
+        "orchestrator"
+      ]
+    },
+    {
+      "name": "@cognitive-substrate/dream-engine",
+      "path": "packages/dream-engine",
+      "kind": "package",
+      "evidence": [
+        "build",
+        "entrypoint-import",
+        "typecheck"
+      ],
+      "runtimeSources": []
+    },
+    {
+      "name": "@cognitive-substrate/grounding-engine",
+      "path": "packages/grounding-engine",
+      "kind": "package",
+      "evidence": [
+        "build",
+        "entrypoint-import",
+        "typecheck"
+      ],
+      "runtimeSources": []
+    },
+    {
+      "name": "@cognitive-substrate/kafka-bus",
+      "path": "packages/kafka-bus",
+      "kind": "package",
+      "evidence": [
+        "build",
+        "entrypoint-import",
+        "runtime-direct",
+        "runtime-probe",
+        "runtime-transitive",
+        "typecheck"
+      ],
+      "runtimeSources": [
+        "aiven-collector",
+        "api",
+        "consolidation",
+        "ingestion",
+        "orchestrator",
+        "pattern",
+        "reinforcement",
+        "telemetry"
+      ]
+    },
+    {
+      "name": "@cognitive-substrate/memory-objectstore",
+      "path": "packages/memory-objectstore",
+      "kind": "package",
+      "evidence": [
+        "build",
+        "entrypoint-import",
+        "runtime-direct",
+        "runtime-probe",
+        "typecheck"
+      ],
+      "runtimeSources": [
+        "ingestion"
+      ]
+    },
+    {
+      "name": "@cognitive-substrate/memory-opensearch",
+      "path": "packages/memory-opensearch",
+      "kind": "package",
+      "evidence": [
+        "build",
+        "entrypoint-import",
+        "runtime-direct",
+        "runtime-probe",
+        "runtime-transitive",
+        "typecheck",
+        "unit-test"
+      ],
+      "runtimeSources": [
+        "api",
+        "consolidation",
+        "ingestion",
+        "orchestrator",
+        "pattern",
+        "reinforcement"
+      ]
+    },
+    {
+      "name": "@cognitive-substrate/metacog-engine",
+      "path": "packages/metacog-engine",
+      "kind": "package",
+      "evidence": [
+        "build",
+        "entrypoint-import",
+        "typecheck"
+      ],
+      "runtimeSources": []
+    },
+    {
+      "name": "@cognitive-substrate/narrative-engine",
+      "path": "packages/narrative-engine",
+      "kind": "package",
+      "evidence": [
+        "build",
+        "entrypoint-import",
+        "typecheck"
+      ],
+      "runtimeSources": []
+    },
+    {
+      "name": "@cognitive-substrate/policy-engine",
+      "path": "packages/policy-engine",
+      "kind": "package",
+      "evidence": [
+        "build",
+        "entrypoint-import",
+        "runtime-direct",
+        "runtime-probe",
+        "runtime-transitive",
+        "typecheck"
+      ],
+      "runtimeSources": [
+        "orchestrator",
+        "reinforcement"
+      ]
+    },
+    {
+      "name": "@cognitive-substrate/reinforcement-engine",
+      "path": "packages/reinforcement-engine",
+      "kind": "package",
+      "evidence": [
+        "build",
+        "entrypoint-import",
+        "runtime-direct",
+        "runtime-probe",
+        "typecheck"
+      ],
+      "runtimeSources": [
+        "reinforcement"
+      ]
+    },
+    {
+      "name": "@cognitive-substrate/retrieval-engine",
+      "path": "packages/retrieval-engine",
+      "kind": "package",
+      "evidence": [
+        "build",
+        "entrypoint-import",
+        "runtime-direct",
+        "runtime-probe",
+        "typecheck",
+        "unit-test"
+      ],
+      "runtimeSources": [
+        "orchestrator"
+      ]
+    },
+    {
+      "name": "@cognitive-substrate/social-engine",
+      "path": "packages/social-engine",
+      "kind": "package",
+      "evidence": [
+        "build",
+        "entrypoint-import",
+        "typecheck"
+      ],
+      "runtimeSources": []
+    },
+    {
+      "name": "@cognitive-substrate/telemetry-otel",
+      "path": "packages/telemetry-otel",
+      "kind": "package",
+      "evidence": [
+        "build",
+        "entrypoint-import",
+        "runtime-direct",
+        "runtime-probe",
+        "typecheck"
+      ],
+      "runtimeSources": [
+        "aiven-collector",
+        "api",
+        "consolidation",
+        "ingestion",
+        "orchestrator",
+        "pattern",
+        "reinforcement",
+        "telemetry"
+      ]
+    },
+    {
+      "name": "@cognitive-substrate/temporal-engine",
+      "path": "packages/temporal-engine",
+      "kind": "package",
+      "evidence": [
+        "build",
+        "entrypoint-import",
+        "typecheck"
+      ],
+      "runtimeSources": []
+    },
+    {
+      "name": "@cognitive-substrate/world-model",
+      "path": "packages/world-model",
+      "kind": "package",
+      "evidence": [
+        "build",
+        "entrypoint-import",
+        "runtime-direct",
+        "runtime-probe",
+        "typecheck"
+      ],
+      "runtimeSources": [
+        "orchestrator"
+      ]
+    }
+  ],
+  "metrics": {
+    "embedding_model_swap.active_lanes": "quality,efficient",
+    "embedding_model_swap.profile_count": 2,
+    "embedding_model_swap.quality.vector_field": "embedding_qwen",
+    "embedding_model_swap.quality.query_count": 6,
+    "embedding_model_swap.efficient.vector_field": "embedding_nomic",
+    "embedding_model_swap.efficient.query_count": 6,
+    "objectstore.sample_key": "events/2026/05/11/13acca92-fc51-42bc-958b-acdda2a7ac19.json",
+    "opensearch.experience_events": 7,
+    "opensearch.memory_semantic": 1,
+    "opensearch.audit_events": 20,
+    "opensearch.agent_activity": 12,
+    "clickhouse.metrics_raw": 16,
+    "clickhouse.logs_raw": 1,
+    "clickhouse.cognitive_events": 32,
+    "objectstore.events": 7,
+    "api.trace_events": 8,
+    "api.agent_activities": 12
+  },
+  "gitSha": "f7176ec",
+  "finishedAt": "2026-05-11T01:16:33.624Z",
+  "durationMs": 76400
+}

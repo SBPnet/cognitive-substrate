@@ -11,6 +11,7 @@ import { sessionsRouter } from "./routes/sessions.js";
 import { messagesRouter } from "./routes/messages.js";
 import { streamRouter } from "./routes/stream.js";
 import { createMemoriesRouter } from "./routes/memories.js";
+import { createCollectorRouter } from "./routes/collector.js";
 import {
   createPolicyRouter,
   createAgentActivityRouter,
@@ -53,6 +54,8 @@ export function createApp(openSearchClient: Client): Hono {
 
   // Roadmap Stages 11-12: goal hierarchy (stub until Stage 12)
   app.route("/api/sessions/:sessionId/goals", createGoalsRouter(openSearchClient));
+
+  app.route("/api/collector", createCollectorRouter());
 
   return app;
 }

@@ -35,6 +35,7 @@ const API_URL = process.env["API_URL"] ?? "http://localhost:3001";
 const OPENSEARCH_URL = process.env["OPENSEARCH_URL"] ?? "http://localhost:9200";
 const CONSOLIDATE = process.env["CONSOLIDATE"] !== "false";
 const WAIT_SECONDS = Number(process.env["WAIT_SECONDS"] ?? "5");
+const INGESTION_WAIT_SECONDS = Number(process.env["INGESTION_WAIT_SECONDS"] ?? "20");
 const MIN_EPISODIC_COUNT = Number(process.env["MIN_EPISODIC_COUNT"] ?? "1");
 const MIN_SEMANTIC_COUNT = Number(process.env["MIN_SEMANTIC_COUNT"] ?? "1");
 
@@ -113,6 +114,8 @@ async function run(): Promise<void> {
 
   // Trigger consolidation
   if (CONSOLIDATE) {
+    await waitForIndexCount("experience_events", MIN_EPISODIC_COUNT, INGESTION_WAIT_SECONDS);
+
     const kafka = createKafkaClient(kafkaConfigFromEnv());
     const producer = new CognitiveProducer({ kafka, enableAuditMirror: false });
     await producer.connect();
@@ -169,6 +172,21 @@ async function run(): Promise<void> {
     }
     process.exit(1);
   }
+}
+
+async function waitForIndexCount(
+  index: string,
+  minimum: number,
+  timeoutSeconds: number,
+): Promise<void> {
+  const deadline = Date.now() + timeoutSeconds * 1000;
+  let count = 0;
+  while (Date.now() < deadline) {
+    count = await getIndexCount(index);
+    if (count >= minimum) return;
+    await sleep(1_000);
+  }
+  throw new Error(`${index} count ${count} stayed below minimum ${minimum}`);
 }
 
 run().catch((e: unknown) => {

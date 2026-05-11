@@ -1,5 +1,20 @@
+/**
+ * Constitution-engine type surface.
+ *
+ * The constitution engine is the gate that decides whether a proposed
+ * change to identity, policy, or behaviour can be applied. It evaluates
+ * invariants (stability, risk-tolerance, identity-drift) and watches
+ * for reward-corruption signatures (reward shaped by contradiction).
+ * Violations either reject the change outright or quarantine it until
+ * an operator reviews the assessment.
+ */
+
 import type { IdentityState, PolicyState, ReinforcementSignal, SelfModificationProposal } from "@cognitive-substrate/core-types";
 
+/**
+ * One named invariant. Empty optional fields are skipped during
+ * evaluation, so callers only configure the bounds they care about.
+ */
 export interface ConstitutionalInvariant {
   readonly invariantId: string;
   readonly description: string;

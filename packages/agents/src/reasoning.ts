@@ -1,3 +1,16 @@
+/**
+ * Default fallback reasoning model and tool executor.
+ *
+ * `EchoReasoningModel` returns a deterministic proposal that echoes the
+ * input event with a small confidence and risk derived from the policy
+ * state. It exists so that the loop can run end-to-end in tests and
+ * smoke checks without an external LLM. Production deployments
+ * substitute an LLM-backed reasoning model.
+ *
+ * `LocalToolExecutor` is a no-op tool executor that always reports
+ * success. It is also intended only for tests and smoke runs.
+ */
+
 import type { AgentContext, EventResult } from "@cognitive-substrate/core-types";
 import type {
   ActionRequest,

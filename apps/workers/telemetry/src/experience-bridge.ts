@@ -4,10 +4,14 @@ import { Topics, type CognitiveProducer } from "@cognitive-substrate/kafka-bus";
 import type { RawMetricMessage } from "./pipeline.js";
 
 export interface RawLogMessage {
+  readonly project?: string;
   readonly serviceId: string;
   readonly serviceType: string;
+  readonly unit?: string;
   readonly message: string;
+  readonly offset?: string;
   readonly timestamp: string;
+  readonly observedAt?: string;
   readonly environment: string;
 }
 

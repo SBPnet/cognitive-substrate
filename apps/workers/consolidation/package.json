@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "@cognitive-substrate/consolidation-engine": "workspace:*",
-    "@cognitive-substrate/core-types": "workspace:*",
     "@cognitive-substrate/kafka-bus": "workspace:*",
     "@cognitive-substrate/memory-opensearch": "workspace:*",
     "@cognitive-substrate/telemetry-otel": "workspace:*"

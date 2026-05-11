@@ -46,17 +46,17 @@ what gets retrieved, and what is allowed to change.
 So the design treats those questions as infrastructure problems:
 
 - **Experience over data.** Inputs are structured events with context,
-  embedding, and a reward signal. Not log lines.
+embedding, and a reward signal. Not log lines.
 - **Memory is selection.** OpenSearch is the associative retrieval layer,
-  object storage is the immutable episodic record, and a consolidation worker
-  decides what stays active.
+object storage is the immutable episodic record, and a consolidation worker
+decides what stays active.
 - **Cognition under scarcity.** Compute budgets, attentional quotas, and
-  forgetting are part of the model, not afterthoughts.
+forgetting are part of the model, not afterthoughts.
 - **Bounded adaptation.** Policies can drift, but inside a constitutional
-  invariant layer with audit trails.
+invariant layer with audit trails.
 - **Code and writing together.** Every implementation stage ships with a
-  companion article. If a claim cannot be written down clearly, it probably
-  is not built clearly either.
+companion article. If a claim cannot be written down clearly, it probably
+is not built clearly either.
 
 The companion claim about cognition is more modest than the directory names
 suggest. Biological terms (dopamine, salience, narrative selfhood) are used as
@@ -65,15 +65,19 @@ equivalence, sentience, or AGI.
 
 ## What is actually working
 
-| Stage range | Evidence level | Notes |
-|-------------|----------------|-------|
-| Stage 1 | Runtime-demonstrated | Kafka consumer, embedding, OpenSearch index, object-store write, downstream emit, and runnable companion demo under `docs/articles/companions/article-01-experience-ingestion/`. |
-| Stages 2-29 | Build-level implementation varies by package | TypeScript sources exist for many engines, but most stages still need deeper behavioral validation, architecture docs, and public article expansion. |
-| Stages 30-36 | Build-level implementation with focused operational flows | Telemetry, primitive mapping, pattern detection, reinforcement feedback, and transfer surfaces are present, but transfer and recommendation quality remain hypotheses until replay and longitudinal evaluation are complete. |
+
+| Stage range  | Evidence level                                            | Notes                                                                                                                                                                                                                        |
+| ------------ | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Stage 1      | Runtime-demonstrated                                      | Kafka consumer, embedding, OpenSearch index, object-store write, downstream emit, and runnable companion demo under `docs/articles/companions/article-01-experience-ingestion/`.                                             |
+| Stages 2-13  | Mixed behavioral, focused-test, and import evidence       | Retrieval and OpenSearch model-swap paths have focused tests; the orchestrator/API path is smoke-tested; metacognition, identity, and reinforcement scoring still need stronger runtime wiring.                              |
+| Stages 14-29 | Mostly build-level surfaces                              | TypeScript sources exist for many engines, but most Series II engines still need behavioral validation, architecture docs, and public article expansion.                                                                      |
+| Stages 30-36 | Partial operational flows                                | Telemetry, primitive mapping, pattern detection, reinforcement feedback, and transfer surfaces are present, but logs/metadata ingestion, experience bridging, and transfer quality still need runtime validation.             |
+
 
 If a package directory exists, treat that as evidence of a buildable design
 surface, not proof of production readiness. The inventory separates source
-presence from smoke coverage and behavioral evaluation.
+presence from smoke coverage and behavioral evaluation; `entrypoint-import`
+evidence only means that a built package can be loaded.
 
 ## Repository layout
 
@@ -133,7 +137,7 @@ docs/
 - pnpm 10 or newer
 - Docker (for `docker-compose.smoke.yml`: full local stack used by smoke tests)
 - Optional: any reachable Kafka, OpenSearch, PostgreSQL, ClickHouse, and
-  S3-compatible storage matching your `.env` settings (managed or self-hosted)
+S3-compatible storage matching your `.env` settings (managed or self-hosted)
 
 ### Install and build
 
@@ -189,13 +193,13 @@ pnpm --filter @cognitive-substrate/web dev
 If you want the design rationale, start here:
 
 - `docs/architecture/inventory.md` for the stage list, implementation status,
-  evidence level, and missing architecture docs.
+evidence level, and missing architecture docs.
 - `docs/paper/` for the research paper chapters (in progress).
 - `docs/articles/index.md` for the public reading order of the per-stage
-  articles.
+articles.
 - `docs/architecture/` for infrastructure deep dives, especially
-  `inventory.md`, `operational-primitives.md`, `opensearch-ml-nodes.md`, and
-  `clickhouse-telemetry.md`.
+`inventory.md`, `operational-primitives.md`, `opensearch-ml-nodes.md`, and
+`clickhouse-telemetry.md`.
 - `docs/glossary.md` if a term in the code or articles feels overloaded.
 
 ## Deployment options
@@ -204,13 +208,15 @@ Swap implementations by changing environment variables; the code paths stay the
 same. The table below maps each concern to an interface, what the local compose
 file provides, and examples of where else it can run.
 
-| Concern | Interface | Local reference (`docker-compose.smoke.yml`) | Other examples |
-|---------|-----------|---------------------------------------------|----------------|
-| Event bus | Kafka API | `kafka` → `localhost:9092` | MSK, Confluent Cloud, Redpanda (Kafka-compatible), self-hosted Kafka |
-| Associative memory | OpenSearch HTTP | `opensearch` → `localhost:9200` | Amazon OpenSearch Service, Elastic Cloud, self-hosted OpenSearch |
-| Episodic archive | S3 API | MinIO → port `9001` | AWS S3, Cloudflare R2, MinIO, any S3-compatible endpoint |
-| Telemetry warehouse | ClickHouse client / HTTP | `clickhouse` → `8123` / `9000` | ClickHouse Cloud, managed ClickHouse, self-hosted |
-| Coordination | PostgreSQL | `postgres` → `localhost:5432` | RDS, Cloud SQL, self-hosted Postgres |
+
+| Concern             | Interface                | Local reference (`docker-compose.smoke.yml`) | Other examples                                                       |
+| ------------------- | ------------------------ | -------------------------------------------- | -------------------------------------------------------------------- |
+| Event bus           | Kafka API                | `kafka` → `localhost:9092`                   | MSK, Confluent Cloud, Redpanda (Kafka-compatible), self-hosted Kafka |
+| Associative memory  | OpenSearch HTTP          | `opensearch` → `localhost:9200`              | Amazon OpenSearch Service, Elastic Cloud, self-hosted OpenSearch     |
+| Episodic archive    | S3 API                   | MinIO → port `9001`                          | AWS S3, Cloudflare R2, MinIO, any S3-compatible endpoint             |
+| Telemetry warehouse | ClickHouse client / HTTP | `clickhouse` → `8123` / `9000`               | ClickHouse Cloud, managed ClickHouse, self-hosted                    |
+| Coordination        | PostgreSQL               | `postgres` → `localhost:5432`                | RDS, Cloud SQL, self-hosted Postgres                                 |
+
 
 ### Example Terraform (Aiven)
 

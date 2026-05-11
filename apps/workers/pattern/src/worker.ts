@@ -26,6 +26,7 @@ import {
   matchPatterns,
   loadPatterns,
   upsertPattern,
+  seedBuiltinPatternsIfEmpty,
   CONFIDENCE_THRESHOLD,
 } from "./detector.js";
 
@@ -58,16 +59,12 @@ export async function startWorker(): Promise<void> {
   await consumer.connect();
 
   log("Loading pattern library from OpenSearch...");
+  const seededPatterns = await seedBuiltinPatternsIfEmpty(openSearch);
+  if (seededPatterns > 0) {
+    log(`Seeded ${seededPatterns} built-in patterns into OpenSearch.`);
+  }
   let patterns = await loadPatterns(openSearch);
   log(`Loaded ${patterns.length} operational patterns.`);
-
-  // Seed patterns into OpenSearch if the index was empty
-  if (patterns.length === 0) {
-    log("Seeding built-in patterns into OpenSearch...");
-    for (const p of patterns) {
-      await upsertPattern(openSearch, p);
-    }
-  }
 
   // Reload patterns periodically so the worker picks up updates from the
   // reinforcement worker without restarting.

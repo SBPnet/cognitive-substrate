@@ -8,6 +8,7 @@
 
 import { Hono } from "hono";
 import type { Client } from "@opensearch-project/opensearch";
+import type { RetrievalMode } from "@cognitive-substrate/memory-opensearch";
 import type { MemoriesResponse, TraceEventDto } from "../types.js";
 import {
   getSessionMemories,
@@ -31,12 +32,13 @@ export function createMemoriesRouter(openSearchClient: Client): Hono {
   router.get("/search", async (c) => {
     const q = c.req.query("q") ?? "";
     const limit = Math.max(1, Number(c.req.query("limit") ?? "10"));
+    const retrievalMode = parseRetrievalMode(c.req.query("mode"));
 
     if (!q.trim()) {
       return c.json({ memories: [], total: 0 } as MemoriesResponse);
     }
 
-    const memories = await searchSemanticMemories(openSearchClient, q, limit);
+    const memories = await searchSemanticMemories(openSearchClient, q, limit, retrievalMode);
     const response: MemoriesResponse = { memories, total: memories.length };
     return c.json(response);
   });
@@ -65,6 +67,13 @@ export function createMemoriesRouter(openSearchClient: Client): Hono {
   });
 
   return router;
+}
+
+function parseRetrievalMode(value: string | undefined): RetrievalMode {
+  if (value === "quality" || value === "efficient" || value === "hybrid" || value === "legacy") {
+    return value;
+  }
+  return "legacy";
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

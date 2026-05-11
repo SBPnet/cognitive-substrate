@@ -25,11 +25,16 @@ export type RetrievalMode = "quality" | "efficient" | "hybrid" | "legacy";
 
 /** Maps each retrieval mode to its OpenSearch knn_vector field name. */
 export const RETRIEVAL_MODE_VECTOR_FIELD: Record<RetrievalMode, string> = {
-  quality:   "embedding_qwen",
+  quality: "embedding_qwen",
   efficient: "embedding_nomic",
-  hybrid:    "embedding_bge_m3",
-  legacy:    "embedding",
+  hybrid: "embedding_bge_m3",
+  legacy: "embedding",
 };
+
+export interface RetrievalFusionOptions {
+  readonly lexicalWeight?: number;
+  readonly vectorWeight?: number;
+}
 
 export interface HybridQueryOptions {
   /** Free-text query for BM25 matching. */
@@ -70,6 +75,9 @@ export interface HybridQueryOptions {
    * Defaults to "legacy" for backward compat.
    */
   readonly retrievalMode?: RetrievalMode;
+
+  /** Relative BM25 and k-NN weights used by bool-query score fusion. */
+  readonly fusion?: RetrievalFusionOptions;
 }
 
 /**
@@ -88,21 +96,14 @@ export function buildHybridQuery(options: HybridQueryOptions): Record<string, un
     timestampField = "created_at",
     includeTagFilter = true,
     retrievalMode = "legacy",
+    fusion,
   } = options;
 
   const retrievalBias = policy?.retrievalBias ?? 0.5;
   const memoryTrust = policy?.memoryTrust ?? 0.5;
-
-  const mustClauses: unknown[] = [
-    {
-      multi_match: {
-        query: queryText,
-        fields: textFields,
-        type: "best_fields",
-        tie_breaker: 0.3,
-      },
-    },
-  ];
+  const vectorField = RETRIEVAL_MODE_VECTOR_FIELD[retrievalMode];
+  const lexicalWeight = fusion?.lexicalWeight ?? 1;
+  const vectorWeight = fusion?.vectorWeight ?? Math.max(0.1, retrievalBias * memoryTrust * 2);
 
   const filterClauses: unknown[] = [
     { range: { importance_score: { gte: minImportance } } },
@@ -119,34 +120,33 @@ export function buildHybridQuery(options: HybridQueryOptions): Record<string, un
   return {
     size,
     query: {
-      script_score: {
-        query: {
-          bool: {
-            must: mustClauses,
-            filter: filterClauses,
+      bool: {
+        filter: filterClauses,
+        should: [
+          {
+            multi_match: {
+              query: queryText,
+              fields: textFields,
+              type: "best_fields",
+              tie_breaker: 0.3,
+              boost: lexicalWeight,
+            },
           },
-        },
-        script: {
-          source: `
-            double bm25 = _score;
-            double importance = doc.containsKey('importance_score') && doc['importance_score'].size() > 0
-              ? doc['importance_score'].value
-              : 0.5;
-            double decay = doc.containsKey('decay_factor') && doc['decay_factor'].size() > 0
-              ? doc['decay_factor'].value
-              : 1.0;
-            double retrievalBias = params.retrievalBias;
-            double memoryTrust = params.memoryTrust;
-            return bm25 * importance * decay * retrievalBias * memoryTrust;
-          `,
-          params: { retrievalBias, memoryTrust },
-        },
+          {
+            knn: {
+              [vectorField]: {
+                vector: Array.from(options.queryEmbedding),
+                k: options.k ?? size,
+                boost: vectorWeight,
+              },
+            },
+          },
+        ],
+        minimum_should_match: 1,
       },
     },
     _source: {
-      // Exclude all vector fields — large blobs not needed in result sources.
-      // retrievalMode is used by callers to select the right field for kNN queries.
-      excludes: [RETRIEVAL_MODE_VECTOR_FIELD[retrievalMode], "embedding", "embedding_qwen", "embedding_nomic", "embedding_bge_m3"],
+      excludes: ["embedding", "embedding_qwen", "embedding_nomic", "embedding_bge_m3"],
     },
   };
 }

@@ -18,7 +18,6 @@
     "clean": "rm -rf dist *.tsbuildinfo"
   },
   "dependencies": {
-    "@cognitive-substrate/core-types": "workspace:*",
     "kafkajs": "^2.2.4"
   },
   "devDependencies": {

@@ -1,8 +1,21 @@
+/**
+ * OpenSearch-backed `WorldModelStore`.
+ *
+ * Predictions are written to the `world_model_predictions` index using
+ * the prediction ID as the document ID, so that the retrospective update
+ * (`updatePrediction`) is a partial-document patch on the same row.
+ */
+
 import type { WorldModelPrediction, WorldModelPredictionUpdate } from "@cognitive-substrate/core-types";
 import type { Client } from "@opensearch-project/opensearch";
 import { indexDocument, updateDocument } from "@cognitive-substrate/memory-opensearch";
 import type { WorldModelStore } from "./types.js";
 
+/**
+ * Flat persistence record matching the `world_model_predictions` index
+ * mapping. Snake_case field names round-trip through the indexer
+ * helpers without translation.
+ */
 export interface WorldModelPredictionRecord extends Record<string, unknown> {
   readonly prediction_id: string;
   readonly timestamp: string;
@@ -39,6 +52,11 @@ export class OpenSearchWorldModelStore implements WorldModelStore {
   }
 }
 
+/**
+ * Flattens a `WorldModelPrediction` into the snake_case shape stored in
+ * `world_model_predictions`. Optional retrospective fields are omitted
+ * when undefined so that the initial save does not write nulls.
+ */
 export function toRecord(prediction: WorldModelPrediction): WorldModelPredictionRecord {
   return {
     prediction_id: prediction.predictionId,

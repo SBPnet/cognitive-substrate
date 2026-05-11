@@ -235,6 +235,10 @@ describe("processEvent — multi-profile (profiledEmbedders)", () => {
     expect(meta["profile_id"]).toBe("stub-quality");
     expect(meta["lane"]).toBe("quality");
     expect(meta["dimension"]).toBe(4);
+    expect(meta["profiles"]).toEqual([
+      expect.objectContaining({ lane: "quality", vector_field: "embedding_qwen" }),
+      expect.objectContaining({ lane: "efficient", vector_field: "embedding_nomic" }),
+    ]);
   });
 
   it("returns an enriched payload with dimension from the primary profile", async () => {

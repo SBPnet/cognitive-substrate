@@ -1,3 +1,15 @@
+/**
+ * Social modelling engine.
+ *
+ * `SocialEngine.assess` takes a batch of recent experience events for a
+ * subject plus the previous `UserModel` and returns an updated
+ * assessment. The engine intentionally uses lightweight heuristics
+ * (token matching, success/failure counts) rather than language models;
+ * this keeps the layer fast and deterministic so that downstream
+ * arbitration sees a stable signal. A future revision can plug in a
+ * richer intent classifier without changing the public interface.
+ */
+
 import { randomUUID } from "node:crypto";
 import type { ExperienceEvent } from "@cognitive-substrate/core-types";
 import type { IntentInference, SocialAssessment, SocialInput, UserBelief, UserModel } from "./types.js";
@@ -25,6 +37,12 @@ export class SocialEngine {
   }
 }
 
+/**
+ * Coarse keyword-based intent classification. Returns one of three
+ * categories: `explanation_request`, `implementation_request`, or
+ * `general_interaction`. Confidence rises with batch size on the
+ * assumption that more evidence yields a less noisy classification.
+ */
 export function inferIntent(events: ReadonlyArray<ExperienceEvent>): IntentInference {
   const text = events.map((event) => event.input.text.toLowerCase()).join(" ");
   const intent = text.includes("why") || text.includes("explain")
@@ -40,6 +58,11 @@ export function inferIntent(events: ReadonlyArray<ExperienceEvent>): IntentInfer
   };
 }
 
+/**
+ * Extracts up to five recent beliefs from the input batch. Belief text
+ * is truncated to 240 characters so that the persisted user model does
+ * not balloon when a subject sends long messages.
+ */
 function extractBeliefs(events: ReadonlyArray<ExperienceEvent>): ReadonlyArray<UserBelief> {
   return events
     .filter((event) => event.input.text.length > 0)
@@ -52,6 +75,11 @@ function extractBeliefs(events: ReadonlyArray<ExperienceEvent>): ReadonlyArray<U
     }));
 }
 
+/**
+ * Concatenates previous and newly extracted beliefs, then keeps only the
+ * 20 most recent. The bound prevents unbounded growth of the persisted
+ * user model while preserving enough history for short-term context.
+ */
 function mergeBeliefs(
   previous: ReadonlyArray<UserBelief>,
   next: ReadonlyArray<UserBelief>,
@@ -59,12 +87,21 @@ function mergeBeliefs(
   return [...previous, ...next].slice(-20);
 }
 
+/**
+ * Trust delta in `[-0.1, 0.1]`: signed success rate scaled by 0.1 so
+ * that any single batch can move the trust score only by a small step.
+ */
 function computeTrustDelta(events: ReadonlyArray<ExperienceEvent>): number {
   const successes = events.filter((event) => event.result?.success === true).length;
   const failures = events.filter((event) => event.result?.success === false).length;
   return clampSigned((successes - failures) / Math.max(1, events.length) * 0.1);
 }
 
+/**
+ * Smoothed deception-risk update: 80% prior plus 20% current-batch
+ * contradiction-token rate. Smoothing prevents one anomalous batch from
+ * spiking the deception risk to extreme values.
+ */
 function computeDeceptionRisk(events: ReadonlyArray<ExperienceEvent>, prior: number): number {
   const contradictionTerms = events.filter((event) =>
     /contradict|false|deceive|mislead/iu.test(event.input.text),

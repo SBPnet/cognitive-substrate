@@ -9,6 +9,9 @@
  */
 
 const EMBEDDING_DIM: number = parseInt(process.env["EMBEDDING_DIMENSION"] ?? "1536", 10);
+export const QUALITY_EMBEDDING_DIM: number = parseInt(process.env["QUALITY_EMBEDDING_DIMENSION"] ?? "1024", 10);
+export const EFFICIENT_EMBEDDING_DIM: number = parseInt(process.env["EFFICIENT_EMBEDDING_DIMENSION"] ?? "768", 10);
+export const HYBRID_EMBEDDING_DIM: number = parseInt(process.env["HYBRID_EMBEDDING_DIMENSION"] ?? "1024", 10);
 
 interface KnnVectorField {
   readonly type: "knn_vector";
@@ -35,6 +38,35 @@ const knnVectorField = (dimension: number = EMBEDDING_DIM): KnnVectorField => ({
   },
 });
 
+const profileVectorFields = {
+  embedding_qwen: knnVectorField(QUALITY_EMBEDDING_DIM),
+  embedding_nomic: knnVectorField(EFFICIENT_EMBEDDING_DIM),
+  embedding_bge_m3: knnVectorField(HYBRID_EMBEDDING_DIM),
+} as const;
+
+const embeddingMetaField = {
+  type: "object",
+  dynamic: false,
+  properties: {
+    profile_id: { type: "keyword" },
+    model_name: { type: "keyword" },
+    dimension: { type: "integer" },
+    lane: { type: "keyword" },
+    indexed_at: { type: "date" },
+    profiles: {
+      type: "nested",
+      properties: {
+        profile_id: { type: "keyword" },
+        model_name: { type: "keyword" },
+        dimension: { type: "integer" },
+        lane: { type: "keyword" },
+        vector_field: { type: "keyword" },
+        provider: { type: "keyword" },
+      },
+    },
+  },
+} as const;
+
 /** Raw episodic event metadata (object storage holds the full payload). */
 export const experienceEventsSchema = {
   settings: {
@@ -55,6 +87,8 @@ export const experienceEventsSchema = {
       agent_id: { type: "keyword" },
       summary: { type: "text", analyzer: "english" },
       embedding: knnVectorField(),
+      ...profileVectorFields,
+      embedding_meta: embeddingMetaField,
       importance_score: { type: "float" },
       reward_score: { type: "float" },
       confidence: { type: "float" },
@@ -78,6 +112,8 @@ export const memorySemanticSchema = {
       summary: { type: "text", analyzer: "english" },
       generalization: { type: "text", analyzer: "english" },
       embedding: knnVectorField(),
+      ...profileVectorFields,
+      embedding_meta: embeddingMetaField,
       source_event_ids: { type: "keyword" },
       importance_score: { type: "float" },
       stability_score: { type: "float" },
@@ -294,6 +330,27 @@ export const auditEventsSchema = {
   },
 } as const;
 
+/** Metadata for model-swap and benchmark runs. */
+export const modelRegistrySchema = {
+  settings: { index: { number_of_shards: 1, number_of_replicas: 1 } },
+  mappings: {
+    properties: {
+      profile_id: { type: "keyword" },
+      lane: { type: "keyword" },
+      model_id: { type: "keyword" },
+      model_name: { type: "keyword" },
+      provider: { type: "keyword" },
+      vector_field: { type: "keyword" },
+      dimension: { type: "integer" },
+      endpoint: { type: "keyword" },
+      ml_commons_model_id: { type: "keyword" },
+      deployment_status: { type: "keyword" },
+      license_notes: { type: "text" },
+      registered_at: { type: "date" },
+    },
+  },
+} as const;
+
 export const INDEX_SCHEMAS = {
   experience_events: experienceEventsSchema,
   memory_semantic: memorySemanticSchema,
@@ -307,6 +364,7 @@ export const INDEX_SCHEMAS = {
   retrieval_feedback: retrievalFeedbackSchema,
   operational_patterns: operationalPatternsSchema,
   audit_events: auditEventsSchema,
+  model_registry: modelRegistrySchema,
 } as const;
 
 export type CognitiveIndex = keyof typeof INDEX_SCHEMAS;

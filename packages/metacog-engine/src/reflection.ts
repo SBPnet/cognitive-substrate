@@ -1,3 +1,19 @@
+/**
+ * Reflection / self-modification proposal engine.
+ *
+ * `ReflectionEngine.reflect` re-scores the previous loop iteration:
+ * recalibrates confidence against the observed outcome, attributes any
+ * failure to a coarse cause (`risk_underestimated`, etc.), and writes
+ * a one-sentence strategy reflection. When the calibration error is
+ * high or risk exceeds the configured ceiling, it emits a
+ * `SelfModificationProposal` for the constitution engine to approve
+ * before any change is applied.
+ *
+ * The reflection budget caps how many proposals can be emitted per
+ * session so that the metacognition layer cannot itself become a
+ * source of churn.
+ */
+
 import { randomUUID } from "node:crypto";
 import type { SelfModificationProposal } from "@cognitive-substrate/core-types";
 import type {

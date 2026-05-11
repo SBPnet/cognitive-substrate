@@ -3,6 +3,7 @@ import type {
   TelemetryInserter,
   PatternOutcomeRow,
 } from "@cognitive-substrate/clickhouse-telemetry";
+import { scoreReinforcement } from "@cognitive-substrate/reinforcement-engine";
 
 const OPERATIONAL_PATTERNS_INDEX = "operational_patterns";
 
@@ -71,14 +72,23 @@ export async function recordOutcome(
   environment: string,
   alpha = 0.15,
 ): Promise<void> {
-  const outcomeSignal =
-    feedback.outcome === "success" ? 1.0
-    : feedback.outcome === "partial" ? 0.5
-    : feedback.outcome === "failure" ? 0.0
-    : 0.5;
+  const reinforcement = scoreReinforcement({
+    importance: feedback.outcome === "ignored" ? 0.2 : 0.7,
+    usageFrequency: 0.5,
+    goalRelevance: feedback.outcome === "success" ? 0.8 : 0.4,
+    novelty: 0.3,
+    predictionAccuracy:
+      feedback.outcome === "success" ? 1.0
+      : feedback.outcome === "partial" ? 0.6
+      : feedback.outcome === "failure" ? 0.1
+      : 0.4,
+    emotionalWeight: Math.min(1, Math.abs(feedback.latencyDeltaMs ?? 0) / 1_000),
+    contradictionRisk: feedback.outcome === "failure" ? 0.6 : 0.1,
+    policyAlignment: feedback.outcome === "success" ? 0.8 : 0.4,
+  });
 
   const newConfidence =
-    alpha * outcomeSignal + (1 - alpha) * feedback.confidenceBefore;
+    alpha * reinforcement.reinforcement + (1 - alpha) * feedback.confidenceBefore;
   const newConfidenceClamped = Math.max(0.1, Math.min(0.99, newConfidence));
 
   // Write outcome row to ClickHouse
@@ -100,10 +110,17 @@ export async function recordOutcome(
     index: OPERATIONAL_PATTERNS_INDEX,
     id: feedback.patternId,
     body: {
-      doc: {
-        confidence: newConfidenceClamped,
-        successCount: { script: { source: "ctx._source.successCount += params.inc", params: { inc: feedback.outcome === "success" ? 1 : 0 } } },
-        updatedAt: new Date().toISOString(),
+      script: {
+        source: `
+          ctx._source.confidence = params.confidence;
+          ctx._source.successCount = (ctx._source.successCount == null ? 0 : ctx._source.successCount) + params.successInc;
+          ctx._source.updatedAt = params.updatedAt;
+        `,
+        params: {
+          confidence: newConfidenceClamped,
+          successInc: feedback.outcome === "success" ? 1 : 0,
+          updatedAt: new Date().toISOString(),
+        },
       },
     },
     retry_on_conflict: 3,

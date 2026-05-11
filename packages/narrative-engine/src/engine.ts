@@ -1,3 +1,16 @@
+/**
+ * Narrative engine orchestrator.
+ *
+ * Each `updateIdentity` call runs the full identity pipeline:
+ *   1. Accumulate evidence into a proposed `IdentityState`.
+ *   2. Stabilise drift against the previous state.
+ *   3. Synthesise the matching `NarrativeSelfModel`.
+ *   4. Build the `IdentityUpdateEvent` and optionally publish it.
+ *
+ * The engine carries no own state; durability is left to whoever calls
+ * `updateIdentity` (typically the consolidation worker).
+ */
+
 import type { IdentityState, IdentityUpdateEvent } from "@cognitive-substrate/core-types";
 import {
   accumulateIdentityVector,

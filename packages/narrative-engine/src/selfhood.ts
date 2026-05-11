@@ -1,3 +1,15 @@
+/**
+ * Long-horizon narrative tools.
+ *
+ *   - `synthesizeAutobiography` groups episodes into themed threads.
+ *   - `projectFutureSelf` builds a forward-looking identity projection
+ *     under a caller-supplied drift hypothesis.
+ *   - `reviseNarrativeThreads` invalidates threads whose anchoring
+ *     beliefs changed, lowering their coherence score.
+ *
+ * The engine treats "selfhood" terminology as computational analogy.
+ */
+
 import { randomUUID } from "node:crypto";
 import type { IdentityState } from "@cognitive-substrate/core-types";
 import type {

@@ -1,3 +1,12 @@
+/**
+ * Search-hit projection.
+ *
+ * The retrieval engine queries multiple indexes whose source-document
+ * shapes differ. `mapSearchHitToMemoryReference` flattens hits from any
+ * supported index into the canonical `MemoryReference` returned to
+ * agents, keeping the index-specific projection logic in one place.
+ */
+
 import type { MemoryReference } from "@cognitive-substrate/core-types";
 import type {
   ExperienceEventSearchDocument,
@@ -6,6 +15,7 @@ import type {
   SemanticMemorySearchDocument,
 } from "./types.js";
 
+/** Subset of the OpenSearch hit shape used by the mapper. */
 export interface SearchHit<T extends RetrievalSearchDocument> {
   readonly _id: string;
   readonly _score: number;
@@ -16,6 +26,13 @@ function isExperienceIndex(index: RetrievalSearchIndex): index is "experience_ev
   return index === "experience_events";
 }
 
+/**
+ * Projects a single hit into a `MemoryReference`. The summary fallback
+ * order differs by index: `experience_events` uses `summary` only, while
+ * `memory_semantic` falls back to `generalization` when `summary` is
+ * empty so that consolidated memories without a short summary still
+ * surface useful text.
+ */
 export function mapSearchHitToMemoryReference(
   index: RetrievalSearchIndex,
   hit: SearchHit<RetrievalSearchDocument>,

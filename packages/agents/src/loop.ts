@@ -1,3 +1,16 @@
+/**
+ * The cognitive loop: one cycle of perceive -> retrieve -> reason -> act
+ * -> evaluate.
+ *
+ * `CognitiveLoop.process` is the canonical entry point used by the
+ * orchestrator. It owns the order of operations but delegates every
+ * decision to the configured ports: which session to use, which
+ * memories to retrieve, how to reason, which tool to invoke, and where
+ * to publish the resulting policy evaluation. The output bundles
+ * everything the calling worker needs to emit downstream events
+ * (interaction response, policy.evaluation, agent traces, audit).
+ */
+
 import type {
   AgentContext,
   AgentResult,
@@ -10,6 +23,7 @@ import type {
   PolicyEvaluationPublisher,
 } from "./types.js";
 
+/** No-op publisher used when downstream policy evaluation is disabled. */
 export class NoopPolicyEvaluationPublisher implements PolicyEvaluationPublisher {
   async publish(): Promise<void> {
     return undefined;
@@ -23,6 +37,20 @@ export class CognitiveLoop {
     this.config = config;
   }
 
+  /**
+   * Processes one experience event through the full loop. Steps:
+   *
+   *   1. Read the current policy snapshot.
+   *   2. Get-or-create the cognitive session for the event.
+   *   3. List active goals for the session.
+   *   4. Hybrid-retrieve up to eight memories using the event text and
+   *      its embedding (when present).
+   *   5. Update working memory on the session.
+   *   6. Build the AgentContext and call the reasoning model.
+   *   7. Optionally execute the proposed action via the ToolExecutor.
+   *   8. Score the loop's own decision and publish the resulting
+   *      PolicyEvaluationInput.
+   */
   async process(event: ExperienceEvent): Promise<CognitiveLoopResult> {
     const policy = await this.config.policyProvider.getCurrentPolicy();
     const session = await this.config.sessionManager.getOrCreate(event, policy);

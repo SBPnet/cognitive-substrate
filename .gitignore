@@ -44,6 +44,10 @@ logs/
 coverage/
 .nyc_output/
 artifacts/
+!artifacts/
+artifacts/*
+!artifacts/baselines/
+!artifacts/baselines/**
 
 # OTEL / observability runtime data
 otel-data/

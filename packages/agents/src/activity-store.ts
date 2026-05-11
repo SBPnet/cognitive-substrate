@@ -1,3 +1,13 @@
+/**
+ * Persistence implementations for `AgentActivityTrace`.
+ *
+ * `NoopAgentActivityStore` discards traces; useful for tests and for
+ * deployments that have not yet enabled per-agent observability.
+ * `OpenSearchAgentActivityStore` writes each trace to the
+ * `agent_activity` index keyed by `traceId`, where the workbench reads
+ * it to render the multi-agent debate timeline.
+ */
+
 import type { Client } from "@opensearch-project/opensearch";
 import type { AgentActivityTrace } from "@cognitive-substrate/core-types";
 import { indexDocument } from "@cognitive-substrate/memory-opensearch";

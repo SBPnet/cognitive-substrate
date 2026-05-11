@@ -94,7 +94,7 @@ export async function processEvent(
     },
     async (span) => {
       // Step 1: Generate embeddings (multi-profile or legacy single).
-      const { primaryEmbedding, profileVectors } = await withSpan(
+      const { primaryEmbedding, profileVectors, profileMetadata } = await withSpan(
         tracer,
         "experience.embed",
         { [CogAttributes.EVENT_ID]: rawEvent.eventId },
@@ -105,7 +105,7 @@ export async function processEvent(
           if (config.embedder) {
             const vec = await config.embedder.embed(rawEvent.input.text);
             span.setAttribute(CogAttributes.EMBEDDING_DIM, vec.length);
-            return { primaryEmbedding: vec, profileVectors: {} };
+            return { primaryEmbedding: vec, profileVectors: {}, profileMetadata: [] };
           }
           throw new Error("PipelineConfig requires either embedder or profiledEmbedders");
         },
@@ -167,6 +167,7 @@ export async function processEvent(
                 dimension:  primaryProfile.dimension,
                 lane:       primaryProfile.lane,
                 indexed_at: new Date().toISOString(),
+                profiles: profileMetadata,
               },
             } : {}),
             structured: rawEvent.input.structured ?? {},
@@ -231,6 +232,7 @@ export async function processEvent(
 interface EmbedAllResult {
   primaryEmbedding: ReadonlyArray<number>;
   profileVectors: Record<string, ReadonlyArray<number>>;
+  profileMetadata: Array<Record<string, string | number>>;
 }
 
 async function embedAllProfiles(
@@ -239,12 +241,21 @@ async function embedAllProfiles(
   span: { setAttribute(key: string, value: string | number | boolean): void },
 ): Promise<EmbedAllResult> {
   const profileVectors: Record<string, ReadonlyArray<number>> = {};
+  const profileMetadata: Array<Record<string, string | number>> = [];
   let primaryEmbedding: ReadonlyArray<number> | undefined;
 
   for (const { profile, client } of profiledEmbedders) {
     try {
       const vec = await client.embed(text);
       profileVectors[profile.vectorField] = vec;
+      profileMetadata.push({
+        profile_id: profile.id,
+        model_name: profile.name,
+        dimension: profile.dimension,
+        lane: profile.lane,
+        vector_field: profile.vectorField,
+        provider: profile.provider,
+      });
       if (!primaryEmbedding) {
         primaryEmbedding = vec;
         span.setAttribute(CogAttributes.EMBEDDING_DIM, vec.length);
@@ -260,5 +271,5 @@ async function embedAllProfiles(
     throw new Error("All embedding profiles failed — cannot index document without at least one vector.");
   }
 
-  return { primaryEmbedding, profileVectors };
+  return { primaryEmbedding, profileVectors, profileMetadata };
 }

@@ -18,8 +18,7 @@
     "clean": "rm -rf dist *.tsbuildinfo"
   },
   "dependencies": {
-    "@cognitive-substrate/attention-engine": "workspace:*",
-    "@cognitive-substrate/core-types": "workspace:*"
+    "@cognitive-substrate/attention-engine": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

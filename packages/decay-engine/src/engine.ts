@@ -1,3 +1,21 @@
+/**
+ * Decay / forgetting engine.
+ *
+ * `DecayEngine.planForgetting` evaluates each candidate against a
+ * cascading set of thresholds:
+ *
+ *   1. High contradiction with low retention -> retire.
+ *   2. Retention below `retirementThreshold`  -> prune.
+ *   3. Retention below `suppressionThreshold` -> suppress.
+ *   4. Old (>30 days) and low importance      -> compress.
+ *   5. Otherwise                              -> retain.
+ *
+ * In parallel it prunes the association graph by removing memory links
+ * whose strength falls below `pruneStrengthThreshold`. The thresholds are
+ * exposed through `DecayEngineOptions` so that operators can tighten or
+ * loosen forgetting without recompiling the engine.
+ */
+
 import type { MemoryLink } from "@cognitive-substrate/core-types";
 import type {
   CompressionCluster,
@@ -8,8 +26,11 @@ import type {
 } from "./types.js";
 
 export interface DecayEngineOptions {
+  /** Retention below this triggers `suppress`. */
   readonly suppressionThreshold?: number;
+  /** Retention below this triggers `prune`. */
   readonly retirementThreshold?: number;
+  /** Memory-graph edges below this strength are dropped during pruning. */
   readonly pruneStrengthThreshold?: number;
 }
 
@@ -24,6 +45,10 @@ export class DecayEngine {
     this.pruneStrengthThreshold = options.pruneStrengthThreshold ?? 0.15;
   }
 
+  /**
+   * Builds a complete forgetting plan covering candidate decisions,
+   * compression clustering, and association-graph pruning.
+   */
   planForgetting(
     candidates: ReadonlyArray<ForgettingCandidate>,
     links: ReadonlyArray<MemoryLink> = [],
@@ -36,6 +61,12 @@ export class DecayEngine {
     };
   }
 
+  /**
+   * Classifies a single candidate. The cascade short-circuits at the
+   * first matching threshold so that, for example, a high-contradiction
+   * memory is retired even if its raw retention score would have only
+   * triggered suppression.
+   */
   decide(candidate: ForgettingCandidate): ForgettingDecision {
     const retentionScore = scoreRetention(candidate);
     const contradiction = candidate.contradictionScore ?? 0;
@@ -56,6 +87,7 @@ export class DecayEngine {
     return decision(candidate, "retain", suppressionWeight, retentionScore, "retained");
   }
 
+  /** Drops association-graph edges whose strength is below the threshold. */
   pruneGraph(links: ReadonlyArray<MemoryLink>): GraphPruningResult {
     const retainedLinks = links.filter((link) => link.strength >= this.pruneStrengthThreshold);
     const prunedLinks = links.filter((link) => link.strength < this.pruneStrengthThreshold);
@@ -63,6 +95,16 @@ export class DecayEngine {
   }
 }
 
+/**
+ * Composite retention score in `[0, 1]`.
+ *
+ *   - importance: 35% of the score (dominant term).
+ *   - retrieval relevance score: 20%.
+ *   - usage / retrieval count: 20% (capped at 20 retrievals).
+ *   - recency: 15% (decays linearly over 90 days).
+ *   - strategic value: 10%.
+ *   - contradiction penalty: subtracts up to 35% directly.
+ */
 export function scoreRetention(candidate: ForgettingCandidate): number {
   const recency = clamp(1 - (candidate.ageDays ?? 0) / 90);
   const use = clamp(candidate.retrievalCount / 20);
@@ -77,6 +119,12 @@ export function scoreRetention(candidate: ForgettingCandidate): number {
   );
 }
 
+/**
+ * Builds the compression-cluster list. Currently emits at most one
+ * cluster containing every candidate flagged for compression. Future
+ * revisions may split by semantic similarity once embeddings are
+ * available at this stage.
+ */
 function buildCompressionClusters(
   candidates: ReadonlyArray<ForgettingCandidate>,
   decisions: ReadonlyArray<ForgettingDecision>,

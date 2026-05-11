@@ -1,6 +1,20 @@
+/**
+ * Invariant-driven approval engine.
+ *
+ * `ConstitutionEngine.assess` evaluates each configured invariant
+ * against the input bundle (current policy, current identity, optional
+ * previous identity, optional self-modification proposal, optional
+ * reinforcement signal) and produces a `ConstitutionalAssessment` with
+ * a list of violations and a quarantine flag. Reward-corruption
+ * detection is layered on top: high-importance signals with low policy
+ * alignment, or contradiction signals coupled with high emotional
+ * weight, are flagged independently of the named invariants.
+ */
+
 import type { IdentityState } from "@cognitive-substrate/core-types";
 import type { ConstitutionalAssessment, ConstitutionalInput, ConstitutionalInvariant } from "./types.js";
 
+/** Conservative defaults applied when the caller supplies no invariants. */
 const DEFAULT_INVARIANTS: ReadonlyArray<ConstitutionalInvariant> = [
   {
     invariantId: "stable-identity",
@@ -37,6 +51,11 @@ export class ConstitutionEngine {
   }
 }
 
+/**
+ * Root-mean-square drift across the identity vector. Used by the
+ * `maxIdentityDrift` invariant to reject changes that would move the
+ * identity vector by more than a configurable distance per cycle.
+ */
 export function identityDrift(previous: IdentityState, next: IdentityState): number {
   const deltas = [
     next.curiosity - previous.curiosity,
@@ -70,6 +89,19 @@ function evaluateInvariant(
   return violations;
 }
 
+/**
+ * Detects two reward-corruption signatures:
+ *
+ *   1. High-importance memory whose stated policy alignment is very
+ *      low (the system is rewarded for something its own policy
+ *      considers off-distribution).
+ *   2. High contradiction risk paired with high emotional weight (the
+ *      system is being rewarded for resolving conflict in ways that
+ *      may amplify identity drift).
+ *
+ * Each signature contributes 0.5 to the corruption score so that any
+ * single match raises the score above 0.5 and triggers quarantine.
+ */
 function detectRewardCorruption(input: ConstitutionalInput): number {
   if (!input.reinforcement) return 0;
   const highRewardLowAlignment = input.reinforcement.importance > 0.8 && input.reinforcement.policyAlignment < 0.25;

@@ -1,3 +1,13 @@
+/**
+ * Retrieval-feedback writer.
+ *
+ * Records whether a retrieved memory was actually used in the final
+ * response, and emits the same record onto the audit topic so that the
+ * reinforcement loop and offline analyses can replay the decision. The
+ * feedback entry feeds the future-weight adjustment that the
+ * reinforcement engine applies during decay scoring.
+ */
+
 import { randomUUID } from "node:crypto";
 import type { Client } from "@opensearch-project/opensearch";
 import { Topics, type TopicName } from "@cognitive-substrate/kafka-bus";
@@ -7,6 +17,11 @@ import type {
   RetrievalFeedbackRecord,
 } from "./types.js";
 
+/**
+ * Minimal publisher contract used to mirror feedback records onto the
+ * audit topic. Defined locally so that this module does not depend on
+ * the full `CognitiveProducer` import surface.
+ */
 export interface AuditPublisher {
   publish<T>(
     topic: TopicName,
@@ -17,7 +32,9 @@ export interface AuditPublisher {
 
 export interface RetrievalFeedbackWriterConfig {
   readonly openSearch: Client;
+  /** When provided, every feedback record is also mirrored to the audit topic. */
   readonly auditPublisher?: AuditPublisher;
+  /** Override hook for tests; defaults to the production `indexDocument`. */
   readonly indexFeedback?: typeof indexDocument;
 }
 
@@ -32,6 +49,12 @@ export class RetrievalFeedbackWriter {
     this.indexFeedback = config.indexFeedback ?? indexDocument;
   }
 
+  /**
+   * Persists one retrieval-feedback record to the `retrieval_feedback`
+   * index, optionally mirroring it onto the audit topic, and returns
+   * the record (with server-supplied `feedbackId` and `timestamp`
+   * populated when missing).
+   */
   async record(input: RetrievalFeedbackInput): Promise<RetrievalFeedbackRecord> {
     const record: RetrievalFeedbackRecord = {
       feedbackId: input.feedbackId ?? randomUUID(),

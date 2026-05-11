@@ -1,5 +1,18 @@
+/**
+ * Arbitration over multiple AgentResult proposals.
+ *
+ * `arbitrate` selects a winner by total `DebateScore`. The score blends
+ * coherence (proposal text plus reasoning is non-empty), predicted
+ * reward (own confidence plus optional forecast confidence), memory
+ * alignment (number of retrieved memories supporting the proposal),
+ * and a risk penalty. Coefficients sum to 1.0 so that the total stays
+ * in `[0, 1]`. `scoreDebateCandidate` is exposed for callers that need
+ * the breakdown for tracing.
+ */
+
 import type { AgentResult, ArbitrationDecision } from "@cognitive-substrate/core-types";
 
+/** Per-candidate breakdown of the arbitration score. */
 export interface DebateScore {
   readonly coherence: number;
   readonly predictedReward: number;
@@ -8,11 +21,13 @@ export interface DebateScore {
   readonly total: number;
 }
 
+/** Optional forecast injected into scoring (e.g. world-model risk). */
 export interface ArbitrationRiskForecast {
   readonly riskScore: number;
   readonly confidence: number;
 }
 
+/** Convenience accessor that returns only the total score. */
 export function scoreAgentResult(result: AgentResult): number {
   return scoreDebateCandidate(result).total;
 }

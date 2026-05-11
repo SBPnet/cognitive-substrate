@@ -1,3 +1,14 @@
+/**
+ * Curiosity-driven exploration engine.
+ *
+ * `CuriosityEngine.assess` ranks candidate states by combined information
+ * gain, novelty, uncertainty, and an "unexplored" bonus that decays with
+ * `visitedCount`. It then proposes up to five experiments around the
+ * top-ranked states. The top priority is also surfaced as
+ * `curiosityReward` so that the affect engine can pick it up directly
+ * without re-running the priority computation.
+ */
+
 import { randomUUID } from "node:crypto";
 import type { CuriosityAssessment, CuriosityState, ExperimentPlan } from "./types.js";
 
@@ -15,6 +26,12 @@ export class CuriosityEngine {
   }
 }
 
+/**
+ * Ranks a state for exploration. Information gain dominates (40%); novelty
+ * and uncertainty contribute equally (25% each); the `1 / (1 + visitedCount)`
+ * term gives a small but persistent bonus to states that have been
+ * sampled less.
+ */
 export function curiosityPriority(state: CuriosityState): number {
   const unexplored = 1 / (1 + state.visitedCount);
   return clamp(
@@ -25,6 +42,11 @@ export function curiosityPriority(state: CuriosityState): number {
   );
 }
 
+/**
+ * Wraps a state in an `ExperimentPlan`. The hypothesis text is templated
+ * from the uncertainty value; future revisions can replace this with a
+ * model-generated hypothesis once a simulator is wired in.
+ */
 export function planExperiment(state: CuriosityState): ExperimentPlan {
   const priority = curiosityPriority(state);
   return {
