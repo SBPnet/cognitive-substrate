@@ -116,6 +116,39 @@ export class VertexQueryEmbeddingClient implements QueryEmbeddingClient {
   }
 
   private async getAccessToken(): Promise<string> {
+    const credsJson = process.env["GOOGLE_APPLICATION_CREDENTIALS_JSON"];
+    if (credsJson) {
+      const creds = JSON.parse(credsJson) as {
+        type?: string;
+        client_id?: string;
+        client_secret?: string;
+        refresh_token?: string;
+      };
+      if (
+        creds.type === "authorized_user" &&
+        creds.client_id &&
+        creds.client_secret &&
+        creds.refresh_token
+      ) {
+        const res = await fetch("https://oauth2.googleapis.com/token", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({
+            client_id: creds.client_id,
+            client_secret: creds.client_secret,
+            refresh_token: creds.refresh_token,
+            grant_type: "refresh_token",
+          }),
+        });
+        if (!res.ok) {
+          const body = await res.text().catch(() => "");
+          throw new Error(`OAuth2 token refresh failed: ${res.status} ${body}`.trim());
+        }
+        const data = (await res.json()) as { access_token?: string };
+        if (!data.access_token) throw new Error("No access_token in OAuth2 response");
+        return data.access_token;
+      }
+    }
     const { stdout } = await execFileAsync("gcloud", [
       "auth",
       "application-default",
