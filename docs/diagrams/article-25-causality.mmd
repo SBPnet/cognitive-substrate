@@ -1,7 +1,0 @@
-flowchart LR
-  experienceHistory["Experience history"] -->|"infer"| causalModel["Structural causal model"]
-  groundedObservations["Grounded observations"] -->|"infer"| causalModel
-  proposedIntervention["Proposed intervention"] -->|"apply"| interventionModel["Intervention model"]
-  causalModel -->|"simulate"| interventionModel
-  interventionModel -->|"compare"| counterfactualOutcome["Counterfactual outcome"]
-  counterfactualOutcome -->|"explain"| causalAbstraction["Causal abstraction"]

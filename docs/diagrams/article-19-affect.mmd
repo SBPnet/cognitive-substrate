@@ -1,9 +1,0 @@
-flowchart LR
-  outcomeSignals["Outcome signals"] -->|"prediction error"| dopamineLike["Reward modulation"]
-  uncertaintySignals["Uncertainty signals"] -->|"alert"| norepinephrineLike["Alert modulation"]
-  stabilitySignals["Stability signals"] -->|"regulate"| serotoninLike["Stability modulation"]
-  dopamineLike -->|"combine"| affectVector["Global affect vector"]
-  norepinephrineLike -->|"combine"| affectVector
-  serotoninLike -->|"combine"| affectVector
-  affectVector -->|"modulate"| attentionEngine["Attention engine"]
-  affectVector -->|"modulate"| reinforcementEngine["Reinforcement engine"]

@@ -1,8 +1,0 @@
-flowchart LR
-  interactionHistory["Interaction history"] -->|"model"| userModel["User model"]
-  peerOutputs["Peer outputs"] -->|"model"| peerModel["Peer model"]
-  userModel -->|"infer"| intentState["Intent state"]
-  peerModel -->|"infer"| beliefState["Belief state"]
-  intentState -->|"score"| trustModel["Trust model"]
-  beliefState -->|"score"| trustModel
-  trustModel -->|"coordinate"| cooperativeCognition["Cooperative cognition"]

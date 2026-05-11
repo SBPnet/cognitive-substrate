@@ -1,7 +1,0 @@
-flowchart LR
-  policyEvaluation["policy.evaluation"] -->|"compute"| rewardDelta["Reward delta"]
-  rewardDelta -->|"clamp"| boundedUpdate["Bounded update"]
-  boundedUpdate -->|"persist"| policyStore["Policy version store"]
-  policyStore -->|"cache"| runtimePolicy["Runtime policy"]
-  runtimePolicy -->|"bias"| futureAction["Future action"]
-  policyStore -->|"emit"| policyUpdated["policy.updated"]

@@ -6,15 +6,14 @@ what happens when memory, retrieval, salience, reinforcement, and observability
 are first-class infrastructure instead. Closer to how a database or a message
 bus is infrastructure: opinionated, durable, and operating below the agent.
 
-Cognitive Substrate is the long-form attempt at building that. TypeScript
-services on Kafka and OpenSearch, with a research paper and per-stage articles
-written alongside the code so the design and the implementation can keep each
-other honest.
+Cognitive Substrate is the long-form attempt at building that: TypeScript
+services on Kafka and OpenSearch, with architecture docs and OpenAPI kept next to
+the code so runtime contracts stay inspectable.
 
 It is early. Stage 1 (experience ingestion) has the strongest end-to-end
 evidence: Kafka consumption, embedding, OpenSearch indexing, object-store
-archive, downstream emission, and a runnable companion demo. Later stages range
-from buildable TypeScript surfaces to architecture drafts and article outlines.
+archive, downstream emission, and a runnable demo under `examples/experience-ingestion/`.
+Later stages range from buildable TypeScript surfaces to architecture drafts.
 `docs/architecture/inventory.md` is the source of truth for implementation
 status, and its status labels distinguish source availability from behavioral
 validation.
@@ -54,9 +53,8 @@ decides what stays active.
 forgetting are part of the model, not afterthoughts.
 - **Bounded adaptation.** Policies can drift, but inside a constitutional
 invariant layer with audit trails.
-- **Code and writing together.** Every implementation stage ships with a
-companion article. If a claim cannot be written down clearly, it probably
-is not built clearly either.
+- **Observable design.** Architecture notes and inventory rows should reflect what
+the code actually does; extend `docs/architecture/` when behavior changes.
 
 The companion claim about cognition is more modest than the directory names
 suggest. Biological terms (dopamine, salience, narrative selfhood) are used as
@@ -68,9 +66,9 @@ equivalence, sentience, or AGI.
 
 | Stage range  | Evidence level                                            | Notes                                                                                                                                                                                                                        |
 | ------------ | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Stage 1      | Runtime-demonstrated                                      | Kafka consumer, embedding, OpenSearch index, object-store write, downstream emit, and runnable companion demo under `docs/articles/companions/article-01-experience-ingestion/`.                                             |
+| Stage 1      | Runtime-demonstrated                                      | Kafka consumer, embedding, OpenSearch index, object-store write, downstream emit, and runnable demo under `examples/experience-ingestion/`.                                             |
 | Stages 2-13  | Mixed behavioral, focused-test, and import evidence       | Retrieval and OpenSearch model-swap paths have focused tests; the orchestrator/API path is smoke-tested; metacognition, identity, and reinforcement scoring still need stronger runtime wiring.                              |
-| Stages 14-29 | Mostly build-level surfaces                              | TypeScript sources exist for many engines, but most Series II engines still need behavioral validation, architecture docs, and public article expansion.                                                                      |
+| Stages 14-29 | Mostly build-level surfaces                              | TypeScript sources exist for many engines, but most Series II engines still need behavioral validation and deeper architecture notes.                                                                      |
 | Stages 30-36 | Partial operational flows                                | Telemetry, primitive mapping, pattern detection, reinforcement feedback, and transfer surfaces are present, but logs/metadata ingestion, experience bridging, and transfer quality still need runtime validation.             |
 
 
@@ -117,16 +115,15 @@ infra/
   kafka/                 Topic and ACL declarations
 
 docs/
-  paper/                 Research paper chapters
-  articles/              One publishable article per stage
-  diagrams/              Mermaid sources, with PNG/SVG exports next to articles
-  architecture/          Architecture deep dives
-  reviews/               Project reviews and audits
-  strategy/              OSS, partnership, and commercial strategy notes
-  style-guide.md         Editorial rules for everything under docs/
+  architecture/          Architecture deep dives and stage inventory
+  api/                   OpenAPI specification for the HTTP surface
+  strategy/              OSS, partnership, and deployment strategy notes
   glossary.md            Canonical terminology
   architecture/inventory.md
                           Stage-by-stage implementation status and doc debt
+
+examples/
+  experience-ingestion/  Dependency-free Stage 1 shape demo (local JSON outputs)
 ```
 
 ## Running it
@@ -194,13 +191,11 @@ If you want the design rationale, start here:
 
 - `docs/architecture/inventory.md` for the stage list, implementation status,
 evidence level, and missing architecture docs.
-- `docs/paper/` for the research paper chapters (in progress).
-- `docs/articles/index.md` for the public reading order of the per-stage
-articles.
 - `docs/architecture/` for infrastructure deep dives, especially
 `inventory.md`, `operational-primitives.md`, `opensearch-ml-nodes.md`, and
 `clickhouse-telemetry.md`.
-- `docs/glossary.md` if a term in the code or articles feels overloaded.
+- `docs/api/openapi.yaml` for the HTTP API surface exposed by the BFF.
+- `docs/glossary.md` if a term in the code or docs feels overloaded.
 
 ## Deployment options
 

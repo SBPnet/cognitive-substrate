@@ -1,8 +1,0 @@
-flowchart LR
-  memorySignals["Memory signals"] -->|"bid"| salienceMarket["Salience market"]
-  goalSignals["Goal signals"] -->|"bid"| salienceMarket
-  riskSignals["Risk signals"] -->|"bid"| salienceMarket
-  interruptSignals["Interrupt signals"] -->|"preempt"| salienceMarket
-  salienceMarket -->|"allocate"| workingMemory["Working memory budget"]
-  workingMemory -->|"focus"| activeFocus["Active focus"]
-  activeFocus -->|"decay"| backgroundMonitoring["Background monitoring"]

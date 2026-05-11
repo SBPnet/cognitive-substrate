@@ -1,8 +1,0 @@
-flowchart LR
-  consolidationRequest["consolidation.request"] -->|"select"| replayCandidates["Replay candidates"]
-  replayCandidates -->|"summarize"| semanticMemory["Semantic memory"]
-  semanticMemory -->|"cluster"| memoryClusters["Memory clusters"]
-  memoryClusters -->|"detect"| contradictions["Contradictions"]
-  memoryClusters -->|"update"| decayScores["Decay and reinforcement"]
-  decayScores -->|"emit"| memoryUpdated["memory.semantic.updated"]
-  contradictions -->|"annotate"| memoryUpdated

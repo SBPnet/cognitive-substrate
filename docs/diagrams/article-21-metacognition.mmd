@@ -1,8 +1,0 @@
-flowchart LR
-  cognitiveOperations["Cognitive operations"] -->|"emit"| confidenceRecords["Confidence records"]
-  observedOutcomes["Observed outcomes"] -->|"compare"| calibrationMonitor["Calibration monitor"]
-  confidenceRecords -->|"compare"| calibrationMonitor
-  calibrationMonitor -->|"attribute"| failureAttribution["Failure attribution"]
-  failureAttribution -->|"route"| strategySelection["Strategy selection"]
-  strategySelection -->|"constrain"| reflectionBudget["Reflection budget"]
-  reflectionBudget -->|"supervise"| watchdogAgents["Watchdog agents"]

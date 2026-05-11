@@ -1,9 +1,0 @@
-flowchart LR
-  repeatedFailure["Repeated failure"] -->|"trigger"| capabilitySearch["Capability search"]
-  curiosityPressure["Curiosity pressure"] -->|"trigger"| capabilitySearch
-  abstractionLibrary["Abstraction library"] -->|"guide"| capabilitySearch
-  capabilitySearch -->|"propose"| architectureMutation["Architecture mutation"]
-  architectureMutation -->|"check"| constitutionalGate["Constitutional gate"]
-  constitutionalGate -->|"accept"| evolvedCapability["Evolved capability"]
-  constitutionalGate -->|"reject"| rejectedMutation["Rejected mutation"]
-  evolvedCapability -->|"observe"| emergenceRecord["Emergence record"]

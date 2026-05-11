@@ -1,8 +1,0 @@
-flowchart LR
-  taskContext["Task context"] -->|"estimate value"| budgetEngine["Budget engine"]
-  operationCosts["Operation costs"] -->|"estimate cost"| budgetEngine
-  budgetEngine -->|"assign"| agentQuotas["Agent quotas"]
-  budgetEngine -->|"gate"| utilityThreshold["Utility threshold"]
-  utilityThreshold -->|"choose"| fastMode["Fast mode"]
-  utilityThreshold -->|"choose"| slowMode["Slow mode"]
-  agentQuotas -->|"track"| exhaustionState["Exhaustion state"]

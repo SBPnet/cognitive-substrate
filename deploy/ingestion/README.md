@@ -64,15 +64,10 @@ infra/
   kafka/                 Topic and ACL declarations
 
 docs/
-  paper/                 Research paper chapters
-  articles/              Publishable excerpts, one per stage
-  diagrams/              Mermaid source and exported SVGs
-  architecture/          Architecture deep dives
-  reviews/               Project reviews and audits
-  strategy/              OSS, partnership, and commercial strategy
-  style-guide.md         Editorial rules for written content
-  glossary.md            Canonical terminology
-  roadmap.md             Stage-by-stage roadmap with dependencies
+  architecture/          Architecture deep dives and stage inventory
+  api/                     OpenAPI specification for the HTTP surface
+  strategy/                OSS, partnership, and deployment strategy
+  glossary.md              Canonical terminology
 ```
 
 ## Design Principles
@@ -81,7 +76,7 @@ docs/
 - **Memory is selection, not storage.** OpenSearch is the associative retrieval layer; object storage is the immutable episodic truth layer. Consolidation decides what remains active.
 - **Cognition under scarcity.** Compute budgets, attentional quotas, and forgetting mechanisms prevent unbounded accumulation.
 - **Adaptation with constraints.** The architecture evolves policies within a constitutional invariant layer.
-- **Paired artifacts.** Every code stage ships with a companion research article. The writing and the implementation are developed together.
+- **Engineering-first docs.** Architecture notes and inventory stay aligned with runtime behavior.
 
 ## Quick Start
 
@@ -136,13 +131,10 @@ The workbench opens a session, accepts messages, and streams cognitive-loop resp
 
 ## Documentation
 
-- `docs/style-guide.md`: editorial rules for formal written content
+- `docs/architecture/`: infrastructure, schema, runtime design, and `inventory.md`
+- `docs/api/openapi.yaml`: HTTP API surface
 - `docs/glossary.md`: canonical terminology
-- `docs/roadmap.md`: stage-by-stage implementation plan
-- `docs/paper/`: research paper chapter sequence
-- `docs/articles/`: publishable excerpts per stage
-- `docs/architecture/`: infrastructure, schema, and runtime design documents
-- `docs/strategy/`: OSS, publication, and partnership strategy
+- `docs/strategy/`: OSS, partnership, and deployment strategy notes
 
 ## Reference Deployment On Aiven
 

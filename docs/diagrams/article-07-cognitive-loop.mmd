@@ -1,8 +1,0 @@
-flowchart LR
-  inputSignal["Input signal"] -->|"perceive"| sessionState["Session state"]
-  sessionState -->|"retrieve"| memoryContext["Memory context"]
-  memoryContext -->|"reason"| reasoningTrace["Reasoning trace"]
-  reasoningTrace -->|"act"| actionResult["Action result"]
-  actionResult -->|"evaluate"| policyEvaluation["Policy evaluation"]
-  actionResult -->|"record"| newExperience["New experience"]
-  policyEvaluation -->|"adapt"| sessionState

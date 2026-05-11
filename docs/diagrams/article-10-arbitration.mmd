@@ -1,7 +1,0 @@
-flowchart LR
-  candidatePlans["Candidate plans"] -->|"score coherence"| arbitrationEngine["Arbitration engine"]
-  memoryEvidence["Memory evidence"] -->|"score support"| arbitrationEngine
-  riskPrediction["Risk prediction"] -->|"score risk"| arbitrationEngine
-  policyWeights["Policy weights"] -->|"weight"| arbitrationEngine
-  arbitrationEngine -->|"select"| winningAction["Winning action"]
-  arbitrationEngine -->|"persist"| debateTrace["Debate trace"]

@@ -42,7 +42,7 @@ This glossary defines project-specific terms and recurring infrastructure termin
 
 **Experience event**: The atomic unit of cognition representing perception, action, tool output, or observed outcome, captured with context, embedding, and evaluation metadata. In code, this is `ExperienceEvent`. See `packages/core-types/src/experience.ts` and `docs/architecture/kafka-pipeline.md`.
 
-**Experience ingestion**: The pipeline stage that accepts incoming experiences and publishes them to the event bus for downstream enrichment, indexing, reasoning, and evaluation. See `docs/architecture/kafka-pipeline.md` and `docs/articles/article-01-experience-ingestion.md`.
+**Experience ingestion**: The pipeline stage that accepts incoming experiences and publishes them to the event bus for downstream enrichment, indexing, reasoning, and evaluation. See `docs/architecture/kafka-pipeline.md` and `examples/experience-ingestion/README.md`.
 
 ## G
 

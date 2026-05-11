@@ -1,8 +1,0 @@
-flowchart LR
-  cognitionRecommendations["cognition.recommendations"] -->|"record"| pendingOutcome["Pending outcome"]
-  policyEvaluation["policy.evaluation"] -->|"resolve"| completedOutcome["Completed outcome"]
-  pendingOutcome -->|"join"| completedOutcome
-  completedOutcome -->|"write"| patternOutcomes["pattern_outcomes"]
-  completedOutcome -->|"compute"| confidenceUpdate["Confidence update"]
-  confidenceUpdate -->|"persist"| operationalPatterns["operational_patterns"]
-  operationalPatterns -->|"influence"| futureMatches["Future matches"]

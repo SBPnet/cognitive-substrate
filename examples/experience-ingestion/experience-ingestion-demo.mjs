@@ -34,12 +34,12 @@ const representationMap = [
   },
   {
     concept: "Truth layer",
-    demo: "A JSON file under runnable/out/object-store/.",
+    demo: "A JSON file under examples/experience-ingestion/out/object-store/.",
     production: "S3-compatible object storage through EpisodicObjectStore.",
   },
   {
     concept: "Associative index",
-    demo: "A JSON file under runnable/out/opensearch/experience_events/.",
+    demo: "A JSON file under examples/experience-ingestion/out/opensearch/experience_events/.",
     production: "OpenSearch experience_events document.",
   },
   {

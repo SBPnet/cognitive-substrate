@@ -2,7 +2,7 @@
 
 Cognitive Substrate is an open-core infrastructure project. Core runtime packages, schemas, reference deployments, and research artifacts are developed in the open. Managed operations, hosted governance, multi-tenant orchestration, and advanced observability products may be developed as commercial extensions.
 
-Project maintainers are responsible for accepting changes, preserving architectural coherence, and enforcing the written-content rules in `docs/style-guide.md`.
+Project maintainers are responsible for accepting changes, preserving architectural coherence, and keeping engineering documentation consistent with `docs/architecture/` and the runtime contracts in code.
 
 ## Maintainer Responsibilities
 
@@ -13,7 +13,7 @@ Project maintainers are responsible for accepting changes, preserving architectu
 
 ## Contribution Workflow
 
-Changes that modify public APIs, event contracts, schemas, or deployment topology should include an architecture note or design rationale. Changes that affect runtime behavior should include tests or an explicit test gap. Documentation changes under `docs/` must follow `docs/style-guide.md`.
+Changes that modify public APIs, event contracts, schemas, or deployment topology should include an architecture note or design rationale. Changes that affect runtime behavior should include tests or an explicit test gap. Documentation changes under `docs/` should stay aligned with `docs/architecture/inventory.md` and affected package or worker READMEs.
 
 ## Release Process
 
