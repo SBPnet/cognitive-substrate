@@ -1,25 +1,24 @@
 import { generateAllOperationalData } from '../generators/operational';
 import { saveCorpusBatch } from '../utils';
+import { registerCoreOperationalPlugins, operationalRegistry } from '@cognitive-substrate/core-types';
 
-/**
- * Experiment 15 — Cross-Domain Operational Correlation (Full Stack Exercise)
- * Generates synthetic dataset with DB metrics, Zendesk tickets, and Slack threads.
- * Plugin-ready design for future operational sources.
- */
 export async function runExp15() {
-  console.log('🚀 Generating operational signals for Experiment 15...');
+  console.log('🚀 Running Experiment 15 with Plugin Architecture...');
+
+  // Register plugins
+  registerCoreOperationalPlugins();
+  console.log('Registered sources:', operationalRegistry.getRegisteredSources());
 
   const signals = generateAllOperationalData();
 
   await saveCorpusBatch('operational', signals);
 
-  console.log(`✅ Saved ${signals.length} operational signals to experiment-corpus/data/operational/`);
-  console.log('   Windows: normal → degraded → outage → recovery with cross-source correlations');
+  console.log(`✅ Saved ${signals.length} operational signals`);
+  console.log('Plugin-ready dataset generated!');
 
   return signals;
 }
 
-// Run directly if called as main module
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   runExp15().catch(console.error);
 }
