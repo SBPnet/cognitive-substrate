@@ -88,7 +88,11 @@ async function deleteExp17Docs(client: ReturnType<typeof createOpenSearchClient>
       query: { term: { tags: EXP17_TAG } },
     },
     refresh: true,
+    conflicts: 'proceed',
+    wait_for_completion: true,
   } as Parameters<typeof client.deleteByQuery>[0]);
+  // Extra guard: wait for index to fully reflect the deletion
+  await client.indices.refresh({ index: INDEX });
 }
 
 // ---------------------------------------------------------------------------
