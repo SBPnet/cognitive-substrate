@@ -1,0 +1,45 @@
+{
+  "experiment": "exp21",
+  "runAt": "2026-05-15T20:53:37.303Z",
+  "opensearchUrl": "(unknown)",
+  "observations": "H1 stressed state norepi=0.861 contraStress=0.895 mood=stressed: PASS; H2 monotonic decrease over 5 recovery steps: PASS; H3 final mood=settled ∈ {settled,exploratory}: PASS; H4 stressed affectBoost (0.3341) > settled (0.0299): PASS",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": true,
+      "h4": true
+    },
+    "baselineState": {
+      "dopamine": 0.12563149999999998,
+      "norepinephrine": 0.11006503125000003,
+      "serotonin": 0.775419921875,
+      "curiosity": 0.13110400000000003,
+      "contradictionStress": 0.061664000000000004
+    },
+    "stressedState": {
+      "vector": {
+        "dopamine": 0.0035487789244743476,
+        "norepinephrine": 0.8611785294951895,
+        "serotonin": 0,
+        "curiosity": 0.7338333552738303,
+        "contradictionStress": 0.8949309027876864
+      },
+      "mood": "stressed"
+    },
+    "recoveredState": {
+      "vector": {
+        "dopamine": 0.04868786797603367,
+        "norepinephrine": 0.08910746711084927,
+        "serotonin": 0.7832597827911377,
+        "curiosity": 0.10383254792146579,
+        "contradictionStress": 0.05510897406757991
+      },
+      "mood": "settled"
+    },
+    "affectBoost": {
+      "stressed": 0.3341004681950345,
+      "settled": 0.02987569837685684
+    }
+  }
+}

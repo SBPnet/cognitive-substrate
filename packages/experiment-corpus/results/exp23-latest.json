@@ -1,0 +1,93 @@
+{
+  "experiment": "exp23",
+  "runAt": "2026-05-15T21:25:51.437Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 outage knn top-5 outage count=5/5 ≥3: PASS; H2 normal knn top-5 normal count=5/5 ≥3: PASS; H3 adjacent ladder levels have different label tokens: PASS tokens=[service,service,degraded,degraded,degraded]; H4 source counts strictly decrease (200→100→25→4→2): PASS",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": true,
+      "h4": true
+    },
+    "knn": {
+      "outageQuery": {
+        "query": "critical infrastructure failure high latency severe incident outage",
+        "top5Windows": [
+          "outage",
+          "outage",
+          "outage",
+          "outage",
+          "outage"
+        ],
+        "outageCount": 5
+      },
+      "normalQuery": {
+        "query": "steady state background metrics no anomalies quiet",
+        "top5Windows": [
+          "normal",
+          "normal",
+          "normal",
+          "normal",
+          "normal"
+        ],
+        "normalCount": 5
+      }
+    },
+    "ladder": {
+      "tokens": [
+        "service",
+        "service",
+        "degraded",
+        "degraded",
+        "degraded"
+      ],
+      "sourceCounts": [
+        200,
+        100,
+        25,
+        4,
+        2
+      ],
+      "nodes": [
+        {
+          "level": "experience",
+          "label": "experience:service",
+          "sources": 200,
+          "ratio": 0.2,
+          "confidence": 1
+        },
+        {
+          "level": "pattern",
+          "label": "pattern:service",
+          "sources": 100,
+          "ratio": 0.4,
+          "confidence": 1
+        },
+        {
+          "level": "concept",
+          "label": "concept:degraded",
+          "sources": 25,
+          "ratio": 0.6,
+          "confidence": 1
+        },
+        {
+          "level": "principle",
+          "label": "principle:degraded",
+          "sources": 4,
+          "ratio": 0.8,
+          "confidence": 0.8
+        },
+        {
+          "level": "worldview",
+          "label": "worldview:degraded",
+          "sources": 2,
+          "ratio": 1,
+          "confidence": 0.5
+        }
+      ]
+    },
+    "model": "nomic-embed-text",
+    "dimension": 768
+  }
+}

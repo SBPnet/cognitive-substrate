@@ -1,0 +1,72 @@
+{
+  "experiment": "exp20",
+  "runAt": "2026-05-15T20:54:31.671Z",
+  "opensearchUrl": "(unknown)",
+  "observations": "H1 outage→latency strength=0.4545 > 0.3: PASS; H2 normal→outage strength=0: PASS; H3 do(outage=1.0) raises latency (0.500→0.955): PASS; H4 abstract reduces edges (16→14): PASS",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": true,
+      "h4": true
+    },
+    "edgeCount": {
+      "full": 16,
+      "abstracted": 14
+    },
+    "outageToLatency": {
+      "sourceId": "v-outage",
+      "targetId": "v-latency",
+      "strength": 0.45454545454545453,
+      "confidence": 1
+    },
+    "normalToOutage": {
+      "strength": 0
+    },
+    "counterfactual": {
+      "targetId": "v-latency",
+      "baseline": 0.5,
+      "counterfactual": 0.9545454545454546,
+      "effect": 0.45454545454545453,
+      "confidence": 1
+    },
+    "topEdges": [
+      {
+        "sourceId": "v-latency",
+        "targetId": "v-degraded",
+        "strength": 1,
+        "confidence": 1
+      },
+      {
+        "sourceId": "v-degraded",
+        "targetId": "v-latency",
+        "strength": 1,
+        "confidence": 1
+      },
+      {
+        "sourceId": "v-normal",
+        "targetId": "v-metrics",
+        "strength": 0.6,
+        "confidence": 1
+      },
+      {
+        "sourceId": "v-metrics",
+        "targetId": "v-normal",
+        "strength": 0.6,
+        "confidence": 1
+      },
+      {
+        "sourceId": "v-recovery",
+        "targetId": "v-normal",
+        "strength": 0.5555555555555556,
+        "confidence": 1
+      },
+      {
+        "sourceId": "v-normal",
+        "targetId": "v-recovery",
+        "strength": 0.5555555555555556,
+        "confidence": 1
+      }
+    ]
+  }
+}

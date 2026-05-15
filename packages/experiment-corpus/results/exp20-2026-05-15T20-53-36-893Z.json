@@ -1,0 +1,30 @@
+{
+  "experiment": "exp20",
+  "runAt": "2026-05-15T20:53:36.893Z",
+  "opensearchUrl": "(unknown)",
+  "observations": "H1 outage→latency strength=0 > 0.3: FAIL; H2 normal→outage strength=0: PASS; H3 do(outage=1.0) raises latency (0.500→0.500): FAIL; H4 abstract reduces edges (0→0): FAIL",
+  "data": {
+    "hypotheses": {
+      "h1": false,
+      "h2": true,
+      "h3": false,
+      "h4": false
+    },
+    "edgeCount": {
+      "full": 0,
+      "abstracted": 0
+    },
+    "outageToLatency": null,
+    "normalToOutage": {
+      "strength": 0
+    },
+    "counterfactual": {
+      "targetId": "v-latency",
+      "baseline": 0.5,
+      "counterfactual": 0.5,
+      "effect": 0,
+      "confidence": 0
+    },
+    "topEdges": []
+  }
+}

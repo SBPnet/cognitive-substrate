@@ -1,0 +1,63 @@
+{
+  "experiment": "exp19",
+  "runAt": "2026-05-15T20:52:58.152Z",
+  "opensearchUrl": "(unknown)",
+  "observations": "H1 outage retain > normal retain (100% vs 45%): PASS; H2 no compress at ageDays=0: PASS; H3 all normal retire at contradictionScore=0.9 (40/40): PASS; H4 normal compress at ageDays=60 (compress=0 retain=0): FAIL; graph pruning 3 retained / 2 pruned: PASS",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": true,
+      "h4": false,
+      "graph": true
+    },
+    "baselineStats": {
+      "normal": {
+        "actions": {
+          "retain": 18,
+          "suppress": 22
+        },
+        "retainRate": 0.45,
+        "avgRetention": 0.3301749999999999
+      },
+      "degraded": {
+        "actions": {
+          "retain": 60
+        },
+        "retainRate": 1,
+        "avgRetention": 0.5040000000000006
+      },
+      "outage": {
+        "actions": {
+          "retain": 50
+        },
+        "retainRate": 1,
+        "avgRetention": 0.5835000000000006
+      },
+      "recovery": {
+        "actions": {
+          "retain": 21,
+          "suppress": 29
+        },
+        "retainRate": 0.42,
+        "avgRetention": 0.30722999999999984
+      }
+    },
+    "phase2": {
+      "retireCount": 40,
+      "total": 40
+    },
+    "phase3": {
+      "compressCount": 0,
+      "retainCount": 0,
+      "actions": {
+        "suppress": 18,
+        "prune": 22
+      }
+    },
+    "graphPruning": {
+      "retained": 3,
+      "pruned": 2
+    }
+  }
+}

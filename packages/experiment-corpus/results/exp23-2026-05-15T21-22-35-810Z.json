@@ -1,0 +1,93 @@
+{
+  "experiment": "exp23",
+  "runAt": "2026-05-15T21:22:35.810Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 outage knn top-5 outage count=5/5 ≥3: PASS; H2 normal knn top-5 normal count=5/5 ≥3: PASS; H3 adjacent ladder levels have different label tokens: FAIL tokens=[service,service,service,service,service]; H4 source counts strictly decrease (200→200→200→200→200): FAIL",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": false,
+      "h4": false
+    },
+    "knn": {
+      "outageQuery": {
+        "query": "critical infrastructure failure high latency severe incident outage",
+        "top5Windows": [
+          "outage",
+          "outage",
+          "outage",
+          "outage",
+          "outage"
+        ],
+        "outageCount": 5
+      },
+      "normalQuery": {
+        "query": "steady state background metrics no anomalies quiet",
+        "top5Windows": [
+          "normal",
+          "normal",
+          "normal",
+          "normal",
+          "normal"
+        ],
+        "normalCount": 5
+      }
+    },
+    "ladder": {
+      "tokens": [
+        "service",
+        "service",
+        "service",
+        "service",
+        "service"
+      ],
+      "sourceCounts": [
+        200,
+        200,
+        200,
+        200,
+        200
+      ],
+      "nodes": [
+        {
+          "level": "experience",
+          "label": "experience:service",
+          "sources": 200,
+          "ratio": 0.2,
+          "confidence": 1
+        },
+        {
+          "level": "pattern",
+          "label": "pattern:service",
+          "sources": 200,
+          "ratio": 0.4,
+          "confidence": 1
+        },
+        {
+          "level": "concept",
+          "label": "concept:service",
+          "sources": 200,
+          "ratio": 0.6,
+          "confidence": 1
+        },
+        {
+          "level": "principle",
+          "label": "principle:service",
+          "sources": 200,
+          "ratio": 0.8,
+          "confidence": 1
+        },
+        {
+          "level": "worldview",
+          "label": "worldview:service",
+          "sources": 200,
+          "ratio": 1,
+          "confidence": 1
+        }
+      ]
+    },
+    "model": "nomic-embed-text",
+    "dimension": 768
+  }
+}

@@ -514,18 +514,30 @@ importers:
 
   packages/experiment-corpus:
     dependencies:
+      '@cognitive-substrate/abstraction-engine':
+        specifier: workspace:*
+        version: link:../abstraction-engine
+      '@cognitive-substrate/affect-engine':
+        specifier: workspace:*
+        version: link:../affect-engine
       '@cognitive-substrate/agents':
         specifier: workspace:*
         version: link:../agents
       '@cognitive-substrate/attention-engine':
         specifier: workspace:*
         version: link:../attention-engine
+      '@cognitive-substrate/causal-engine':
+        specifier: workspace:*
+        version: link:../causal-engine
       '@cognitive-substrate/consolidation-engine':
         specifier: workspace:*
         version: link:../consolidation-engine
       '@cognitive-substrate/core-types':
         specifier: workspace:*
         version: link:../core-types
+      '@cognitive-substrate/decay-engine':
+        specifier: workspace:*
+        version: link:../decay-engine
       '@cognitive-substrate/memory-opensearch':
         specifier: workspace:*
         version: link:../memory-opensearch

@@ -1,0 +1,135 @@
+{
+  "experiment": "exp22",
+  "runAt": "2026-05-15T20:59:49.990Z",
+  "opensearchUrl": "(unknown)",
+  "observations": "H1 5-node canonical ladder with monotone compressionRatio (A/B/C): PASS; H2 root label is incident vocab (A=\"service\" B=\"latency\"): PASS; H3 confidence(200 events) ≥ confidence(4 memories) at all levels: PASS; H4 mixed ladder sourceIds span both events and memories: PASS; symbolic-label ceiling: all levels share same token (service); embeddings needed for differentiation",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": true,
+      "h4": true
+    },
+    "ladderA": {
+      "nodes": [
+        {
+          "level": "experience",
+          "label": "experience:service",
+          "compressionRatio": 0.2,
+          "confidence": 1,
+          "sourceCount": 200
+        },
+        {
+          "level": "pattern",
+          "label": "pattern:service",
+          "compressionRatio": 0.4,
+          "confidence": 1,
+          "sourceCount": 200
+        },
+        {
+          "level": "concept",
+          "label": "concept:service",
+          "compressionRatio": 0.6,
+          "confidence": 1,
+          "sourceCount": 200
+        },
+        {
+          "level": "principle",
+          "label": "principle:service",
+          "compressionRatio": 0.8,
+          "confidence": 1,
+          "sourceCount": 200
+        },
+        {
+          "level": "worldview",
+          "label": "worldview:service",
+          "compressionRatio": 1,
+          "confidence": 1,
+          "sourceCount": 200
+        }
+      ]
+    },
+    "ladderB": {
+      "nodes": [
+        {
+          "level": "experience",
+          "label": "experience:latency",
+          "compressionRatio": 0.2,
+          "confidence": 0.5,
+          "sourceCount": 4
+        },
+        {
+          "level": "pattern",
+          "label": "pattern:latency",
+          "compressionRatio": 0.4,
+          "confidence": 0.5714285714285714,
+          "sourceCount": 4
+        },
+        {
+          "level": "concept",
+          "label": "concept:latency",
+          "compressionRatio": 0.6,
+          "confidence": 0.6666666666666666,
+          "sourceCount": 4
+        },
+        {
+          "level": "principle",
+          "label": "principle:latency",
+          "compressionRatio": 0.8,
+          "confidence": 0.8,
+          "sourceCount": 4
+        },
+        {
+          "level": "worldview",
+          "label": "worldview:latency",
+          "compressionRatio": 1,
+          "confidence": 1,
+          "sourceCount": 4
+        }
+      ]
+    },
+    "ladderC": {
+      "nodes": [
+        {
+          "level": "experience",
+          "label": "experience:service",
+          "compressionRatio": 0.2,
+          "confidence": 1,
+          "sourceCount": 204
+        },
+        {
+          "level": "pattern",
+          "label": "pattern:service",
+          "compressionRatio": 0.4,
+          "confidence": 1,
+          "sourceCount": 204
+        },
+        {
+          "level": "concept",
+          "label": "concept:service",
+          "compressionRatio": 0.6,
+          "confidence": 1,
+          "sourceCount": 204
+        },
+        {
+          "level": "principle",
+          "label": "principle:service",
+          "compressionRatio": 0.8,
+          "confidence": 1,
+          "sourceCount": 204
+        },
+        {
+          "level": "worldview",
+          "label": "worldview:service",
+          "compressionRatio": 1,
+          "confidence": 1,
+          "sourceCount": 204
+        }
+      ]
+    },
+    "dominantToken": "service",
+    "ceiling": {
+      "allLevelsSameToken": true
+    }
+  }
+}
