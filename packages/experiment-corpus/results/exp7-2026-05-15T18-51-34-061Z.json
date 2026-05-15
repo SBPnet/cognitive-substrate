@@ -1,44 +1,44 @@
 {
   "experiment": "exp7",
-  "runAt": "2026-05-15T19:37:16.427Z",
+  "runAt": "2026-05-15T18:51:34.061Z",
   "opensearchUrl": "http://thor:9200",
-  "observations": "H1 loop live — cluster-A rp changed from importanceScore: PASS; H2 mem-c1 rp suppressed below importanceScore: PASS; H3 ranking shifts after reinforcement: PASS; H4 cluster-B enters post-reinforcement top-5 at T=0.5: PASS",
+  "observations": "H1 cluster-A retrieval_priority gain ≥ 0.05: FAIL; H2 cluster-C retrieval_priority suppressed below importanceScore: FAIL; H3 ranking shifts after reinforcement: FAIL; H4 cluster-B enters post-reinforcement top-5 at T=0.5: PASS",
   "data": {
     "hypotheses": {
-      "h1": true,
-      "h2": true,
-      "h3": true,
+      "h1": false,
+      "h2": false,
+      "h3": false,
       "h4": true
     },
     "preRanking": [
       {
         "memoryId": "mem-a1",
         "cluster": "cluster-a",
-        "score": 1.35,
+        "score": 1.3376647,
         "rank": 1
-      },
-      {
-        "memoryId": "mem-a2",
-        "cluster": "cluster-a",
-        "score": 1.3,
-        "rank": 2
       },
       {
         "memoryId": "mem-a3",
         "cluster": "cluster-a",
-        "score": 1.25,
+        "score": 1.2521586,
+        "rank": 2
+      },
+      {
+        "memoryId": "mem-a2",
+        "cluster": "cluster-a",
+        "score": 1.2420198,
         "rank": 3
       },
       {
         "memoryId": "mem-a4",
         "cluster": "cluster-a",
-        "score": 1.2,
+        "score": 1.1639344,
         "rank": 4
       },
       {
         "memoryId": "mem-b2",
         "cluster": "cluster-b",
-        "score": 1.15,
+        "score": 1.1228702,
         "rank": 5
       }
     ],
@@ -46,31 +46,31 @@
       {
         "memoryId": "mem-a1",
         "cluster": "cluster-a",
-        "score": 1.25464,
+        "score": 1.3422862,
         "rank": 1
+      },
+      {
+        "memoryId": "mem-a3",
+        "cluster": "cluster-a",
+        "score": 1.2511969,
+        "rank": 2
       },
       {
         "memoryId": "mem-a2",
         "cluster": "cluster-a",
         "score": 1.22486,
-        "rank": 2
-      },
-      {
-        "memoryId": "mem-a3",
-        "cluster": "cluster-a",
-        "score": 1.17764,
         "rank": 3
       },
       {
         "memoryId": "mem-a4",
         "cluster": "cluster-a",
-        "score": 1.1229401,
+        "score": 1.1998806,
         "rank": 4
       },
       {
         "memoryId": "mem-b2",
         "cluster": "cluster-b",
-        "score": 1.05874,
+        "score": 1.1445003,
         "rank": 5
       }
     ],
@@ -79,80 +79,80 @@
         "memoryId": "mem-a1",
         "cluster": "cluster-a",
         "importanceScore": 0.85,
-        "preRetrievalPriority": 0.85,
-        "postRetrievalPriority": 0.75464,
-        "delta": -0.09536
+        "preRetrievalPriority": 0.8376647229974935,
+        "postRetrievalPriority": 0.8422862194113464,
+        "delta": 0.004621496413852899
       },
       {
         "memoryId": "mem-a2",
         "cluster": "cluster-a",
         "importanceScore": 0.8,
-        "preRetrievalPriority": 0.8,
+        "preRetrievalPriority": 0.7420197792195689,
         "postRetrievalPriority": 0.7248599999999998,
-        "delta": -0.0751400000000002
+        "delta": -0.017159779219569016
       },
       {
         "memoryId": "mem-a3",
         "cluster": "cluster-a",
         "importanceScore": 0.75,
-        "preRetrievalPriority": 0.75,
-        "postRetrievalPriority": 0.67764,
-        "delta": -0.07235999999999998
+        "preRetrievalPriority": 0.7521586044413786,
+        "postRetrievalPriority": 0.7511968168469341,
+        "delta": -0.0009617875944445409
       },
       {
         "memoryId": "mem-a4",
         "cluster": "cluster-a",
         "importanceScore": 0.7,
-        "preRetrievalPriority": 0.7,
-        "postRetrievalPriority": 0.6229399999999999,
-        "delta": -0.07706000000000002
+        "preRetrievalPriority": 0.6639343743645683,
+        "postRetrievalPriority": 0.6998806554786797,
+        "delta": 0.03594628111411147
       },
       {
         "memoryId": "mem-b1",
         "cluster": "cluster-b",
         "importanceScore": 0.6,
-        "preRetrievalPriority": 0.6,
-        "postRetrievalPriority": 0.5371,
-        "delta": -0.06289999999999996
+        "preRetrievalPriority": 0.5907785963108063,
+        "postRetrievalPriority": 0.6360882834671477,
+        "delta": 0.04530968715634143
       },
       {
         "memoryId": "mem-b2",
         "cluster": "cluster-b",
         "importanceScore": 0.65,
-        "preRetrievalPriority": 0.65,
-        "postRetrievalPriority": 0.55874,
-        "delta": -0.09126000000000001
+        "preRetrievalPriority": 0.6228701887332057,
+        "postRetrievalPriority": 0.6445002058293038,
+        "delta": 0.02163001709609813
       },
       {
         "memoryId": "mem-b3",
         "cluster": "cluster-b",
         "importanceScore": 0.55,
-        "preRetrievalPriority": 0.55,
-        "postRetrievalPriority": 0.52926,
-        "delta": -0.02074000000000009
+        "preRetrievalPriority": 0.5847102100391524,
+        "postRetrievalPriority": 0.5976719655612946,
+        "delta": 0.012961755522142293
       },
       {
         "memoryId": "mem-c1",
         "cluster": "cluster-c",
         "importanceScore": 0.3,
-        "preRetrievalPriority": 0.3,
-        "postRetrievalPriority": 0.2478,
-        "delta": -0.052199999999999996
+        "preRetrievalPriority": 0.26241220944640864,
+        "postRetrievalPriority": 0.290849109724173,
+        "delta": 0.028436900277764354
       },
       {
         "memoryId": "mem-c2",
         "cluster": "cluster-c",
         "importanceScore": 0.15,
-        "preRetrievalPriority": 0.15,
-        "postRetrievalPriority": 0.1996,
-        "delta": 0.049600000000000005
+        "preRetrievalPriority": 0.22911655206737006,
+        "postRetrievalPriority": 0.2110718471031853,
+        "delta": -0.018044704964184755
       }
     ],
     "updateLog": [
       {
         "turnId": "turn-01",
         "memoryId": "mem-a1",
-        "preRp": 0.85,
+        "preRp": 0.8376647229974935,
         "reinforcement": 0.7228,
         "newRp": 0.7309599999999999,
         "policyDelta": 0.04456
@@ -160,7 +160,7 @@
       {
         "turnId": "turn-02",
         "memoryId": "mem-a2",
-        "preRp": 0.8,
+        "preRp": 0.7420197792195689,
         "reinforcement": 0.6901999999999999,
         "newRp": 0.6856399999999998,
         "policyDelta": 0.03803999999999999
@@ -168,7 +168,7 @@
       {
         "turnId": "turn-03",
         "memoryId": "mem-a3",
-        "preRp": 0.75,
+        "preRp": 0.7521586044413786,
         "reinforcement": 0.6766,
         "newRp": 0.6536199999999999,
         "policyDelta": 0.03532
@@ -176,7 +176,7 @@
       {
         "turnId": "turn-04",
         "memoryId": "mem-a1",
-        "preRp": 0.85,
+        "preRp": 0.8376647229974935,
         "reinforcement": 0.7208,
         "newRp": 0.7370599999999999,
         "policyDelta": 0.044160000000000005
@@ -184,7 +184,7 @@
       {
         "turnId": "turn-05",
         "memoryId": "mem-a4",
-        "preRp": 0.7,
+        "preRp": 0.6639343743645683,
         "reinforcement": 0.645,
         "newRp": 0.609,
         "policyDelta": 0.029000000000000005
@@ -192,7 +192,7 @@
       {
         "turnId": "turn-06",
         "memoryId": "mem-a2",
-        "preRp": 0.8,
+        "preRp": 0.7420197792195689,
         "reinforcement": 0.6931999999999999,
         "newRp": 0.6952399999999999,
         "policyDelta": 0.03863999999999999
@@ -200,7 +200,7 @@
       {
         "turnId": "turn-07",
         "memoryId": "mem-b1",
-        "preRp": 0.6,
+        "preRp": 0.5907785963108063,
         "reinforcement": 0.6304,
         "newRp": 0.53128,
         "policyDelta": 0.026079999999999992
@@ -208,7 +208,7 @@
       {
         "turnId": "turn-08",
         "memoryId": "mem-b2",
-        "preRp": 0.65,
+        "preRp": 0.6228701887332057,
         "reinforcement": 0.6464,
         "newRp": 0.54248,
         "policyDelta": 0.029279999999999997
@@ -216,7 +216,7 @@
       {
         "turnId": "turn-09",
         "memoryId": "mem-b3",
-        "preRp": 0.55,
+        "preRp": 0.5847102100391524,
         "reinforcement": 0.5822,
         "newRp": 0.49004000000000003,
         "policyDelta": 0.01644000000000001
@@ -224,7 +224,7 @@
       {
         "turnId": "turn-10",
         "memoryId": "mem-b1",
-        "preRp": 0.6,
+        "preRp": 0.5907785963108063,
         "reinforcement": 0.6304,
         "newRp": 0.53128,
         "policyDelta": 0.026079999999999992
@@ -232,7 +232,7 @@
       {
         "turnId": "turn-11",
         "memoryId": "mem-c1",
-        "preRp": 0.3,
+        "preRp": 0.26241220944640864,
         "reinforcement": 0.29760000000000003,
         "newRp": 0.26082,
         "policyDelta": -0.040479999999999995
@@ -240,7 +240,7 @@
       {
         "turnId": "turn-12",
         "memoryId": "mem-c2",
-        "preRp": 0.15,
+        "preRp": 0.22911655206737006,
         "reinforcement": 0.253,
         "newRp": 0.1996,
         "policyDelta": -0.0494
@@ -248,7 +248,7 @@
       {
         "turnId": "turn-13",
         "memoryId": "mem-c1",
-        "preRp": 0.3,
+        "preRp": 0.26241220944640864,
         "reinforcement": 0.279,
         "newRp": 0.2478,
         "policyDelta": -0.044199999999999996
@@ -256,7 +256,7 @@
       {
         "turnId": "turn-14",
         "memoryId": "mem-a3",
-        "preRp": 0.75,
+        "preRp": 0.7521586044413786,
         "reinforcement": 0.7002,
         "newRp": 0.67764,
         "policyDelta": 0.04004000000000001
@@ -264,7 +264,7 @@
       {
         "turnId": "turn-15",
         "memoryId": "mem-b2",
-        "preRp": 0.65,
+        "preRp": 0.6228701887332057,
         "reinforcement": 0.6482,
         "newRp": 0.55874,
         "policyDelta": 0.02964
@@ -272,7 +272,7 @@
       {
         "turnId": "turn-16",
         "memoryId": "mem-a4",
-        "preRp": 0.7,
+        "preRp": 0.6639343743645683,
         "reinforcement": 0.6542,
         "newRp": 0.6229399999999999,
         "policyDelta": 0.030840000000000003
@@ -280,7 +280,7 @@
       {
         "turnId": "turn-17",
         "memoryId": "mem-a1",
-        "preRp": 0.85,
+        "preRp": 0.8376647229974935,
         "reinforcement": 0.7352000000000001,
         "newRp": 0.75464,
         "policyDelta": 0.04704000000000002
@@ -288,7 +288,7 @@
       {
         "turnId": "turn-18",
         "memoryId": "mem-b3",
-        "preRp": 0.55,
+        "preRp": 0.5847102100391524,
         "reinforcement": 0.6168,
         "newRp": 0.52926,
         "policyDelta": 0.023360000000000006
@@ -296,7 +296,7 @@
       {
         "turnId": "turn-19",
         "memoryId": "mem-b1",
-        "preRp": 0.6,
+        "preRp": 0.5907785963108063,
         "reinforcement": 0.628,
         "newRp": 0.5371,
         "policyDelta": 0.0256
@@ -304,7 +304,7 @@
       {
         "turnId": "turn-20",
         "memoryId": "mem-a2",
-        "preRp": 0.8,
+        "preRp": 0.7420197792195689,
         "reinforcement": 0.7248,
         "newRp": 0.7248599999999998,
         "policyDelta": 0.04496

@@ -1,13 +1,13 @@
 {
   "experiment": "exp7",
-  "runAt": "2026-05-15T19:37:16.427Z",
+  "runAt": "2026-05-15T19:36:22.596Z",
   "opensearchUrl": "http://thor:9200",
-  "observations": "H1 loop live — cluster-A rp changed from importanceScore: PASS; H2 mem-c1 rp suppressed below importanceScore: PASS; H3 ranking shifts after reinforcement: PASS; H4 cluster-B enters post-reinforcement top-5 at T=0.5: PASS",
+  "observations": "H1 loop live — cluster-A rp changed from importanceScore: PASS; H2 mem-c1 rp suppressed below importanceScore: PASS; H3 ranking shifts after reinforcement: FAIL; H4 cluster-B enters post-reinforcement top-5 at T=0.5: PASS",
   "data": {
     "hypotheses": {
       "h1": true,
       "h2": true,
-      "h3": true,
+      "h3": false,
       "h4": true
     },
     "preRanking": [

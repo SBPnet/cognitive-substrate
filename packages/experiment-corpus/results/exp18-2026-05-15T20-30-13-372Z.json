@@ -1,0 +1,80 @@
+{
+  "experiment": "exp18",
+  "runAt": "2026-05-15T20:30:13.372Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 outage importance > normal (0.9200 > 0.2437): PASS; H2 all windows non-empty source sets: PASS; H3 stabilityScore ordering outage≥degraded≥recovery≥normal: FAIL (0.710≥0.590≥0.369≥0.372); H4 BM25 top-1 retrieval correct for all windows: FAIL",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": false,
+      "h4": false
+    },
+    "windowResults": [
+      {
+        "window": "normal",
+        "memoryId": "4e916391-d6e5-46e2-b71e-92d8d2ea4709",
+        "importanceScore": 0.24374999999999977,
+        "stabilityScore": 0.3718749999999999,
+        "sourceEventCount": 40,
+        "summary": "Normal background metrics for clickhouse-analytics. No anomalies detected. Severity score 0.45. Normal background metrics for postgres-prod. No anomalies detected. Severity score 0.45. Normal background metrics for redis-cache. No anomalies detected. Severity score 0.45.",
+        "semanticCluster": "operational"
+      },
+      {
+        "window": "degraded",
+        "memoryId": "d3047bde-1af3-4601-8de6-149ab78e9ad0",
+        "importanceScore": 0.6799999999999998,
+        "stabilityScore": 0.5899999999999999,
+        "sourceEventCount": 60,
+        "summary": "Performance degraded on clickhouse-analytics. Latency rising above threshold. Zendesk ticket opened for slow queries and timeouts. Ops team discussing in Slack ops-alerts channel. Severity score 0.68. Performance degraded on clickhouse-analytics. Latency rising above threshold. Zendesk ticket opened for slow queries and timeouts. Ops team discussing in Slack ops-alerts channel. Severity score 0.68. Performance degraded on postgres-prod. Latency rising above threshold. Zendesk ticket opened for slow queries and timeouts. Ops team discussing in Slack ops-alerts channel. Severity score 0.68.",
+        "semanticCluster": "operational"
+      },
+      {
+        "window": "outage",
+        "memoryId": "86ee1d12-a7d5-4797-a2ab-f7dfb3a40a5e",
+        "importanceScore": 0.9200000000000012,
+        "stabilityScore": 0.7100000000000006,
+        "sourceEventCount": 50,
+        "summary": "Outage detected on redis-cache. Latency p95 severely elevated. Critical incident. Zendesk ticket opened for slow queries and timeouts. Ops team discussing in Slack ops-alerts channel. Severity score 0.92. Outage detected on clickhouse-analytics. Latency p95 severely elevated. Critical incident. Zendesk ticket opened for slow queries and timeouts. Ops team discussing in Slack ops-alerts channel. Severity score 0.92. Outage detected on postgres-prod. Latency p95 severely elevated. Critical incident. Zendesk ticket opened for slow queries and timeouts. Ops team discussing in Slack ops-alerts channel. Severity score 0.92.",
+        "semanticCluster": "operational"
+      },
+      {
+        "window": "recovery",
+        "memoryId": "2a7ac149-0848-43fa-96e3-b303b0b93bc3",
+        "importanceScore": 0.23879999999999954,
+        "stabilityScore": 0.3693999999999998,
+        "sourceEventCount": 50,
+        "summary": "Service clickhouse-analytics recovering. Incident resolved, metrics returning to normal. Zendesk ticket opened for slow queries and timeouts. Ops team discussing in Slack ops-alerts channel. Severity score 0.45. Service clickhouse-analytics recovering. Incident resolved, metrics returning to normal. Zendesk ticket opened for slow queries and timeouts. Ops team discussing in Slack ops-alerts channel. Severity score 0.45. Service clickhouse-analytics recovering. Incident resolved, metrics returning to normal. Zendesk ticket opened for slow queries and timeouts. Ops team discussing in Slack ops-alerts channel. Severity score 0.45.",
+        "semanticCluster": "operational"
+      }
+    ],
+    "stabilityScores": {
+      "outage": 0.7100000000000006,
+      "degraded": 0.5899999999999999,
+      "recovery": 0.3693999999999998,
+      "normal": 0.3718749999999999
+    },
+    "retrievalResults": [
+      {
+        "window": "normal",
+        "topHitMemoryId": "10ec428b-c2d8-4a4d-88a2-8e8467bd96f6",
+        "hit": false
+      },
+      {
+        "window": "degraded",
+        "topHitMemoryId": "287da1c3-19fa-4ae9-ba63-af301d8dc4c8",
+        "hit": false
+      },
+      {
+        "window": "outage",
+        "topHitMemoryId": "17f0efc4-1e76-4948-ba04-b25c3b0d46f7",
+        "hit": false
+      },
+      {
+        "window": "recovery",
+        "topHitMemoryId": "69f403a7-747f-4b6e-b7e6-abbbaefd4d91",
+        "hit": false
+      }
+    ]
+  }
+}

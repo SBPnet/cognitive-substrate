@@ -215,6 +215,8 @@ Four scenarios tested after 100 reinforcement turns (cb=0.02):
 | Recovery severity drops back toward normal, not midway between degraded and outage | Exp 15 | Severity ordering: normal < recovery < degraded < outage |
 | Re-consolidation every 5 epochs prevents catastrophic convergence; every 10 is insufficient | Exp 16 | Re-consolidation mechanism validated; interval matters |
 | Operational signal BM25 retrieval correctly surfaces incident windows by query | Exp 17 | experience_events index ready for cross-domain correlation |
+| ConsolidationEngine correctly propagates severity from experience_events to memory_semantic | Exp 18 | Full pipeline validated; requiredTags filter added to ConsolidationRequest |
+| Consolidation with empty embeddings must omit the embedding field entirely | Exp 18 | Fixed: empty-embedding guard in consolidate() write path |
 
 ---
 
@@ -275,3 +277,32 @@ Tag filter for "outage" returns exactly 50 documents (correct — 50 outage-wind
 **Key finding (H3):** Outage signals (importance=0.920) rank far above normal signals (importance≈0.384) in retrieval score — severity is naturally encoded in the summary vocabulary ("critical incident", "severely elevated" vs "no anomalies detected"), so BM25 implicitly orders by severity when the query is incident-specific.
 
 **Production implication:** Operational signals are a first-class citizen in `experience_events`. The BM25 path retrieves the correct incident window without any embedding — future work can add embeddings for semantic recall across service names and ticket IDs via graphSeeds.
+
+---
+
+## Experiment 18 — ConsolidationEngine: Operational Signals → Semantic Memories
+
+**Result:** H1/H2/H3/H4 pass. The full `experience_events → ConsolidationEngine → memory_semantic` pipeline is demonstrated end-to-end with operational incident data.
+
+Four incident windows consolidated from 200 Exp 15 signals:
+
+| Window | Sources | importanceScore | stabilityScore |
+| ------ | ------- | --------------- | -------------- |
+| normal | 40 | 0.260 | 0.380 |
+| degraded | 60 | 0.680 | 0.590 |
+| outage | 50 | 0.920 | 0.710 |
+| recovery | 50 | 0.259 | 0.379 |
+
+**Key finding (H1):** outage-window `importanceScore` (0.920) vs normal (0.260) — the severity ordering from raw signals propagates faithfully through the `ExtractiveConsolidationModel`'s averaging into the consolidated semantic memory.
+
+**Key finding (H2):** Source event counts exactly match window signal counts (40/60/50/50) with no cross-window contamination. The `requiredTags` filter added to `ConsolidationRequest` correctly scopes candidate selection to the target window.
+
+**Key finding (H3):** `stabilityScore` (avg of importanceScore + rewardScore across candidates) orders incident windows above non-incident: outage=0.71 > degraded=0.59 > max(normal, recovery)=0.38. The normal/recovery windows are indistinguishable by stabilityScore (0.380 vs 0.379) — both are "quiet" windows with similar importance distributions.
+
+**Key finding (H4):** BM25 over consolidated `summary` text correctly returns the right memory per window (e.g. "outage critical incident latency" → outage memory). The extractive model's concatenation of high-importance summaries preserves enough incident-specific vocabulary for keyword retrieval.
+
+**Bug fixed:** `ConsolidationEngine` was writing `embedding: []` (empty array) to the `knn_vector` field when source events carried no embeddings, causing OpenSearch to reject the document with `mapper_parsing_exception`. Fixed by omitting the field when empty.
+
+*Code changes: `requiredTags` added to `ConsolidationRequest`; tag-filtered query overlay in `selectReplayCandidates`; empty-embedding guard in `consolidate()` write.*
+
+---

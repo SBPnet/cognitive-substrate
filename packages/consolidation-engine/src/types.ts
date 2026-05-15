@@ -19,6 +19,8 @@ export interface ConsolidationRequest {
   readonly size?: number;
   /** Importance floor; events below this score are excluded. */
   readonly minImportance?: number;
+  /** When provided, only candidates carrying ALL of these tags are selected. */
+  readonly requiredTags?: ReadonlyArray<string>;
 }
 
 /**

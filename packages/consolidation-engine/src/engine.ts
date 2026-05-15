@@ -92,7 +92,7 @@ export class ConsolidationEngine {
         created_at: semanticMemory.createdAt,
         summary: semanticMemory.summary,
         generalization: semanticMemory.generalization,
-        embedding: semanticMemory.embedding,
+        ...(semanticMemory.embedding.length > 0 ? { embedding: semanticMemory.embedding } : {}),
         source_event_ids: semanticMemory.sourceEventIds,
         importance_score: semanticMemory.importanceScore,
         stability_score: semanticMemory.stabilityScore,
@@ -121,13 +121,29 @@ export class ConsolidationEngine {
   async selectReplayCandidates(
     request: ConsolidationRequest,
   ): Promise<ReadonlyArray<ReplayCandidate>> {
-    const query = buildReplaySelectionQuery({
+    const baseQuery = buildReplaySelectionQuery({
       maxAge: request.maxAge,
       size: request.size ?? 100,
       minImportance: request.minImportance ?? 0.1,
       timestampField: "timestamp",
       usageField: "retrieval_count",
     });
+
+    // Overlay required tag filters when specified, without touching sort/size.
+    const query = request.requiredTags && request.requiredTags.length > 0
+      ? {
+          ...baseQuery,
+          query: {
+            bool: {
+              must: [
+                baseQuery["query"] as Record<string, unknown>,
+                ...request.requiredTags.map((tag) => ({ term: { tags: tag } })),
+              ],
+            },
+          },
+        }
+      : baseQuery;
+
     const hits = await this.searchClient(this.openSearch, "experience_events", query);
 
     return hits.map((hit) => {

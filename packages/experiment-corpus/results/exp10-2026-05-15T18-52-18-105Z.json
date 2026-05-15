@@ -1,0 +1,382 @@
+{
+  "experiment": "exp10",
+  "runAt": "2026-05-15T18:52:18.105Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 cluster-A gap ≥ 0.05 at turn 60: FAIL (gap=0.0210); H2 A-B spread gap ≥ 0.04 at turn 100: FAIL (gap=0.0062); H3 mem-c1 below importanceScore at all cb: FAIL; H4 divergence curve convex: FAIL",
+  "data": {
+    "hypotheses": {
+      "h1": false,
+      "h2": false,
+      "h3": false,
+      "h4": false
+    },
+    "conditions": [
+      {
+        "countBonus": 0,
+        "turn100ClusterA": 0.6913874414278107,
+        "turn100ClusterB": 0.5400147891324101,
+        "turn100ClusterC": 0.2187228593688212,
+        "turn100Spread": 0.15137265229540064,
+        "memA1FinalRp": 0.7590856146114833,
+        "memA1FinalCount": 0,
+        "memC1FinalRp": 0.24051919894324794,
+        "samples": [
+          {
+            "turn": 10,
+            "clusterAAvg": 0.6712686325688608,
+            "clusterBAvg": 0.524534283782089,
+            "clusterCAvg": 0.22499999999999998,
+            "spread": 0.14673434878677183,
+            "memA1Rp": 0.7334141368936611,
+            "memA1Count": 0,
+            "memB1Rp": 0.5276858052376878,
+            "memB1Count": 0
+          },
+          {
+            "turn": 20,
+            "clusterAAvg": 0.6958885858217807,
+            "clusterBAvg": 0.5436869626059188,
+            "clusterCAvg": 0.2332698280543588,
+            "spread": 0.15220162321586195,
+            "memA1Rp": 0.7580054050834528,
+            "memA1Count": 0,
+            "memB1Rp": 0.533599898162901,
+            "memB1Count": 0
+          },
+          {
+            "turn": 30,
+            "clusterAAvg": 0.6724150983766854,
+            "clusterBAvg": 0.522983157213123,
+            "clusterCAvg": 0.2332698280543588,
+            "spread": 0.1494319411635624,
+            "memA1Rp": 0.738569578937975,
+            "memA1Count": 0,
+            "memB1Rp": 0.5282984482732134,
+            "memB1Count": 0
+          },
+          {
+            "turn": 40,
+            "clusterAAvg": 0.6901208367631922,
+            "clusterBAvg": 0.5391862570299946,
+            "clusterCAvg": 0.21888870990235543,
+            "spread": 0.15093457973319768,
+            "memA1Rp": 0.7399288292460027,
+            "memA1Count": 0,
+            "memB1Rp": 0.5414061012808858,
+            "memB1Count": 0
+          },
+          {
+            "turn": 50,
+            "clusterAAvg": 0.6645622479802347,
+            "clusterBAvg": 0.5197960426966797,
+            "clusterCAvg": 0.21888870990235543,
+            "spread": 0.144766205283555,
+            "memA1Rp": 0.7311728663660131,
+            "memA1Count": 0,
+            "memB1Rp": 0.5336328275731003,
+            "memB1Count": 0
+          },
+          {
+            "turn": 60,
+            "clusterAAvg": 0.6859027112188176,
+            "clusterBAvg": 0.5429535141559244,
+            "clusterCAvg": 0.2318699411111932,
+            "spread": 0.14294919706289322,
+            "memA1Rp": 0.7489238054561691,
+            "memA1Count": 0,
+            "memB1Rp": 0.5299376752801513,
+            "memB1Count": 0
+          },
+          {
+            "turn": 70,
+            "clusterAAvg": 0.6699108271218768,
+            "clusterBAvg": 0.5134726906366798,
+            "clusterCAvg": 0.2318699411111932,
+            "spread": 0.156438136485197,
+            "memA1Rp": 0.7340095409160503,
+            "memA1Count": 0,
+            "memB1Rp": 0.5238448645484638,
+            "memB1Count": 0
+          },
+          {
+            "turn": 80,
+            "clusterAAvg": 0.70765889390192,
+            "clusterBAvg": 0.5423803795462506,
+            "clusterCAvg": 0.23199840724287474,
+            "spread": 0.16527851435566943,
+            "memA1Rp": 0.7528525832305384,
+            "memA1Count": 0,
+            "memB1Rp": 0.5321009723600884,
+            "memB1Count": 0
+          },
+          {
+            "turn": 90,
+            "clusterAAvg": 0.7477128007403722,
+            "clusterBAvg": 0.5761558871678132,
+            "clusterCAvg": 0.25076222881081406,
+            "spread": 0.17155691357255898,
+            "memA1Rp": 0.85,
+            "memA1Count": 0,
+            "memB1Rp": 0.5284676615034396,
+            "memB1Count": 0
+          },
+          {
+            "turn": 100,
+            "clusterAAvg": 0.6913874414278107,
+            "clusterBAvg": 0.5400147891324101,
+            "clusterCAvg": 0.2187228593688212,
+            "spread": 0.15137265229540064,
+            "memA1Rp": 0.7590856146114833,
+            "memA1Count": 0,
+            "memB1Rp": 0.5419058326036263,
+            "memB1Count": 0
+          }
+        ]
+      },
+      {
+        "countBonus": 0.02,
+        "turn100ClusterA": 0.6970078741993315,
+        "turn100ClusterB": 0.5394852069754119,
+        "turn100ClusterC": 0.22597690188585895,
+        "turn100Spread": 0.1575226672239196,
+        "memA1FinalRp": 0.7481140704189521,
+        "memA1FinalCount": 15,
+        "memC1FinalRp": 0.249792071844285,
+        "samples": [
+          {
+            "turn": 10,
+            "clusterAAvg": 0.6781929701696385,
+            "clusterBAvg": 0.5192271225269739,
+            "clusterCAvg": 0.22499999999999998,
+            "spread": 0.15896584764266464,
+            "memA1Rp": 0.7429418656715674,
+            "memA1Count": 2,
+            "memB1Rp": 0.5242519341584113,
+            "memB1Count": 2
+          },
+          {
+            "turn": 20,
+            "clusterAAvg": 0.68157932853732,
+            "clusterBAvg": 0.5577790588168742,
+            "clusterCAvg": 0.23003829832711747,
+            "spread": 0.12380026972044578,
+            "memA1Rp": 0.7569028780125604,
+            "memA1Count": 3,
+            "memB1Rp": 0.562729542091862,
+            "memB1Count": 3
+          },
+          {
+            "turn": 30,
+            "clusterAAvg": 0.678572145898868,
+            "clusterBAvg": 0.5148018100293029,
+            "clusterCAvg": 0.23003829832711747,
+            "spread": 0.16377033586956513,
+            "memA1Rp": 0.74733261125833,
+            "memA1Count": 5,
+            "memB1Rp": 0.5145364917800752,
+            "memB1Count": 5
+          },
+          {
+            "turn": 40,
+            "clusterAAvg": 0.7035054374830805,
+            "clusterBAvg": 0.5386075256559999,
+            "clusterCAvg": 0.22307948345303785,
+            "spread": 0.16489791182708058,
+            "memA1Rp": 0.7480586843059147,
+            "memA1Count": 6,
+            "memB1Rp": 0.5397568828827862,
+            "memB1Count": 6
+          },
+          {
+            "turn": 50,
+            "clusterAAvg": 0.6761879013129564,
+            "clusterBAvg": 0.529613998802377,
+            "clusterCAvg": 0.22307948345303785,
+            "spread": 0.14657390251057933,
+            "memA1Rp": 0.7301029611231676,
+            "memA1Count": 8,
+            "memB1Rp": 0.5535064982077403,
+            "memB1Count": 8
+          },
+          {
+            "turn": 60,
+            "clusterAAvg": 0.7068601853719125,
+            "clusterBAvg": 0.5494709929032479,
+            "clusterCAvg": 0.22527910091420564,
+            "spread": 0.15738919246866467,
+            "memA1Rp": 0.7459887965668515,
+            "memA1Count": 9,
+            "memB1Rp": 0.5516366113090491,
+            "memB1Count": 9
+          },
+          {
+            "turn": 70,
+            "clusterAAvg": 0.6837586688340718,
+            "clusterBAvg": 0.5263130245328265,
+            "clusterCAvg": 0.22527910091420564,
+            "spread": 0.1574456443012453,
+            "memA1Rp": 0.7487813657273281,
+            "memA1Count": 11,
+            "memB1Rp": 0.5368945078358848,
+            "memB1Count": 11
+          },
+          {
+            "turn": 80,
+            "clusterAAvg": 0.711800220303234,
+            "clusterBAvg": 0.5318544382703864,
+            "clusterCAvg": 0.22874607617641982,
+            "spread": 0.1799457820328476,
+            "memA1Rp": 0.7526431636543016,
+            "memA1Count": 12,
+            "memB1Rp": 0.5309216043596626,
+            "memB1Count": 12
+          },
+          {
+            "turn": 90,
+            "clusterAAvg": 0.6744039598695517,
+            "clusterBAvg": 0.5216206178081226,
+            "clusterCAvg": 0.22874607617641982,
+            "spread": 0.15278334206142907,
+            "memA1Rp": 0.7226899395156824,
+            "memA1Count": 14,
+            "memB1Rp": 0.545000829357335,
+            "memB1Count": 14
+          },
+          {
+            "turn": 100,
+            "clusterAAvg": 0.6970078741993315,
+            "clusterBAvg": 0.5394852069754119,
+            "clusterCAvg": 0.22597690188585895,
+            "spread": 0.1575226672239196,
+            "memA1Rp": 0.7481140704189521,
+            "memA1Count": 15,
+            "memB1Rp": 0.5468810101653468,
+            "memB1Count": 15
+          }
+        ]
+      },
+      {
+        "countBonus": 0.05,
+        "turn100ClusterA": 0.8239366479143432,
+        "turn100ClusterB": 0.6340430686559497,
+        "turn100ClusterC": 0.2724708450227046,
+        "turn100Spread": 0.18989357925839345,
+        "memA1FinalRp": 0.8889341304629106,
+        "memA1FinalCount": 12,
+        "memC1FinalRp": 0.3158251379780391,
+        "samples": [
+          {
+            "turn": 10,
+            "clusterAAvg": 0.7227686815273741,
+            "clusterBAvg": 0.5550384156435861,
+            "clusterCAvg": 0.22499999999999998,
+            "spread": 0.16773026588378792,
+            "memA1Rp": 0.7973369660111229,
+            "memA1Count": 2,
+            "memB1Rp": 0.5576871583869422,
+            "memB1Count": 2
+          },
+          {
+            "turn": 20,
+            "clusterAAvg": 0.3545793895986029,
+            "clusterBAvg": 0.5898088937983904,
+            "clusterCAvg": 0.24097758374163822,
+            "spread": -0.2352295041997875,
+            "memA1Rp": 0,
+            "memA1Count": 0,
+            "memB1Rp": 0.6084231872488879,
+            "memB1Count": 3
+          },
+          {
+            "turn": 30,
+            "clusterAAvg": 0.7137208576108155,
+            "clusterBAvg": 0.5683772675407152,
+            "clusterCAvg": 0,
+            "spread": 0.14534359007010034,
+            "memA1Rp": 0.7897549056366634,
+            "memA1Count": 2,
+            "memB1Rp": 0.5864461889515189,
+            "memB1Count": 2
+          },
+          {
+            "turn": 40,
+            "clusterAAvg": 0.7087064893774699,
+            "clusterBAvg": 0.5994529983610548,
+            "clusterCAvg": 0.24576438075688933,
+            "spread": 0.10925349101641513,
+            "memA1Rp": 0.7309599999999999,
+            "memA1Count": 3,
+            "memB1Rp": 0.5907785963108063,
+            "memB1Count": 3
+          },
+          {
+            "turn": 50,
+            "clusterAAvg": 0.7476175622055774,
+            "clusterBAvg": 0.5882666056213842,
+            "clusterCAvg": 0.2237,
+            "spread": 0.15935095658419318,
+            "memA1Rp": 0.8036928818245191,
+            "memA1Count": 5,
+            "memB1Rp": 0.6187456686595354,
+            "memB1Count": 5
+          },
+          {
+            "turn": 60,
+            "clusterAAvg": 0.7751683349811351,
+            "clusterBAvg": 0.6260868182859154,
+            "clusterCAvg": 0.25096047841367913,
+            "spread": 0.14908151669521974,
+            "memA1Rp": 0.8376647229974935,
+            "memA1Count": 6,
+            "memB1Rp": 0.6360882834671477,
+            "memB1Count": 6
+          },
+          {
+            "turn": 70,
+            "clusterAAvg": 0.767014639505039,
+            "clusterBAvg": 0.6105950572786146,
+            "clusterCAvg": 0.24576438075688933,
+            "spread": 0.15641958222642438,
+            "memA1Rp": 0.8561290210135324,
+            "memA1Count": 8,
+            "memB1Rp": 0.6228248438017301,
+            "memB1Count": 8
+          },
+          {
+            "turn": 80,
+            "clusterAAvg": 0.7877846379984038,
+            "clusterBAvg": 0.5212666666666667,
+            "clusterCAvg": 0.24767729839735708,
+            "spread": 0.26651797133173716,
+            "memA1Rp": 0.8532185999566713,
+            "memA1Count": 9,
+            "memB1Rp": 0.53128,
+            "memB1Count": 9
+          },
+          {
+            "turn": 90,
+            "clusterAAvg": 0.69502,
+            "clusterBAvg": 0.6164774563525058,
+            "clusterCAvg": 0.2237,
+            "spread": 0.07854254364749413,
+            "memA1Rp": 0.75464,
+            "memA1Count": 11,
+            "memB1Rp": 0.6439827999534421,
+            "memB1Count": 11
+          },
+          {
+            "turn": 100,
+            "clusterAAvg": 0.8239366479143432,
+            "clusterBAvg": 0.6340430686559497,
+            "clusterCAvg": 0.2724708450227046,
+            "spread": 0.18989357925839345,
+            "memA1Rp": 0.8889341304629106,
+            "memA1Count": 12,
+            "memB1Rp": 0.6462918584268291,
+            "memB1Count": 12
+          }
+        ]
+      }
+    ]
+  }
+}

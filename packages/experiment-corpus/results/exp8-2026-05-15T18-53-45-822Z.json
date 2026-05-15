@@ -1,14 +1,14 @@
 {
   "experiment": "exp8",
-  "runAt": "2026-05-15T19:38:44.848Z",
+  "runAt": "2026-05-15T18:53:45.822Z",
   "opensearchUrl": "http://thor:9200",
-  "observations": "H1 mem-a1 converges not monotonically increasing at pw=0.3: PASS; H2 mem-c1 decays below baseline at all pw: PASS; H3 cluster-A avg rp indistinguishable across pw (EMA fixed point): PASS; H4 A-B spread indistinguishable across pw: PASS",
+  "observations": "H1 mem-a1 monotonically increasing at pw=0.3: FAIL; H2 mem-c1 decays below baseline at all pw: PASS; H3 cluster-A avg rp increases monotonically with pw: FAIL; H4 A-B spread widens with pw: FAIL",
   "data": {
     "hypotheses": {
-      "h1": true,
+      "h1": false,
       "h2": true,
-      "h3": true,
-      "h4": true
+      "h3": false,
+      "h4": false
     },
     "conditions": [
       {

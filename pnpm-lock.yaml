@@ -520,6 +520,9 @@ importers:
       '@cognitive-substrate/attention-engine':
         specifier: workspace:*
         version: link:../attention-engine
+      '@cognitive-substrate/consolidation-engine':
+        specifier: workspace:*
+        version: link:../consolidation-engine
       '@cognitive-substrate/core-types':
         specifier: workspace:*
         version: link:../core-types

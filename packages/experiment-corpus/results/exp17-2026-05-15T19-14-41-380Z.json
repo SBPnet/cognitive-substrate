@@ -1,18 +1,18 @@
 {
   "experiment": "exp17",
-  "runAt": "2026-05-15T19:31:12.235Z",
+  "runAt": "2026-05-15T19:14:41.380Z",
   "opensearchUrl": "http://thor:9200",
-  "observations": "H1 Q1 top-3 all outage: PASS ([outage,outage,outage]); H2 Q2 top-3 majority recovery: PASS (3/3); H3 Q1 avg importance > Q3: PASS (0.920 vs 0.186); H4 tag filter outage = 50: PASS (50)",
+  "observations": "H1 Q1 top-3 all outage: PASS ([outage,outage,outage]); H2 Q2 top-3 majority recovery: PASS (3/3); H3 Q1 avg importance > Q3: PASS (0.920 vs 0.252); H4 tag filter outage = 50: FAIL (75)",
   "data": {
     "hypotheses": {
       "h1": true,
       "h2": true,
       "h3": true,
-      "h4": true
+      "h4": false
     },
     "q1Results": [
       {
-        "id": "op-outage-12-dd5c820d",
+        "id": "op-outage-12-ccfdd629",
         "tags": [
           "operational",
           "postgres-prod",
@@ -22,7 +22,7 @@
         "importance": 0.92
       },
       {
-        "id": "op-outage-15-5482ca7f",
+        "id": "op-outage-3-f7686f44",
         "tags": [
           "operational",
           "postgres-prod",
@@ -32,7 +32,7 @@
         "importance": 0.92
       },
       {
-        "id": "op-outage-18-6a131e4d",
+        "id": "op-outage-18-30e36b73",
         "tags": [
           "operational",
           "postgres-prod",
@@ -42,7 +42,7 @@
         "importance": 0.92
       },
       {
-        "id": "op-outage-21-ec2399be",
+        "id": "op-outage-24-63f90be7",
         "tags": [
           "operational",
           "postgres-prod",
@@ -52,7 +52,7 @@
         "importance": 0.92
       },
       {
-        "id": "op-outage-24-cd475762",
+        "id": "op-outage-27-1a50a88a",
         "tags": [
           "operational",
           "postgres-prod",
@@ -64,7 +64,7 @@
     ],
     "q2Results": [
       {
-        "id": "op-recovery-14-02a3e8f7",
+        "id": "op-recovery-2-ca042630",
         "tags": [
           "operational",
           "clickhouse-analytics",
@@ -74,17 +74,7 @@
         "importance": 0.12
       },
       {
-        "id": "op-recovery-17-7dbdbda6",
-        "tags": [
-          "operational",
-          "clickhouse-analytics",
-          "recovery",
-          "exp17-operational"
-        ],
-        "importance": 0.12
-      },
-      {
-        "id": "op-recovery-15-dd46fc15",
+        "id": "op-recovery-0-97a0ad3e",
         "tags": [
           "operational",
           "postgres-prod",
@@ -94,7 +84,7 @@
         "importance": 0.12
       },
       {
-        "id": "op-recovery-1-b4550d68",
+        "id": "op-recovery-7-4b5c01a1",
         "tags": [
           "operational",
           "redis-cache",
@@ -104,10 +94,20 @@
         "importance": 0.12
       },
       {
-        "id": "op-recovery-4-b5a8acac",
+        "id": "op-recovery-23-5e4ce482",
         "tags": [
           "operational",
-          "redis-cache",
+          "clickhouse-analytics",
+          "recovery",
+          "exp17-operational"
+        ],
+        "importance": 0.12
+      },
+      {
+        "id": "op-recovery-36-71114f10",
+        "tags": [
+          "operational",
+          "postgres-prod",
           "recovery",
           "exp17-operational"
         ],
@@ -116,17 +116,27 @@
     ],
     "q3Results": [
       {
-        "id": "op-normal-5-7663799f",
+        "id": "op-normal-5-d8ede2a4",
         "tags": [
           "operational",
           "clickhouse-analytics",
           "normal",
           "exp17-operational"
         ],
+        "importance": 0.12
+      },
+      {
+        "id": "op-normal-1-1c156016",
+        "tags": [
+          "operational",
+          "redis-cache",
+          "normal",
+          "exp17-operational"
+        ],
         "importance": 0.45
       },
       {
-        "id": "op-normal-7-08fad681",
+        "id": "op-normal-19-9f2e300f",
         "tags": [
           "operational",
           "redis-cache",
@@ -136,7 +146,7 @@
         "importance": 0.12
       },
       {
-        "id": "op-normal-11-c75a03d7",
+        "id": "op-normal-11-2cf160e9",
         "tags": [
           "operational",
           "clickhouse-analytics",
@@ -146,26 +156,16 @@
         "importance": 0.12
       },
       {
-        "id": "op-normal-14-7d2c77b8",
+        "id": "op-normal-16-7b07c3be",
         "tags": [
           "operational",
-          "clickhouse-analytics",
+          "redis-cache",
           "normal",
           "exp17-operational"
         ],
-        "importance": 0.12
-      },
-      {
-        "id": "op-normal-23-b63fea05",
-        "tags": [
-          "operational",
-          "clickhouse-analytics",
-          "normal",
-          "exp17-operational"
-        ],
-        "importance": 0.12
+        "importance": 0.45
       }
     ],
-    "outageTagCount": 50
+    "outageTagCount": 75
   }
 }

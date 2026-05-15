@@ -34,10 +34,12 @@
     "exp14": "node --import tsx/esm src/experiment-14.ts",
     "exp15": "node --import tsx/esm src/experiment-15.ts",
     "exp16": "node --import tsx/esm src/experiment-16.ts",
-    "exp17": "node --import tsx/esm src/experiment-17.ts"
+    "exp17": "node --import tsx/esm src/experiment-17.ts",
+    "exp18": "node --import tsx/esm src/experiment-18.ts"
   },
   "dependencies": {
     "@cognitive-substrate/agents": "workspace:*",
+    "@cognitive-substrate/consolidation-engine": "workspace:*",
     "@cognitive-substrate/attention-engine": "workspace:*",
     "@cognitive-substrate/core-types": "workspace:*",
     "@cognitive-substrate/memory-opensearch": "workspace:*",
