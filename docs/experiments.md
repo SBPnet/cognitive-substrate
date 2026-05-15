@@ -194,6 +194,52 @@ Four scenarios tested after 100 reinforcement turns (cb=0.02):
 
 ---
 
+## Experiment 15 — Cross-Domain Operational Correlation (Full Stack Exercise)
+
+**Goal:** Ingest heterogeneous real-world signals (DB metrics/logs, Zendesk tickets, Slack conversations), normalize them into unified `OperationalSignal` experiences, detect cross-source correlations, and let the full reinforcement → retrieval → attention → arbitration pipeline surface actionable operational insights.
+
+This experiment exercises **almost every package** end-to-end:
+
+- Ingestion/telemetry workers, Kafka bus, Aiven client
+- Memory (OpenSearch + object store)
+- AttentionEngine + salience
+- ReinforcementEngine (quality-gated count-bonus)
+- Pattern detection, causal/abstraction engines
+- Arbitration + agent loops
+- ClickHouse telemetry + OTEL tracing
+
+**Corpus Extension:** Synthetic + seeded real samples (see `experiment-corpus/data/operational/`). Plugin architecture note: future sources will be loaded via dynamic importers.
+
+### Setup
+
+- Extend corpus with ~200 synthetic signals across 4 time windows (normal, degraded, outage, recovery).
+- Add Zendesk/Slack sample payloads.
+- Run: `OPENSEARCH_URL=http://thor:9200 pnpm --filter @cognitive-substrate/experiment-corpus exp12`
+
+### Key Hypotheses (H1–H5)
+
+- **H1:** Unified `OperationalSignal` schema enables high-quality vector + temporal + graph correlations across sources.
+- **H2:** Quality-gated Hebbian compounding (from Exp 10/11) preferentially strengthens true correlations while suppressing noise.
+- **H3:** AttentionEngine routes urgent cross-domain bursts (e.g., latency spike + ticket flood) with <30s latency.
+- **H4:** Arbitration scores improve when proposals are backed by multi-source reinforced memories.
+- **H5:** System can auto-generate monitoring rules or Slack summaries from detected patterns.
+
+### Expected Metrics
+
+- Correlation precision/recall vs ground-truth labels
+- Arbitration score lift for true-positive insights
+- End-to-end latency, memory bloat, Kafka lag
+- Reinforcement compounding curves for signal clusters
+
+**Variants planned:** 12a (streaming vs batch), 12b (decay & forgetting), 12c (multi-agent debate).
+
+**Code changes expected:** New `OperationalSignal` type, ingest adapters, pattern worker hooks, config tuning.
+
+*Status: Draft — ready to implement (plugin-ready design)*
+
+
+---
+
 ## Architecture Findings Summary
 
 | Finding | Experiment | Code impact |
