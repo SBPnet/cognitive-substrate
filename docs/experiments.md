@@ -538,3 +538,102 @@ curl -X POST "http://thor:9200/_plugins/_ml/models/_register" -H "Content-Type: 
 **Key finding (H4):** Sustained outage evidence (contradictionRisk=0.9, reinforcement=0.1, cautionDelta=+0.3 per round) drives `caution` to near-saturation (0.957) while `explorationPreference` collapses (0.224). Identity coherence falls from 0.786 to 0.270 — the engine correctly reports a stressed, low-stability self-model.
 
 **Key finding (narrative):** Post-outage dominant traits shift from `[stabilityScore, curiosity, explorationPreference]` (settled) to `[caution, verbosity, toolDependence]` (stressed). Themes: `outage, incident, critical, risk monitoring`. The narrative summary explicitly calls out "low coherence" — the identity engine is self-aware of the stress state.
+
+---
+
+## Experiment 26 — GroundingEngine → WorldModelEngine → ConstitutionEngine Pipeline
+
+**Result:** H1/H2/H3/H4 pass. Sensing and safety pipeline validated end-to-end: sensor readings ground into events, world model predicts action risk, constitution gates identity changes.
+
+### GroundingEngine (H1)
+
+| Reading | value | importance | probes |
+| ------- | ----- | ---------- | ------ |
+| latency_p95_ms (normal) | 45ms | 0.450 | 1 |
+| latency_p95_ms (outage) | 1200ms | **1.000** (clamped) | 1 (infoGain=1.0, risk=1.0) |
+| error_rate (outage) | 78% | 0.780 | 1 |
+| cpu_percent (outage) | 95% | 0.950 | 1 |
+
+**Key finding (H1):** Outage max importance 1.000 vs normal 0.450. Importance formula `|value|/100` clamped to `[0,1]` means any metric over 100 saturates at 1.0 — appropriate for `latency_p95_ms` in ms units but means the scale is domain-specific. Active-inference probes are proposed for all 3 outage metrics.
+
+**PredictionFeedback:** `computePredictionFeedback("pred-1", observed=1200, expected=50)` → error=1150, accuracy=0.000 (the prediction was wildly wrong — the feedback payload is ready for the reinforcement engine to score).
+
+### WorldModelEngine (H2)
+
+| Action | riskScore | confidence | outcome label |
+| ------ | --------- | ---------- | ------------- |
+| Explain runbook (safe) | 0.200 | 0.360 | low-risk low-confidence |
+| Overwrite credential (risky) | 0.750 | 0.250 | high-risk low-confidence |
+| Explain runbook + 5 memories + 3 goals | 0.000 | **0.880** | low-risk high-confidence |
+
+**Key finding (H2):** Risky action lexicon ("overwrite", "credential", "external", "irreversible") triggers 3/3 risk terms → riskScore=0.75. Memory and goal context together raise confidence from 0.360 → 0.880 (same action, same state — context is the differentiator).
+
+### ConstitutionEngine (H3, H4)
+
+| Input | approved | quarantine | violations |
+| ----- | -------- | ---------- | ---------- |
+| Healthy identity (stability=0.70) | true | false | [] |
+| Low-stability (stability=0.20) | false | true | `stable-identity:identity_stability_below_minimum` |
+| Reward corruption (importance=0.9, policyAlignment=0.1, contradictionRisk=0.8, emotionalWeight=0.8) | false | true | `reward_corruption_risk` |
+| Post-outage identity (Exp 25, drift=0.266) | false | true | `stable-identity:identity_drift_above_maximum` |
+
+**Key finding (H3):** Default `stable-identity` invariant fires when `stabilityScore < 0.35`. Low-stability identity (0.20) is quarantined immediately.
+
+**Key finding (H4):** Reward corruption requires both signatures to reach the 0.6 threshold: `importance>0.8 + policyAlignment<0.25` (+0.5) AND `contradictionRisk>0.7 + emotionalWeight>0.7` (+0.5) → total 1.0. Single-signature inputs (importance/alignment only) score 0.5 and are approved — two independent corruption signals are required to quarantine.
+
+**Cross-experiment integration:** The post-outage identity from Exp 25 (`caution=0.957, explorationPreference=0.224, stabilityScore=0.353`) drifts 0.266 from the healthy baseline (RMS across 6 identity dimensions), exceeding the `maxIdentityDrift=0.2` invariant → quarantined. The ConstitutionEngine would block this identity from being committed without operator review.
+
+---
+
+## Experiment 27 — BudgetEngine, DevelopmentEngine, DreamEngine, MetacogEngine, SocialEngine
+
+**Result:** H1/H2/H3/H4 pass. Final five engines complete full package coverage. All pure in-memory.
+
+### BudgetEngine (H1)
+
+| Request | approved | mode | reason | exhaustion |
+| ------- | -------- | ---- | ------ | ---------- |
+| High utility (0.9 utility, 0.1 cost, uncertainty=0.4) | true | **slow** | budget_approved | 0.0 |
+| After 900-token spend (quota=1000) | false | fast | quota_exceeded | 0.485 |
+| Low utility (0.2 utility, 0.05 cost) | false | fast | utility_below_threshold | 0.0 |
+
+**Key finding (H1):** `slow` mode requires `utility>0.65 AND uncertainty>0.35 AND exhaustion<0.7` — the high-utility request satisfies all three. Token exhaustion (900/1000 spent) makes the 200-token follow-up request exceed the allowance, not the aggregate exhaustion (which is only 0.485 via the weighted formula). Rejection reason is `quota_exceeded`, not `cognitive_exhaustion`.
+
+### DevelopmentEngine (H2)
+
+| Capability mean | Phase | Transition | Unlocked subsystems |
+| --------------- | ----- | ---------- | ------------------- |
+| 0.30 | novice | true (was seed) | ingestion, retrieval, consolidation, policy |
+| 0.75 | integrative | true (was novice) | + agents, world-model, goals, attention, affect, metacognition |
+
+**Key finding (H2):** Phase thresholds: seed<0.25, novice<0.48, apprentice<0.68, integrative<0.85, open_ended≥0.85. Each phase unlock is cumulative — `integrative` inherits all lower-phase subsystems. Curriculum selection prioritises items where `difficulty ≈ current capability score` (readiness term).
+
+### DreamEngine (H3)
+
+| Scenario | Memory pair | adversarialPressure | stressScore | tags |
+| -------- | ----------- | ------------------- | ----------- | ---- |
+| 0 | outage+db-timeout (contradiction=0.85/0.80) | 0.825 | **0.775** | `dream`, `synthetic-replay` |
+| 1 | normal+cache (contradiction=0.05/0.03) | 0.040 | 0.064 | `dream`, `synthetic-replay` |
+
+**Key finding (H3):** Stress formula: `adversarialPressure×0.6 + (1 - min(stabilityScore))×0.4`. High-contradiction pair (0.825 avg) + low minimum stability (0.30) → stressScore=0.775, triggering a stress-failure flag. Low-contradiction pair: 0.064. 12× stress difference between the two pairs. Synthetic events carry `dream` and `synthetic-replay` tags on all scenarios.
+
+### MetacogEngine — CalibrationMonitor + ReflectionEngine (H4)
+
+| Operation | confidence | succeeded | calibrationError |
+| --------- | ---------- | --------- | ---------------- |
+| retrieval | 0.848 (discounted from 0.9) | false | **0.848** |
+| planning | 0.659 | true | 0.341 |
+| tool_call | 0.654 (discounted for risk=0.75) | false | 0.654 |
+
+Mean calibration error: 0.614. Watchdog alert: `calibration_drift_detected` (threshold 0.35).
+
+Reflection over failed high-risk action (confidence=0.9, riskScore=0.8, 0 memories): calibrationError=0.570, failureAttribution=`risk_underestimated`, self-modification proposal emitted (`strategy_adjustment`, stabilityRisk=0.8).
+
+### SocialEngine (H4 cont.)
+
+| Phase | trustScore | cooperationSignal | deceptionRisk | intent |
+| ----- | ---------- | ----------------- | ------------- | ------ |
+| After 5 successful `implement` events | 0.592 | 0.595 | 0.100 | implementation_request |
+| After 3 `contradict/mislead` events | 0.566 | — | **0.264** | — |
+
+**Key finding (H4):** Intent classifier correctly identifies "implement" keyword → `implementation_request`. Deception risk rises from 0.100 → 0.264 after 3 contradiction-laden events (smoothed EMA: `prior×0.8 + batchRate×0.2`). Trust score barely moves (0.592→0.566) because the trust formula weights event outcomes, not text content — deception risk and trust are updated by separate mechanisms.
