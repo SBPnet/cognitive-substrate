@@ -9,6 +9,14 @@
  * The engine intentionally does not own a Kafka producer: callers decide
  * whether the policy vote is sent to the policy worker synchronously or
  * batched onto the `policy.evaluation` topic.
+ *
+ * Hebbian compounding (Experiment 10):
+ * When `countBonus > 0`, the engine reads and increments `reinforcement_count`
+ * on each evaluation, then adds `countBonus × log2(1 + count)` to the final
+ * retrieval_priority. This shifts the fixed point upward with each evaluation —
+ * memories that are consistently positively reinforced compound away from those
+ * receiving weak or contradictory signal, mirroring biological long-term
+ * potentiation. The log2 curve prevents unbounded growth.
  */
 
 import type { Client } from "@opensearch-project/opensearch";
@@ -39,47 +47,72 @@ export interface ReinforcementEngineConfig {
    * low regardless of how large priorWeight is.
    */
   readonly priorWeight?: number;
+  /**
+   * Hebbian log-count bonus coefficient. When > 0, the engine reads and
+   * increments `reinforcement_count` per evaluation and adds
+   * `countBonus × log2(1 + count)` to the final retrieval_priority.
+   * Typical range: 0.02–0.05. At 0.03 a memory reaches +0.15 after ~30
+   * evaluations and +0.25 after ~200, approaching but never exceeding 1.
+   */
+  readonly countBonus?: number;
 }
 
 interface PriorDoc extends Record<string, unknown> {
   readonly retrieval_priority?: number;
+  readonly reinforcement_count?: number;
 }
 
 export class ReinforcementEngine {
   private readonly openSearch: Client | undefined;
   private readonly updateMemory: typeof updateDocument;
   private readonly priorWeight: number;
+  private readonly countBonus: number;
 
   constructor(config: ReinforcementEngineConfig = {}) {
     this.openSearch = config.openSearch;
     this.updateMemory = config.updateMemory ?? updateDocument;
     this.priorWeight = config.priorWeight ?? 0;
+    this.countBonus = config.countBonus ?? 0;
   }
 
   /**
    * Runs scoring for one reinforcement input. When a client is configured,
    * the memory document is updated in place with the new retrieval priority,
-   * decay factor, and reinforcement score so that subsequent retrieval
-   * passes see the change immediately.
-   *
-   * When `priorWeight > 0`, the current retrieval_priority is read from
-   * OpenSearch before scoring and blended as an EMA prior, producing
-   * compounding reinforcement rather than stateless replacement.
+   * decay factor, reinforcement score, and (when countBonus > 0)
+   * reinforcement_count so that subsequent retrieval passes see the change.
    */
   async evaluate(input: ReinforcementInput): Promise<ReinforcementUpdate> {
     const result = scoreReinforcement(input.signal);
 
     if (this.openSearch) {
       let finalRp = result.retrievalPriority;
-      if (this.priorWeight > 0) {
+      let newCount: number | undefined;
+
+      if (this.priorWeight > 0 || this.countBonus > 0) {
         const prior = await getDocument<PriorDoc>(this.openSearch, input.memoryIndex, input.memoryId);
-        const priorRp = prior?.retrieval_priority ?? result.retrievalPriority;
-        finalRp = Math.max(0, Math.min(1, priorRp * this.priorWeight + result.retrievalPriority * (1 - this.priorWeight)));
+
+        if (this.priorWeight > 0) {
+          const priorRp = prior?.retrieval_priority ?? result.retrievalPriority;
+          finalRp = priorRp * this.priorWeight + result.retrievalPriority * (1 - this.priorWeight);
+        }
+
+        if (this.countBonus > 0) {
+          newCount = (prior?.reinforcement_count ?? 0) + 1;
+          // Gate the bonus on reinforcement quality so that low-signal memories
+          // (high contradictionRisk, low importance) don't accumulate strength
+          // through count alone. Exp 10 found that bare log(count) lifted
+          // mem-c1 above its baseline despite weak signal.
+          finalRp += this.countBonus * Math.log2(1 + newCount) * result.reinforcement;
+        }
+
+        finalRp = Math.max(0, Math.min(1, finalRp));
       }
+
       await this.updateMemory(this.openSearch, input.memoryIndex, input.memoryId, {
         retrieval_priority: finalRp,
         decay_factor: result.decayAdjustment,
         reinforcement_score: result.reinforcement,
+        ...(newCount !== undefined ? { reinforcement_count: newCount } : {}),
       });
     }
 

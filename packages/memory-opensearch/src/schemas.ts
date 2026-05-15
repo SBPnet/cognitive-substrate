@@ -123,6 +123,7 @@ export const memorySemanticSchema = {
       retrieval_priority: { type: "float" },
       decay_factor: { type: "float" },
       reinforcement_score: { type: "float" },
+      reinforcement_count: { type: "integer" },
       last_retrieved: { type: "date" },
     },
   },
