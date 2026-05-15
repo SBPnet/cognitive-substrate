@@ -4,12 +4,14 @@
 #   opensearch-node1   cluster-manager + data + ingest     9200 / 9300
 #   opensearch-node2   data + ingest                       9201 / 9301
 #   opensearch-ml1     ml only (no data, no manager)       9202 / 9302
+#   opensearch-ml2     ml only (no data, no manager)       9203 / 9303
 #   opensearch-dashboards                                   5601
 #
 # Heap sizing (rule: 50% of RAM up to 32GB per node, never exceed 31g)
 #   node1 / node2 : 24g  — data nodes need headroom for shard field data cache
-#   ml1           : 16g  — model weights live in native memory; JVM heap is
-#                          smaller but native_memory_threshold is lifted to 99%
+#   ml1           : 16g  — original ML node; adequate for small models (MiniLM)
+#   ml2           : 24g  — second ML node; larger heap for BGE-M3 / nomic-embed-text
+#                          Total committed: 88g JVM + ~30g native ≈ 118g of 157g RAM
 #
 # Prerequisites (run once on thor, survives reboots via /etc/sysctl.d):
 #   echo "vm.max_map_count=262144" | sudo tee /etc/sysctl.d/99-opensearch.conf
@@ -36,7 +38,7 @@ x-opensearch-common: &opensearch-common
       hard: 65536
   environment: &opensearch-env
     cluster.name: cognitive-substrate
-    discovery.seed_hosts: opensearch-node1,opensearch-node2,opensearch-ml1
+    discovery.seed_hosts: opensearch-node1,opensearch-node2,opensearch-ml1,opensearch-ml2
     cluster.initial_cluster_manager_nodes: opensearch-node1
     # Security disabled for local experiment use — enable before any network exposure.
     DISABLE_SECURITY_PLUGIN: "true"
@@ -136,6 +138,39 @@ services:
       - opensearch-ml1-data:/usr/share/opensearch/data
 
   # ---------------------------------------------------------------------------
+  # ML node 2 — second dedicated ML Commons inference node
+  #
+  # Gives the cluster two independent JVMs for ML inference:
+  #   - ML Commons round-robins _predict calls across both nodes, so two
+  #     concurrent embedding requests are handled in parallel.
+  #   - Deploy different models on ml1 vs ml2 with no memory contention.
+  #   - 24g heap matches the data nodes; larger native headroom for models
+  #     like BGE-M3 (~2-4GB native) or nomic-embed-text (~1-2GB native).
+  #
+  # To start without disrupting the running cluster:
+  #   docker compose -f docker-compose.thor.yml up -d opensearch-ml2
+  # ---------------------------------------------------------------------------
+  opensearch-ml2:
+    <<: *opensearch-common
+    container_name: opensearch-ml2
+    ports:
+      - "9203:9200"
+      - "9303:9300"
+    environment:
+      <<: *opensearch-env
+      node.name: opensearch-ml2
+      node.roles: ml
+      OPENSEARCH_JAVA_OPTS: "-Xms24g -Xmx24g -XX:+UseG1GC -XX:G1HeapRegionSize=32m"
+      network.host: "0.0.0.0"
+      http.port: "9200"
+      transport.port: "9300"
+    depends_on:
+      opensearch-node1:
+        condition: service_healthy
+    volumes:
+      - opensearch-ml2-data:/usr/share/opensearch/data
+
+  # ---------------------------------------------------------------------------
   # Dashboards — cluster management and ML model registry UI
   # http://thor:5601  (or localhost:5601 from thor itself)
   # ---------------------------------------------------------------------------
@@ -156,3 +191,4 @@ volumes:
   opensearch-node1-data:
   opensearch-node2-data:
   opensearch-ml1-data:
+  opensearch-ml2-data:
