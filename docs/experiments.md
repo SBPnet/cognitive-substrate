@@ -221,6 +221,8 @@ Four scenarios tested after 100 reinforcement turns (cb=0.02):
 | compress fires only when retentionScore > suppressionThreshold; low-importance old memories go to suppress/prune | Exp 19 | Architecture behaviour; not a bug — compress is for memories worth keeping before pruning |
 | CausalEngine infers incident co-occurrence structure from text; outage→latency strength=0.45 | Exp 20 | inferModel depends on event input.text vocabulary; generators must embed window labels |
 | AffectEngine norepinephrine and contradictionStress spike on outage signals and decay monotonically to baseline | Exp 21 | EMA smoothing validated; stressed state produces 11× higher coupleAttention boost |
+| AbstractionEngine ladder structure (5 nodes, compressionRatio 0.2→1.0, confidence scales with source count) is correct | Exp 22 | Structure validated; symbolic-label ceiling hit: all levels share same token — embeddings required for differentiation |
+| AbstractionEngine symbolic-label assigns same dominant token to all 5 levels — no per-level clustering | Exp 22 | Known limitation documented in engine; embedding-based clustering is the fix |
 
 ---
 
@@ -308,6 +310,30 @@ Four incident windows consolidated from 200 Exp 15 signals:
 **Bug fixed:** `ConsolidationEngine` was writing `embedding: []` (empty array) to the `knn_vector` field when source events carried no embeddings, causing OpenSearch to reject the document with `mapper_parsing_exception`. Fixed by omitting the field when empty.
 
 *Code changes: `requiredTags` added to `ConsolidationRequest`; tag-filtered query overlay in `selectReplayCandidates`; empty-embedding guard in `consolidate()` write.*
+
+---
+
+## Experiment 22 — AbstractionEngine: Compression Ladder over Operational Data
+
+**Result:** H1/H2/H3/H4 pass. Ladder structure is correct. Symbolic-label ceiling documented: all levels share the same dominant token — embeddings are required to differentiate labels across levels.
+
+Three input configurations tested:
+
+| Config | Sources | Root token | Confidence (experience) | Confidence (worldview) |
+| ------ | ------- | ---------- | ----------------------- | ---------------------- |
+| A — 200 events | 200 | "service" | 1.000 | 1.000 |
+| B — 4 memories | 4 | "latency" | 0.500 | 1.000 |
+| C — 200 events + 4 memories | 204 | "service" | 1.000 | 1.000 |
+
+**Key finding (H1):** Every ladder has exactly 5 nodes in the canonical order `experience → pattern → concept → principle → worldview`, with `compressionRatio` exactly 0.2 / 0.4 / 0.6 / 0.8 / 1.0.
+
+**Key finding (H2):** Root label is always incident-domain vocabulary — "service" for event-heavy inputs (200 events all saying "service=..."), "latency" for memory-only inputs (whose `generalization` field mentions "latency" frequently). Never falls back to "general-abstraction".
+
+**Key finding (H3):** Confidence scales with source count. At the `experience` level: A=1.000 vs B=0.500 (4/8). At `worldview`: both saturate at 1.000 (formula is `min(1, sources / max(1, 8-depth))` = `min(1, 4/1)` at depth 4).
+
+**Key finding (H4):** Mixed ladder sourceIds contain IDs from both event set (200) and memory set (4) at every node — 204 unique IDs total.
+
+**Ceiling documented:** All five levels share the identical dominant token (`service` for Config A, `latency` for Config B). The engine uses the same source corpus at every level — no per-level clustering. The engine comment explicitly acknowledges this: "Future revisions are expected to build the ladder incrementally by clustering at each level." This is the natural trigger point for introducing embeddings: once embeddings are available, each level can cluster a subset of sources by similarity, producing meaningfully differentiated labels.
 
 ---
 
