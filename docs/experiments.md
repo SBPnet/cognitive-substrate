@@ -218,6 +218,25 @@ Four scenarios tested after 100 reinforcement turns (cb=0.02):
 
 ---
 
+## Experiment 15 — Cross-Domain Operational Correlation
+
+**Result:** H1/H2/H3/H4 pass. 200 synthetic operational signals generated across 4 incident windows; schema self-consistent and severity ordering correct.
+
+| Window | Signals | Mean severity | XD rate |
+| ------ | ------- | ------------- | ------- |
+| normal | 40 | 0.268 | 0.000 |
+| degraded | 60 | 0.680 | 1.000 |
+| outage | 50 | 0.920 | 1.000 |
+| recovery | 50 | 0.272 | 0.460 |
+
+Each `OperationalSignal` extends `ExperienceEvent` and carries a structured `payload` with cross-domain fields (DB metrics, Zendesk ticket, Slack thread). XD rate (fraction of signals with both Zendesk and Slack present) is 100% for degraded/outage and drops to ~45% for recovery as the incident resolves.
+
+**Key finding:** Recovery severity (0.272) is nearly equal to normal (0.268), not halfway between degraded and outage. This is correct behaviour — recovery signals reflect "incident resolved" state where most noise has subsided. The ordering `normal < recovery < degraded < outage` holds consistently.
+
+**Production implication:** This dataset is ready to be fed into the experience_events index for retrieval and reinforcement experiments testing cross-domain correlation (e.g., "find all memories related to this Zendesk ticket"). The plugin architecture (`OperationalPluginRegistry`) is in place for real source ingestion.
+
+---
+
 ## Experiment 16 — Re-Consolidation
 
 **Result:** H1/H2/H3/H4 pass. Periodic background reinforcement prevents cluster ordering inversion; frequency determines effectiveness.
@@ -256,22 +275,3 @@ Tag filter for "outage" returns exactly 50 documents (correct — 50 outage-wind
 **Key finding (H3):** Outage signals (importance=0.920) rank far above normal signals (importance≈0.384) in retrieval score — severity is naturally encoded in the summary vocabulary ("critical incident", "severely elevated" vs "no anomalies detected"), so BM25 implicitly orders by severity when the query is incident-specific.
 
 **Production implication:** Operational signals are a first-class citizen in `experience_events`. The BM25 path retrieves the correct incident window without any embedding — future work can add embeddings for semantic recall across service names and ticket IDs via graphSeeds.
-
----
-
-## Experiment 15 — Cross-Domain Operational Correlation
-
-**Result:** H1/H2/H3/H4 pass. 200 synthetic operational signals generated across 4 incident windows; schema self-consistent and severity ordering correct.
-
-| Window | Signals | Mean severity | XD rate |
-| ------ | ------- | ------------- | ------- |
-| normal | 40 | 0.268 | 0.000 |
-| degraded | 60 | 0.680 | 1.000 |
-| outage | 50 | 0.920 | 1.000 |
-| recovery | 50 | 0.272 | 0.460 |
-
-Each `OperationalSignal` extends `ExperienceEvent` and carries a structured `payload` with cross-domain fields (DB metrics, Zendesk ticket, Slack thread). XD rate (fraction of signals with both Zendesk and Slack present) is 100% for degraded/outage and drops to ~45% for recovery as the incident resolves.
-
-**Key finding:** Recovery severity (0.272) is nearly equal to normal (0.268), not halfway between degraded and outage. This is correct behaviour — recovery signals reflect "incident resolved" state where most noise has subsided. The ordering `normal < recovery < degraded < outage` holds consistently.
-
-**Production implication:** This dataset is ready to be fed into the experience_events index for retrieval and reinforcement experiments testing cross-domain correlation (e.g., "find all memories related to this Zendesk ticket"). The plugin architecture (`OperationalPluginRegistry`) is in place for real source ingestion.
