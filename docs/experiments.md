@@ -447,3 +447,54 @@ Source counts: 200 → 100 → 25 → 4 → 2 (halving each level). Label shifts
 - OpenSearch 3.0 knn requires all docs in a shard to have the `knn_vector` field — mixed-doc shards cause `ConjunctionDISI` errors. Exp 23 uses a dedicated `exp23_events` index (single shard, dropped after cleanup).
 - `@cognitive-substrate/abstraction-engine` must be rebuilt (`pnpm build`) before tsx picks up source changes — tsx resolves via `dist/` from `package.json` exports.
 - `exactOptionalPropertyTypes` requires conditional spread (`...(x ? { field: v } : {})`) rather than `field: x ? v : undefined` when the field is optional.
+
+---
+
+## Experiment 24 — OpenSearch ML Node: all-MiniLM-L6-v2 Throughput vs ollama
+
+**Result:** H1/H2/H3/H4 pass. ML node delivers 5.4× throughput improvement over ollama sequential. Neural ingest pipeline auto-embeds at index time.
+
+**Model:** `all-MiniLM-L6-v2` (384-dim, `huggingface/sentence-transformers/all-MiniLM-L6-v2`) deployed to `opensearch-ml1` via OpenSearch ML Commons.
+
+**Throughput comparison (200 operational signals):**
+
+| Strategy | Total time | ms/doc | docs/s | vs ollama baseline |
+| -------- | ---------- | ------ | ------ | ------------------ |
+| ollama sequential (Exp 23 baseline) | ~50s | ~250ms | ~4 | 1× |
+| ML node sequential (1 req/doc) | 12.8s | 64ms | 16 | 4× |
+| ML node batch (1 req, 200 docs) | 9.3s | 46ms | 22 | **5.4×** |
+| ML node ingest pipeline | 13.0s | 65ms | 15 | 3.8× |
+
+**Key finding (H1):** Batch call 9.3s vs sequential 12.8s — 1.4× speedup from batching alone (expected higher; ML node serializes inference on CPU so batch parallelism is limited on a single node).
+
+**Key finding (H2):** Batch latency 46ms/doc ≤ 50ms threshold — 5.4× faster than the ollama 250ms baseline, confirming the ML node delivers meaningfully better throughput for this corpus size.
+
+**Key finding (H3):** Neural ingest pipeline (`text_embedding` processor, `field_map: {summary → embedding_minilm}`) correctly auto-embeds documents at index time. Fetched doc has `embedding_minilm` dim=384 with non-zero values.
+
+**Key finding (H4):** knn top-5 for outage query: 5/5 outage-window hits (scores ~1.69, innerproduct space). `all-MiniLM-L6-v2` correctly separates incident windows at 384 dimensions.
+
+**Infrastructure bootstrap (one-time):**
+
+```bash
+# Enable ML node routing and raise memory thresholds
+curl -X PUT "http://thor:9200/_cluster/settings" -H "Content-Type: application/json" -d '{
+  "persistent": {
+    "plugins.ml_commons.only_run_on_ml_node": true,
+    "plugins.ml_commons.allow_registering_model_via_url": true,
+    "plugins.ml_commons.native_memory_threshold": 100,
+    "plugins.ml_commons.jvm_heap_memory_threshold": 100,
+    "plugins.ml_commons.max_model_on_node": 5
+  }
+}'
+# Register and deploy the model
+curl -X POST "http://thor:9200/_plugins/_ml/models/_register" -H "Content-Type: application/json" \
+  -d '{"name":"huggingface/sentence-transformers/all-MiniLM-L6-v2","version":"1.0.1","model_format":"TORCH_SCRIPT"}'
+# Poll task, then deploy: curl -X POST "http://thor:9200/_plugins/_ml/models/<model_id>/_deploy"
+```
+
+**Architecture notes:**
+
+- Batch size ceiling: the ML node serializes inference on CPU. Sending all 200 docs in one call is only 1.4× faster than 200 sequential calls — the batch is processed token-by-token, not in parallel. True horizontal scale requires multiple physical ML hosts.
+- Ingest pipeline latency ≈ sequential latency: the pipeline issues one `_predict` call per document at index time (no batching in the `text_embedding` processor as of OpenSearch 3.0). Matches the 64ms sequential baseline exactly.
+- Model chunk sub-documents: OpenSearch stores model weights as chunk records (`<model_id>_2`, `_3`, etc.) in the `.plugins-ml-model` index. The parent record ID is the one without the trailing `_N` suffix.
+- `embedding_minilm` (384-dim) is distinct from `embedding_nomic` (768-dim). Future experiments should choose based on latency budget vs precision trade-off.
