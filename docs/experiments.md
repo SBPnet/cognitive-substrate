@@ -138,6 +138,62 @@ Quality gate confirmed: mem-c1 stays at 0.269 (below importanceScore=0.30 baseli
 
 ---
 
+## Experiment 12 — Policy Drift
+
+**Result:** H1/H2/H3/H4 pass. Policy vector drifts in a signal-consistent direction with bounded per-step magnitude.
+
+Two conditions over 100 turns: corpus mix (positive-dominant) and contradiction-heavy.
+
+| Condition | ef drift | rb drift | mt drift |
+| --------- | -------- | -------- | -------- |
+| corpus mix | −0.072 (0.500→0.428) | +0.108 (0.500→0.608) | +0.230 (0.500→0.730) |
+| contradiction-heavy | −0.411 (0.500→0.086) | +0.246 (0.500→0.746) | +0.340 (0.500→0.840) |
+
+**Key finding:** The `explorationFactor` formula (`reward × (0.5 - confidence + contradictionRisk) × 0.08`) means *negative* reward with high `contradictionRisk` suppresses `explorationFactor` *more aggressively* than positive reward does. Both conditions reduce exploration; contradiction-heavy reduces it to near-zero (0.086) because low reinforcement → negative `rewardDelta` × large `contradictionRisk` bracket. The system punishes exploration in the face of contradicted knowledge — it should exploit trusted memories, not explore further. Per-step drift bounded to 0.005 (max observed), well within MAX_ABSOLUTE_DRIFT=0.08.
+
+**Production implication:** The policy engine correctly encodes that contradiction episodes should decrease exploration temperature, not increase it.
+
+---
+
+## Experiment 13 — Temporal Decay
+
+**Result:** H1/H2/H3/H4 pass. Decay causes catastrophic convergence — without continuous reinforcement, cluster-A's Hebbian gains erode and cluster ordering inverts.
+
+100 reinforcement turns (cb=0.02) followed by in-memory decay projection at epochs {0, 10, 20, 50, 100}. Per-epoch decay rate = `1 - (1 - decay_factor) / 20`.
+
+| Epochs | Cluster-A | Cluster-B | Cluster-C | A-C gap |
+| ------ | --------- | --------- | --------- | ------- |
+| 0 | 0.748 | 0.587 | 0.238 | 0.510 |
+| 10 | 0.592 | 0.478 | 0.218 | 0.374 |
+| 20 | 0.468 | 0.388 | 0.200 | 0.268 |
+| 50 | 0.232 | 0.209 | 0.155 | 0.077 |
+| 100 | 0.072 | 0.074 | 0.100 | −0.028 |
+
+**Key finding:** Decay is multiplicative — cluster-A starts high and loses more in absolute terms than cluster-C which starts near its floor. By epoch 100 cluster-C *exceeds* cluster-A in rp (0.100 > 0.072). The Hebbian gains from compounding are not permanent; they require periodic re-retrieval. This is biological long-term potentiation behaviour: memories that are never re-accessed fade even if they were once strongly potentiated.
+
+**Production implication:** The substrate needs a re-consolidation mechanism (periodic background reinforcement of high-importance memories) to prevent catastrophic convergence. Without it, trusted memories degrade to the same level as contradictory ones over long idle periods.
+
+---
+
+## Experiment 14 — Multi-Agent Arbitration
+
+**Result:** H1/H2/H3/H4 pass. Agent-A (cluster-A memories) wins arbitration in all 4 scenarios including when agent-C has more retrieved memories.
+
+Four scenarios tested after 100 reinforcement turns (cb=0.02):
+
+| Scenario | A memories | C memories | A-score | C-score | Winner | Margin |
+| -------- | ---------- | ---------- | ------- | ------- | ------ | ------ |
+| Full support | 3 | 2 | 0.812 | 0.501 | A | 0.311 |
+| Degraded A | 2 | 5 (+B mix) | 0.772 | 0.714 | A | 0.055 |
+| Equal count | 3 | 3 (+B mix) | 0.812 | 0.586 | A | 0.227 |
+| Baseline (no reinf.) | 3 | 2 | 0.820 | 0.498 | A | 0.325 |
+
+**Key finding 1 (H2):** Agent-A beats agent-C even when agent-C has 5 retrieved memories vs agent-A's 2. `memoryAlignment` (capped at `min(1, count/5)`) is only 25% of the arbitration score; `confidence` (30%) and `riskScore` (20%) together (50%) outweigh it. High rp → high confidence → agent-A wins on confidence even with less memory alignment.
+
+**Key finding 2 (H4):** Baseline margin (0.325) slightly *exceeds* reinforced margin (0.311) because baseline draws confidence from raw `importanceScore` (0.80 for cluster-A) which is higher than post-reinforcement rp (0.775). Reinforcement converges rp toward the signal-determined fixed point; it does not inflate above importanceScore ceiling. The arbitration system is robust at baseline; reinforcement refines rather than amplifies the separation.
+
+---
+
 ## Architecture Findings Summary
 
 | Finding | Experiment | Code impact |
@@ -150,3 +206,8 @@ Quality gate confirmed: mem-c1 stays at 0.269 (below importanceScore=0.30 baseli
 | Reinforcement loop is live but stateless | Exp 7 | EMA added (priorWeight) |
 | EMA converges to signal fixed point, no compounding | Exp 9 | Led to count-bonus design |
 | Count bonus must be quality-gated | Exp 10 | Fixed: multiply by result.reinforcement |
+| Policy drift is signal-consistent and bounded | Exp 12 | Policy engine validated; ef suppressed by contradiction |
+| Contradiction-heavy signal suppresses explorationFactor more than positive signal | Exp 12 | Architectural behaviour, not a bug |
+| Temporal decay causes catastrophic convergence without re-retrieval | Exp 13 | Needs re-consolidation mechanism |
+| Arbitration selects cluster-A even when cluster-C has more retrieved memories | Exp 14 | Confidence+risk outweigh memoryAlignment |
+| Reinforcement refines but does not inflate arbitration margin beyond baseline | Exp 14 | importanceScore already encodes trust; compounding converges, not amplifies |

@@ -1,0 +1,99 @@
+{
+  "experiment": "exp13",
+  "runAt": "2026-05-15T02:58:20.020Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 post-reinforcement cluster ordering A>B>C: PASS; H2 cluster-C rp < baseline after 50 epochs: PASS (0.1555 vs 0.2250); H3 A-C gap widens t=0→t=100: FAIL (0.5110→-0.0279); H4 decay ordering monotone A<B<C at all epochs: FAIL",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": false,
+      "h4": false
+    },
+    "clusterCBaseline": 0.22499999999999998,
+    "snapshots": [
+      {
+        "epochs": 0,
+        "clusterA": 0.7522895298314168,
+        "clusterB": 0.5821871969908534,
+        "clusterC": 0.24125124064844644,
+        "acGap": 0.5110382891829703
+      },
+      {
+        "epochs": 10,
+        "clusterA": 0.5949168880195518,
+        "clusterB": 0.4743755935862867,
+        "clusterC": 0.22092895704767984,
+        "acGap": 0.37398793097187194
+      },
+      {
+        "epochs": 20,
+        "clusterA": 0.47052404063848,
+        "clusterB": 0.38655641635057464,
+        "clusterC": 0.20232819059536278,
+        "acGap": 0.26819585004311725
+      },
+      {
+        "epochs": 50,
+        "clusterA": 0.23296451568468832,
+        "clusterB": 0.2092512873399932,
+        "clusterC": 0.15545047069204568,
+        "acGap": 0.07751404499264264
+      },
+      {
+        "epochs": 100,
+        "clusterA": 0.07237845043438915,
+        "clusterB": 0.07534057661156185,
+        "clusterC": 0.1002846868007313,
+        "acGap": -0.027906236366342152
+      }
+    ],
+    "memoryStates": [
+      {
+        "memoryId": "mem-a1",
+        "rp": 0.8150857100423591,
+        "decayFactor": 0.5163165773688212
+      },
+      {
+        "memoryId": "mem-a2",
+        "rp": 0.7928646068651664,
+        "decayFactor": 0.5242804772307893
+      },
+      {
+        "memoryId": "mem-a3",
+        "rp": 0.7394455915424762,
+        "decayFactor": 0.5353865384333993
+      },
+      {
+        "memoryId": "mem-a4",
+        "rp": 0.6617622108756659,
+        "decayFactor": 0.5747770046644733
+      },
+      {
+        "memoryId": "mem-b1",
+        "rp": 0.5693378196115005,
+        "decayFactor": 0.6042530283143025
+      },
+      {
+        "memoryId": "mem-b2",
+        "rp": 0.6152884278719521,
+        "decayFactor": 0.5722233733094806
+      },
+      {
+        "memoryId": "mem-b3",
+        "rp": 0.5619353434891077,
+        "decayFactor": 0.6090641872622536
+      },
+      {
+        "memoryId": "mem-c1",
+        "rp": 0.2753096627931801,
+        "decayFactor": 0.8128800873495439
+      },
+      {
+        "memoryId": "mem-c2",
+        "rp": 0.20719281850371282,
+        "decayFactor": 0.8404857089201677
+      }
+    ]
+  }
+}

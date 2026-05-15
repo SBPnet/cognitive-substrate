@@ -1,19 +1,44 @@
 # @cognitive-substrate/budget-engine
 
-## Purpose
+Compute-budget gating for reasoning requests. Enforces utility, exhaustion, and quota constraints and selects between fast (heuristic) and slow (deliberative) cognition modes.
 
-`@cognitive-substrate/budget-engine` is a top-level package used by the Cognitive Substrate workspace. Its public API is the package export surface, not this README.
+## What it does
 
-## Entrypoints
+Before the cognitive loop commits to a full reasoning cycle, the budget engine checks three independent constraints:
 
-- Source: `packages/budget-engine/src/index.ts`
-- Package main: `./dist/index.js`
-- Package metadata: `packages/budget-engine/package.json`
+| Constraint | Rule |
+| ---------- | ---- |
+| Utility | Expected utility ≥ configured threshold |
+| Exhaustion | Blended exhaustion score < 0.9 |
+| Quota | Estimated token cost fits within remaining quota |
 
-## Runtime Wiring
+If all three pass, it returns a `BudgetDecision` recommending either `fast` or `slow` mode based on the exhaustion level. Any failed constraint returns `deny` with the blocking reason.
 
-Runtime wiring happens through apps, workers, or other packages that import this package. Kafka topic claims should be checked against `packages/kafka-bus/src/topics.ts`; OpenSearch index claims should be checked against `packages/memory-opensearch/src/schemas.ts`.
+### Exhaustion formula
 
-## Evidence
+```text
+exhaustion = tokenPressure×0.45 + toolPressure×0.35 + latencyPressure×0.20
+```
 
-Evidence is limited to build/typecheck/import coverage and any downstream smoke usage that imports this package or runs this worker.
+## API
+
+```ts
+import { BudgetEngine, BudgetDecision, computeExhaustion } from '@cognitive-substrate/budget-engine';
+
+const engine = new BudgetEngine(config);
+const decision: BudgetDecision = engine.evaluate(request);
+// decision.mode === 'fast' | 'slow' | 'deny'
+// decision.reason explains any denial
+```
+
+### Key exports
+
+| Export | Description |
+| ------ | ----------- |
+| `BudgetEngine` | Main gate; call `.evaluate(request)` |
+| `BudgetDecision` | `mode`, `reason`, `estimatedCost` |
+| `computeExhaustion(metrics)` | Standalone exhaustion scorer |
+
+## Dependencies
+
+- `@cognitive-substrate/core-types` — `ReasoningRequest`, `BudgetConfig`

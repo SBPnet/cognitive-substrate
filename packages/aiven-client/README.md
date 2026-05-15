@@ -1,19 +1,34 @@
 # @cognitive-substrate/aiven-client
 
-## Purpose
+Shared HTTP base client and service types for Aiven control-plane and data-plane integration.
 
-`@cognitive-substrate/aiven-client` is a top-level package used by the Cognitive Substrate workspace. Its public API is the package export surface, not this README.
+## What it does
 
-## Entrypoints
+Provides a thin authenticated wrapper around the Aiven API so other packages and workers can list, inspect, and manage Aiven services (Kafka, OpenSearch, etc.) without duplicating auth logic or error handling.
 
-- Source: `packages/aiven-client/src/index.ts`
-- Package main: `./dist/index.js`
-- Package metadata: `packages/aiven-client/package.json`
+## API
 
-## Runtime Wiring
+```ts
+import { AivenBaseClient, AivenService } from '@cognitive-substrate/aiven-client';
 
-Runtime wiring happens through apps, workers, or other packages that import this package. Kafka topic claims should be checked against `packages/kafka-bus/src/topics.ts`; OpenSearch index claims should be checked against `packages/memory-opensearch/src/schemas.ts`.
+const client = new AivenBaseClient({ token: process.env.AIVEN_TOKEN, project: 'my-project' });
+const services: AivenService[] = await client.listServices();
+```
 
-## Evidence
+### Key exports
 
-Evidence is limited to build/typecheck/import coverage and any downstream smoke usage that imports this package or runs this worker.
+| Export | Description |
+| ------ | ----------- |
+| `AivenBaseClient` | Authenticated fetch wrapper; `.listServices()`, `.getService(name)` |
+| `AivenService` | Type describing a single Aiven service (name, type, state, connection info) |
+
+## Dependencies
+
+None — pure HTTP + types, no intra-monorepo dependencies.
+
+## Configuration
+
+| Env var | Description |
+| ------- | ----------- |
+| `AIVEN_TOKEN` | Personal or service account token |
+| `AIVEN_PROJECT` | Aiven project name |

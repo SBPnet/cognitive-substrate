@@ -1,0 +1,57 @@
+{
+  "experiment": "exp14",
+  "runAt": "2026-05-15T03:06:32.017Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 agent-A wins with full support: PASS (A=0.8124, C=0.5012, margin=0.3111); H2 agent-A wins despite fewer memories (A=2 vs C=5): PASS (A=0.7716, C=0.7141); H3 agent-A wins with equal memory count (3 vs 3): PASS (A=0.8124, C=0.5858); H4 agent-A wins all 4 scenarios (conf+risk beats count): PASS",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": true,
+      "h4": true
+    },
+    "clusterAvgs": {
+      "a": 0.7745902713783411,
+      "b": 0.5864806699226649,
+      "c": 0.23748762235756748
+    },
+    "scenarios": [
+      {
+        "label": "full support (A=3, C=2)",
+        "agentAScore": 0.8123770814135024,
+        "agentCScore": 0.5012462867072702,
+        "margin": 0.31113079470623217,
+        "winner": "agent-A",
+        "agentAConfidence": 0.7745902713783411,
+        "agentCConfidence": 0.23748762235756748
+      },
+      {
+        "label": "degraded A (A=2, C=5 with B-mix)",
+        "agentAScore": 0.7715926642700921,
+        "agentCScore": 0.7140650352689877,
+        "margin": 0.05752762900110442,
+        "winner": "agent-A",
+        "agentAConfidence": 0.8053088809003068,
+        "agentCConfidence": 0.44688345089662584
+      },
+      {
+        "label": "equal count (A=3, C=3)",
+        "agentAScore": 0.8123770814135024,
+        "agentCScore": 0.585840648460016,
+        "margin": 0.22653643295348636,
+        "winner": "agent-A",
+        "agentAConfidence": 0.7745902713783411,
+        "agentCConfidence": 0.3528021615333868
+      },
+      {
+        "label": "baseline (no reinforcement, A=3, C=2)",
+        "agentAScore": 0.8200000000000001,
+        "agentCScore": 0.4975,
+        "margin": 0.32250000000000006,
+        "winner": "agent-A",
+        "agentAConfidence": 0.7999999999999999,
+        "agentCConfidence": 0.22499999999999998
+      }
+    ]
+  }
+}

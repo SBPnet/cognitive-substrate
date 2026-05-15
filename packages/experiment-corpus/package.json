@@ -28,7 +28,10 @@
     "exp8": "node --import tsx/esm src/experiment-8.ts",
     "exp9": "node --import tsx/esm src/experiment-9.ts",
     "exp10": "node --import tsx/esm src/experiment-10.ts",
-    "exp11": "node --import tsx/esm src/experiment-11.ts"
+    "exp11": "node --import tsx/esm src/experiment-11.ts",
+    "exp12": "node --import tsx/esm src/experiment-12.ts",
+    "exp13": "node --import tsx/esm src/experiment-13.ts",
+    "exp14": "node --import tsx/esm src/experiment-14.ts"
   },
   "dependencies": {
     "@cognitive-substrate/agents": "workspace:*",

@@ -1,19 +1,40 @@
 # @cognitive-substrate/abstraction-engine
 
-## Purpose
+Builds compression ladders from raw experience events and semantic memories, progressively abstracting concrete experiences into higher-order representations.
 
-`@cognitive-substrate/abstraction-engine` is a top-level package used by the Cognitive Substrate workspace. Its public API is the package export surface, not this README.
+## What it does
 
-## Entrypoints
+The abstraction engine operates a five-level compression ladder:
 
-- Source: `packages/abstraction-engine/src/index.ts`
-- Package main: `./dist/index.js`
-- Package metadata: `packages/abstraction-engine/package.json`
+```text
+experience → pattern → concept → principle → worldview
+```
 
-## Runtime Wiring
+At each level it groups related nodes, computes a symbolic label from token frequency across the group's content, and emits an `AbstractionNode`. The resulting `CompressionLadder` gives the rest of the system a coarse-grained view of accumulated knowledge that is cheaper to reason over than raw events.
 
-Runtime wiring happens through apps, workers, or other packages that import this package. Kafka topic claims should be checked against `packages/kafka-bus/src/topics.ts`; OpenSearch index claims should be checked against `packages/memory-opensearch/src/schemas.ts`.
+## API
 
-## Evidence
+```ts
+import { AbstractionEngine, CompressionLadder, symbolicLabel } from '@cognitive-substrate/abstraction-engine';
 
-Evidence is limited to build/typecheck/import coverage and any downstream smoke usage that imports this package or runs this worker.
+const engine = new AbstractionEngine();
+const ladder: CompressionLadder = engine.build(experiences, memories);
+// ladder.levels[0] = experience nodes, ladder.levels[4] = worldview nodes
+```
+
+### Key exports
+
+| Export | Description |
+| ------ | ----------- |
+| `AbstractionEngine` | Main class; call `.build(experiences, memories)` |
+| `AbstractionNode` | A single node at any level of the ladder |
+| `CompressionLadder` | Full five-level output structure |
+| `symbolicLabel(tokens)` | Picks the most-frequent token as a label |
+
+## Dependencies
+
+- `@cognitive-substrate/core-types` — `Experience`, `Memory` input types
+
+## Notes
+
+Label generation is currently heuristic (token frequency). Embedding-based summarization is the intended upgrade path.

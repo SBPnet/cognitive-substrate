@@ -1,19 +1,42 @@
 # @cognitive-substrate/affect-engine
 
-## Purpose
+Maintains a neurochemical affect vector and couples it to attention candidates to modulate salience across the cognitive loop.
 
-`@cognitive-substrate/affect-engine` is a top-level package used by the Cognitive Substrate workspace. Its public API is the package export surface, not this README.
+## What it does
 
-## Entrypoints
+The affect engine tracks five dimensions of internal state:
 
-- Source: `packages/affect-engine/src/index.ts`
-- Package main: `./dist/index.js`
-- Package metadata: `packages/affect-engine/package.json`
+| Dimension | Role |
+| --------- | ---- |
+| `dopamine` | Reward signal; drives exploitation |
+| `norepinephrine` | Arousal; boosts urgency weighting |
+| `serotonin` | Stability; dampens novelty-seeking |
+| `curiosity` | Information-seeking drive |
+| `contradictionStress` | Tension from unresolved inconsistencies |
 
-## Runtime Wiring
+Each dimension is updated by blending the incoming stimulus with the current state using exponential moving averages. The combined vector maps to a discrete `mood` label (stressed, cautious, curious, exploratory, settled) via `classifyMood()`.
 
-Runtime wiring happens through apps, workers, or other packages that import this package. Kafka topic claims should be checked against `packages/kafka-bus/src/topics.ts`; OpenSearch index claims should be checked against `packages/memory-opensearch/src/schemas.ts`.
+## API
 
-## Evidence
+```ts
+import { AffectEngine, AffectVector, classifyMood } from '@cognitive-substrate/affect-engine';
 
-Evidence is limited to build/typecheck/import coverage and any downstream smoke usage that imports this package or runs this worker.
+const engine = new AffectEngine();
+const state = engine.update(stimulus);
+// state.vector.curiosity, state.mood === 'exploratory', etc.
+
+const candidates = engine.modulateCandidates(attentionCandidates, state);
+```
+
+### Key exports
+
+| Export | Description |
+| ------ | ----------- |
+| `AffectEngine` | Call `.update(stimulus)` to advance state; `.modulateCandidates()` to reweight salience |
+| `AffectVector` | Five-dimensional neurochemical state |
+| `AffectState` | Vector + derived mood label |
+| `classifyMood(vector)` | Maps a vector to a mood enum value |
+
+## Dependencies
+
+- `@cognitive-substrate/attention-engine` — `AttentionCandidate` type used for salience modulation

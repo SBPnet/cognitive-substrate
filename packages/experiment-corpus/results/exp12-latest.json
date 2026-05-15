@@ -1,0 +1,222 @@
+{
+  "experiment": "exp12",
+  "runAt": "2026-05-15T02:52:48.691Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 retrievalBias > 0.5 after corpus mix: PASS (0.6080); H2 explorationFactor < 0.5 after corpus mix: PASS (0.4282); H3 contradiction-heavy suppresses ef more than corpus mix: PASS (contradiction=0.0892 corpus=0.4282); H4 per-step drift bounded ≤ 0.08: PASS (max=0.004931)",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": true,
+      "h4": true
+    },
+    "corpusResult": {
+      "initial": {
+        "version": "policy-v1",
+        "timestamp": "2026-05-15T02:49:10.266Z",
+        "retrievalBias": 0.5,
+        "toolBias": 0.5,
+        "riskTolerance": 0.5,
+        "memoryTrust": 0.5,
+        "explorationFactor": 0.5,
+        "goalPersistence": 0.5,
+        "workingMemoryDecayRate": 0.5
+      },
+      "final": {
+        "version": "policy-v101",
+        "timestamp": "2026-05-15T02:50:53.521Z",
+        "retrievalBias": 0.6080055251151926,
+        "toolBias": 0.5,
+        "riskTolerance": 0.6441918508894998,
+        "memoryTrust": 0.7299577221728198,
+        "explorationFactor": 0.42817605291678973,
+        "goalPersistence": 0.5896696380670662,
+        "workingMemoryDecayRate": 0.4519975443932476
+      },
+      "maxStepDrift": 0.004463373664772341,
+      "snapshots": [
+        {
+          "turn": 1,
+          "explorationFactor": 0.4994196871391361,
+          "retrievalBias": 0.5018256057130139,
+          "memoryTrust": 0.5035719368867885,
+          "riskTolerance": 0.5018479038224278
+        },
+        {
+          "turn": 10,
+          "explorationFactor": 0.4970323857287257,
+          "retrievalBias": 0.5084282714051381,
+          "memoryTrust": 0.5230756401604731,
+          "riskTolerance": 0.51205230109266
+        },
+        {
+          "turn": 20,
+          "explorationFactor": 0.4864708372995584,
+          "retrievalBias": 0.5208345399791328,
+          "memoryTrust": 0.544770684034107,
+          "riskTolerance": 0.5278185270035727
+        },
+        {
+          "turn": 30,
+          "explorationFactor": 0.48314968747619264,
+          "retrievalBias": 0.5300160399023411,
+          "memoryTrust": 0.568535308911253,
+          "riskTolerance": 0.5402574367364927
+        },
+        {
+          "turn": 40,
+          "explorationFactor": 0.471227453643154,
+          "retrievalBias": 0.5435362048583445,
+          "memoryTrust": 0.5920922630726497,
+          "riskTolerance": 0.5576819239205949
+        },
+        {
+          "turn": 50,
+          "explorationFactor": 0.46806893959319656,
+          "retrievalBias": 0.5516466865239075,
+          "memoryTrust": 0.6149298404310918,
+          "riskTolerance": 0.569756338702165
+        },
+        {
+          "turn": 60,
+          "explorationFactor": 0.4565008674327356,
+          "retrievalBias": 0.5649964590821319,
+          "memoryTrust": 0.6381929981039994,
+          "riskTolerance": 0.5867867496105992
+        },
+        {
+          "turn": 70,
+          "explorationFactor": 0.45361323421472505,
+          "retrievalBias": 0.5728663332502824,
+          "memoryTrust": 0.6605501120152207,
+          "riskTolerance": 0.5985247648442796
+        },
+        {
+          "turn": 80,
+          "explorationFactor": 0.44245009547517583,
+          "retrievalBias": 0.5865242552149386,
+          "memoryTrust": 0.6842079115603735,
+          "riskTolerance": 0.6155162366447307
+        },
+        {
+          "turn": 90,
+          "explorationFactor": 0.43972374700044986,
+          "retrievalBias": 0.5947795870548896,
+          "memoryTrust": 0.7064275945858964,
+          "riskTolerance": 0.6269897953824501
+        },
+        {
+          "turn": 100,
+          "explorationFactor": 0.42817605291678973,
+          "retrievalBias": 0.6080055251151926,
+          "memoryTrust": 0.7299577221728198,
+          "riskTolerance": 0.6441918508894998
+        }
+      ]
+    },
+    "contradictionResult": {
+      "initial": {
+        "version": "policy-v1",
+        "timestamp": "2026-05-15T02:51:02.788Z",
+        "retrievalBias": 0.5,
+        "toolBias": 0.5,
+        "riskTolerance": 0.5,
+        "memoryTrust": 0.5,
+        "explorationFactor": 0.5,
+        "goalPersistence": 0.5,
+        "workingMemoryDecayRate": 0.5
+      },
+      "final": {
+        "version": "policy-v101",
+        "timestamp": "2026-05-15T02:52:46.666Z",
+        "retrievalBias": 0.744659661308246,
+        "toolBias": 0.5,
+        "riskTolerance": 0.8906848885743217,
+        "memoryTrust": 0.8394144420146474,
+        "explorationFactor": 0.08917943718503622,
+        "goalPersistence": 0.6747409862307608,
+        "workingMemoryDecayRate": 0.3912623727518905
+      },
+      "maxStepDrift": 0.004931335123891045,
+      "snapshots": [
+        {
+          "turn": 1,
+          "explorationFactor": 0.49599078984058576,
+          "retrievalBias": 0.5023264076471529,
+          "memoryTrust": 0.5033083196869081,
+          "riskTolerance": 0.5038127813135022
+        },
+        {
+          "turn": 10,
+          "explorationFactor": 0.45996198868030996,
+          "retrievalBias": 0.5244359114283914,
+          "memoryTrust": 0.5327292676946704,
+          "riskTolerance": 0.5378432392323195
+        },
+        {
+          "turn": 20,
+          "explorationFactor": 0.4191913161330994,
+          "retrievalBias": 0.5486461200813437,
+          "memoryTrust": 0.5660984750245258,
+          "riskTolerance": 0.5765346610251644
+        },
+        {
+          "turn": 30,
+          "explorationFactor": 0.37933183223517725,
+          "retrievalBias": 0.57249616971529,
+          "memoryTrust": 0.598976133628994,
+          "riskTolerance": 0.614324747485365
+        },
+        {
+          "turn": 40,
+          "explorationFactor": 0.3392446564311185,
+          "retrievalBias": 0.5965012169003259,
+          "memoryTrust": 0.6319240686883693,
+          "riskTolerance": 0.6523196873040003
+        },
+        {
+          "turn": 50,
+          "explorationFactor": 0.2962681215603718,
+          "retrievalBias": 0.6214478300491882,
+          "memoryTrust": 0.6682611482174178,
+          "riskTolerance": 0.6935934473288776
+        },
+        {
+          "turn": 60,
+          "explorationFactor": 0.25446942531795247,
+          "retrievalBias": 0.6464191453522169,
+          "memoryTrust": 0.7029715799586986,
+          "riskTolerance": 0.7334228275190049
+        },
+        {
+          "turn": 70,
+          "explorationFactor": 0.21192303243220412,
+          "retrievalBias": 0.6718780888371984,
+          "memoryTrust": 0.738185034343019,
+          "riskTolerance": 0.7739876035586003
+        },
+        {
+          "turn": 80,
+          "explorationFactor": 0.17143395426323432,
+          "retrievalBias": 0.6959315399370237,
+          "memoryTrust": 0.771420388715753,
+          "riskTolerance": 0.8124089349442666
+        },
+        {
+          "turn": 90,
+          "explorationFactor": 0.13145618294878056,
+          "retrievalBias": 0.7196218047200047,
+          "memoryTrust": 0.8041965849764943,
+          "riskTolerance": 0.8503098720864343
+        },
+        {
+          "turn": 100,
+          "explorationFactor": 0.08917943718503622,
+          "retrievalBias": 0.744659661308246,
+          "memoryTrust": 0.8394144420146474,
+          "riskTolerance": 0.8906848885743217
+        }
+      ]
+    }
+  }
+}
