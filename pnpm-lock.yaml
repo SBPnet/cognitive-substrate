@@ -514,9 +514,15 @@ importers:
 
   packages/experiment-corpus:
     dependencies:
+      '@cognitive-substrate/attention-engine':
+        specifier: workspace:*
+        version: link:../attention-engine
       '@cognitive-substrate/core-types':
         specifier: workspace:*
         version: link:../core-types
+      '@cognitive-substrate/memory-opensearch':
+        specifier: workspace:*
+        version: link:../memory-opensearch
       '@cognitive-substrate/policy-engine':
         specifier: workspace:*
         version: link:../policy-engine
@@ -526,10 +532,16 @@ importers:
       '@cognitive-substrate/retrieval-engine':
         specifier: workspace:*
         version: link:../retrieval-engine
+      '@opensearch-project/opensearch':
+        specifier: ^2.7.0
+        version: 2.13.0
     devDependencies:
       '@types/node':
         specifier: ^22.0.0
         version: 22.19.18
+      tsx:
+        specifier: ^4.19.0
+        version: 4.21.0
       typescript:
         specifier: ^5.5.0
         version: 5.9.3

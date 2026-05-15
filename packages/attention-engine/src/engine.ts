@@ -87,12 +87,22 @@ export class AttentionEngine {
 /**
  * Computes the per-candidate salience score.
  *
- * The weights reflect the design priorities: importance leads (35%),
- * followed by relevance (20%), urgency (18%), and policy-modulated novelty
- * (14% baseline, scaled by `explorationFactor`). Risk contributes a small
- * positive term because risky-but-relevant items should not be dropped
- * silently. Focus persistence and source-class boosts add small biases;
- * age decay subtracts a time-dependent penalty.
+ * Weight rationale (updated from Experiment 6 findings):
+ *   importance  0.29  — still the primary anchor; reduced from 0.35 to give
+ *                       novelty enough headroom to produce rank crossovers
+ *   relevance   0.20  — topical fit with the current cycle input
+ *   urgency     0.18  — time-criticality
+ *   novelty     0.30  — policy-modulated by explorationFactor; raised from 0.14
+ *                       so that T=0.9 can contribute up to 0.27, approaching
+ *                       importance's 0.29 ceiling and enabling ADHD-pattern
+ *                       attentional switching without exceeding it
+ *   risk        0.08  — small positive term; risky items stay visible
+ *
+ * At T=0.5 (default), novelty contributes 0.15 — similar to the prior 0.14
+ * ceiling. The change is felt at T≥0.7 where novelty begins competing with
+ * importance for rank position. Experiment 6 showed the prior 0.14 coefficient
+ * kept cluster-B memories in the background lane at all T values in [0,1];
+ * 0.30 allows them to reach primary at T=0.9.
  */
 export function scoreSalience(
   candidate: AttentionCandidate,
@@ -105,10 +115,10 @@ export function scoreSalience(
   const sourceBoost = candidate.source === "goal" ? 0.08 : candidate.source === "experience" ? 0.05 : 0;
 
   return clamp(
-    candidate.importance * 0.35
+    candidate.importance * 0.29
       + (candidate.relevance ?? 0.5) * 0.2
       + (candidate.urgency ?? 0.5) * 0.18
-      + (candidate.novelty ?? 0.5) * policyNoveltyBias * 0.14
+      + (candidate.novelty ?? 0.5) * policyNoveltyBias * 0.30
       + (candidate.risk ?? 0) * 0.08
       + focusBoost
       + sourceBoost

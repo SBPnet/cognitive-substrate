@@ -15,16 +15,28 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "clean": "rm -rf dist *.tsbuildinfo"
+    "clean": "rm -rf dist *.tsbuildinfo",
+    "provision": "node --import tsx/esm src/provision-indexes.ts",
+    "seed": "node --import tsx/esm src/seed-corpus.ts",
+    "exp1": "node --import tsx/esm src/experiment-1.ts",
+    "exp2": "node --import tsx/esm src/experiment-2.ts",
+    "exp3": "node --import tsx/esm src/experiment-3.ts",
+    "exp4": "node --import tsx/esm src/experiment-4.ts",
+    "exp5": "node --import tsx/esm src/experiment-5.ts",
+    "exp6": "node --import tsx/esm src/experiment-6.ts"
   },
   "dependencies": {
+    "@cognitive-substrate/attention-engine": "workspace:*",
     "@cognitive-substrate/core-types": "workspace:*",
+    "@cognitive-substrate/memory-opensearch": "workspace:*",
     "@cognitive-substrate/policy-engine": "workspace:*",
     "@cognitive-substrate/reinforcement-engine": "workspace:*",
-    "@cognitive-substrate/retrieval-engine": "workspace:*"
+    "@cognitive-substrate/retrieval-engine": "workspace:*",
+    "@opensearch-project/opensearch": "^2.7.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
     "typescript": "^5.5.0"
   }
 }

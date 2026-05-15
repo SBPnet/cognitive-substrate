@@ -119,7 +119,7 @@ export const memorySemanticSchema = {
       stability_score: { type: "float" },
       contradiction_score: { type: "float" },
       semantic_cluster: { type: "keyword" },
-      usage_frequency: { type: "integer" },
+      usage_frequency: { type: "float" },
       retrieval_priority: { type: "float" },
       decay_factor: { type: "float" },
       reinforcement_score: { type: "float" },
