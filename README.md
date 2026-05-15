@@ -1,248 +1,66 @@
-# Cognitive Substrate
+# cognitive-substrate
 
-This repo is my workbench for an idea I keep coming back to: most "AI memory"
-systems treat memory as a bag of vectors bolted onto a chat loop. I want to see
-what happens when memory, retrieval, salience, reinforcement, and observability
-are first-class infrastructure instead. Closer to how a database or a message
-bus is infrastructure: opinionated, durable, and operating below the agent.
+TypeScript monorepo implementing a persistent, learnable cognitive memory substrate — memory, retrieval, salience, reinforcement, and observability as first-class infrastructure rather than an afterthought bolted onto a chat loop.
 
-Cognitive Substrate is the long-form attempt at building that: TypeScript
-services on Kafka and OpenSearch, with architecture docs and OpenAPI kept next to
-the code so runtime contracts stay inspectable.
+## Packages
 
-It is early. Stage 1 (experience ingestion) has the strongest end-to-end
-evidence: Kafka consumption, embedding, OpenSearch indexing, object-store
-archive, downstream emission, and a runnable demo under `examples/experience-ingestion/`.
-Later stages range from buildable TypeScript surfaces to architecture drafts.
-`docs/architecture/inventory.md` is the source of truth for implementation
-status, and its status labels distinguish source availability from behavioral
-validation.
+| Package | Description |
+|---------|-------------|
+| `core-types` | Shared types: `ExperienceEvent`, `MemoryRecord`, `OperationalSignal`, policy vectors |
+| `memory-opensearch` | OpenSearch client, index schemas, BM25 + k-NN retrieval helpers |
+| `memory-objectstore` | S3-compatible object store archive for raw experience events |
+| `retrieval-engine` | Attention-weighted retrieval with session-relative novelty and graph augmentation |
+| `attention-engine` | Computes salience scores blending importance, novelty, and recency |
+| `reinforcement-engine` | Hebbian compounding via retrieval-count bonus; writes `retrieval_priority` |
+| `decay-engine` | Temporal decay projection; per-epoch rate scaling |
+| `consolidation-engine` | Background re-consolidation: periodic boost for high-priority memories |
+| `policy-engine` | Stateful policy vector updated from reinforcement signal; InMemoryPolicyStore |
+| `constitution-engine` | Constraint evaluation against constitutional rules |
+| `world-model` | Structured world-state graph updated from experience events |
+| `causal-engine` | Structural causal model inference and counterfactual simulation |
+| `narrative-engine` | Narrative thread construction from episodic memory sequences |
+| `metacog-engine` | Meta-cognition: monitoring and adjusting cognitive loop parameters |
+| `affect-engine` | Affective state modulation from experience valence |
+| `curiosity-engine` | Novelty-driven exploration weighting |
+| `social-engine` | Multi-agent interaction and reputation tracking |
+| `temporal-engine` | Temporal indexing, windowing, and sequence alignment |
+| `grounding-engine` | Perceptual grounding of symbolic memory to sensory context |
+| `development-engine` | Developmental stage transitions and capability unlocking |
+| `dream-engine` | Offline consolidation and memory replay |
+| `abstraction-engine` | Hierarchical abstraction over episodic clusters |
+| `budget-engine` | Cognitive resource budgeting and prioritisation |
+| `agents` | Agent runtime: debate, arbitration, multi-agent orchestration |
+| `kafka-bus` | Kafka topic definitions, producer/consumer helpers |
+| `clickhouse-telemetry` | ClickHouse telemetry sink for operational metrics |
+| `telemetry-otel` | OpenTelemetry instrumentation |
+| `aiven-client` | Aiven platform client utilities |
+| `experiment-corpus` | Fixed-replay corpus and experiment harness (Experiments 1–17) |
 
-## Vendor-neutral infrastructure
-
-The core pipeline is bound to **protocols and URLs**, not to a single cloud or
-vendor. You need Kafka-compatible brokers, OpenSearch-compatible HTTP APIs,
-S3-compatible object storage, PostgreSQL for coordination, and ClickHouse (or
-another warehouse if you adapt the telemetry writers). Services are reached
-through ordinary connection strings and environment variables—there is no
-proprietary substrate SDK in the main path.
-
-For local development and CI, `docker-compose.smoke.yml` runs an OSS-shaped
-stack (Apache Kafka in KRaft mode, OpenSearch, PostgreSQL, ClickHouse, MinIO,
-plus optional helpers). For managed infrastructure, `infra/aiven/` is one
-reference Terraform layout the maintainer uses for testing; the same code runs
-elsewhere by swapping endpoints and credentials.
-
-## Why "substrate" and not "agent framework"
-
-There are already a lot of agent frameworks. They tend to be thin wrappers
-around an LLM with a prompt-shaped notion of memory. The bet here is that the
-interesting failure modes of long-running cognitive systems (drift, forgetting,
-contradiction, attention starvation, reward hacking, identity collapse) live
-underneath the prompt layer, in the substrate that decides what gets remembered,
-what gets retrieved, and what is allowed to change.
-
-So the design treats those questions as infrastructure problems:
-
-- **Experience over data.** Inputs are structured events with context,
-embedding, and a reward signal. Not log lines.
-- **Memory is selection.** OpenSearch is the associative retrieval layer,
-object storage is the immutable episodic record, and a consolidation worker
-decides what stays active.
-- **Cognition under scarcity.** Compute budgets, attentional quotas, and
-forgetting are part of the model, not afterthoughts.
-- **Bounded adaptation.** Policies can drift, but inside a constitutional
-invariant layer with audit trails.
-- **Observable design.** Architecture notes and inventory rows should reflect what
-the code actually does; extend `docs/architecture/` when behavior changes.
-
-The companion claim about cognition is more modest than the directory names
-suggest. Biological terms (dopamine, salience, narrative selfhood) are used as
-computational analogies for naming concepts. They are not claims of biological
-equivalence, sentience, or AGI.
-
-## What is actually working
-
-
-| Stage range  | Evidence level                                            | Notes                                                                                                                                                                                                                        |
-| ------------ | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Stage 1      | Runtime-demonstrated                                      | Kafka consumer, embedding, OpenSearch index, object-store write, downstream emit, and runnable demo under `examples/experience-ingestion/`.                                             |
-| Stages 2-13  | Mixed behavioral, focused-test, and import evidence       | Retrieval and OpenSearch model-swap paths have focused tests; the orchestrator/API path is smoke-tested; metacognition, identity, and reinforcement scoring still need stronger runtime wiring.                              |
-| Stages 14-29 | Mostly build-level surfaces                              | TypeScript sources exist for many engines, but most Series II engines still need behavioral validation and deeper architecture notes.                                                                      |
-| Stages 30-36 | Partial operational flows                                | Telemetry, primitive mapping, pattern detection, reinforcement feedback, and transfer surfaces are present, but logs/metadata ingestion, experience bridging, and transfer quality still need runtime validation.             |
-
-
-If a package directory exists, treat that as evidence of a buildable design
-surface, not proof of production readiness. The inventory separates source
-presence from smoke coverage and behavioral evaluation; `entrypoint-import`
-evidence only means that a built package can be loaded.
-
-## Repository layout
-
-```text
-apps/
-  orchestrator/          Cognitive runtime entrypoint
-  api/                   API/BFF between the web UI and Kafka/OpenSearch
-  web/                   Cognitive workbench (Next.js)
-  workers/
-    ingestion/           Stage 1: experience ingestion
-    consolidation/       Stage 3: memory consolidation
-    reinforcement/       Stage 9: reinforcement scoring
-    pattern/             Operational pattern detection
-    telemetry/           Telemetry ingestion
-    aiven-collector/     Optional collector for managed-service metrics APIs into the pipeline
-
-packages/
-  core-types/            Shared event and policy types
-  kafka-bus/             Typed producers, consumers, topic registry, W3C trace propagation
-  memory-opensearch/     Hybrid BM25 + k-NN client, schema helpers
-  memory-objectstore/    S3-compatible episodic store
-  telemetry-otel/        cog.* semantic conventions and OTLP bootstrap
-  policy-engine/         Drift, clamping, reward propagation
-  agents/                Planner, critic, executor, memory, world-model agents
-  consolidation-engine/  Replay, clustering, abstraction, decay
-  reinforcement-engine/  Survival scoring, policy voting, identity influence
-  affect-engine/         Runtime modulation signals
-  attention-engine/      Salience routing and working-memory budget
-  temporal-engine/       Urgency gradients and multi-timescale planning
-  ... (more engines under packages/, mostly skeletons for later stages)
-
-infra/
-  README.md              How portable runtime contracts map to example IaC
-  aiven/                 Example Terraform for managed Kafka, OpenSearch, PostgreSQL, ClickHouse
-  k8s/                   Kubernetes manifests and KEDA scalers
-  opensearch/            Index templates and ISM policies
-  kafka/                 Topic and ACL declarations
-
-docs/
-  architecture/          Architecture deep dives and stage inventory
-  api/                   OpenAPI specification for the HTTP surface
-  strategy/              OSS, partnership, and deployment strategy notes
-  glossary.md            Canonical terminology
-  architecture/inventory.md
-                          Stage-by-stage implementation status and doc debt
-
-examples/
-  experience-ingestion/  Dependency-free Stage 1 shape demo (local JSON outputs)
-```
-
-## Running it
-
-### Prerequisites
-
-- Node.js 22 or newer
-- pnpm 10 or newer
-- Docker (for `docker-compose.smoke.yml`: full local stack used by smoke tests)
-- Optional: any reachable Kafka, OpenSearch, PostgreSQL, ClickHouse, and
-S3-compatible storage matching your `.env` settings (managed or self-hosted)
-
-### Install and build
+## Getting started
 
 ```bash
 pnpm install
 pnpm build
-pnpm test
 ```
 
-### Smoke checks
+Requires Node 20+, pnpm 9+. A running OpenSearch instance is needed for retrieval and reinforcement experiments — see `deploy/` for Docker Compose and Aiven configurations.
 
-There are two layers of smoke coverage. They double as the quickest way to
-verify a clean checkout:
+## Experiments
+
+`packages/experiment-corpus` contains a numbered experiment series validating substrate behaviour end-to-end. Results are in `packages/experiment-corpus/results/`. The lab notebook is at `docs/experiments.md`.
 
 ```bash
-pnpm smoke:packages   # build, typecheck, unit tests, package entrypoint imports
-pnpm smoke:deep       # spins up local services and runs end-to-end probes
+OPENSEARCH_URL=http://localhost:9200 pnpm --filter @cognitive-substrate/experiment-corpus exp17
 ```
 
-The deep smoke flow is the one that catches "I forgot to wire that topic"
-mistakes. If you change a worker, package, Kafka topic, or storage schema,
-update `scripts/smoke/deep-smoke.ts` along with it.
+## Implementation status
 
-### Stage 1: ingestion worker
+`docs/architecture/inventory.md` is the source of truth for what is built vs drafted.
 
-```bash
-cp apps/workers/ingestion/.env.example apps/workers/ingestion/.env
-# Set KAFKA_BROKERS, OPENSEARCH_URL, S3_BUCKET, and an embedding endpoint
-# (OpenAI-compatible by default).
-pnpm --filter @cognitive-substrate/ingestion-worker start
-```
+## Documentation
 
-### Cognitive workbench UI
-
-The workbench is a Next.js app that opens a session, sends messages, and
-streams the cognitive-loop response over SSE while showing the retrieved
-memory context and pipeline trace. It depends on the API/BFF and the workers
-being up.
-
-```bash
-cp apps/api/.env.example apps/api/.env
-# Use the same KAFKA_BROKERS and OPENSEARCH_URL as the workers.
-pnpm --filter @cognitive-substrate/api build
-pnpm --filter @cognitive-substrate/api start
-
-# In another terminal:
-pnpm --filter @cognitive-substrate/web dev
-# http://localhost:3000
-```
-
-## Documentation worth reading first
-
-If you want the design rationale, start here:
-
-- `docs/architecture/inventory.md` for the stage list, implementation status,
-evidence level, and missing architecture docs.
-- `docs/architecture/` for infrastructure deep dives, especially
-`inventory.md`, `operational-primitives.md`, `opensearch-ml-nodes.md`, and
-`clickhouse-telemetry.md`.
-- `docs/api/openapi.yaml` for the HTTP API surface exposed by the BFF.
-- `docs/glossary.md` if a term in the code or docs feels overloaded.
-
-## Deployment options
-
-Swap implementations by changing environment variables; the code paths stay the
-same. The table below maps each concern to an interface, what the local compose
-file provides, and examples of where else it can run.
-
-
-| Concern             | Interface                | Local reference (`docker-compose.smoke.yml`) | Other examples                                                       |
-| ------------------- | ------------------------ | -------------------------------------------- | -------------------------------------------------------------------- |
-| Event bus           | Kafka API                | `kafka` → `localhost:9092`                   | MSK, Confluent Cloud, Redpanda (Kafka-compatible), self-hosted Kafka |
-| Associative memory  | OpenSearch HTTP          | `opensearch` → `localhost:9200`              | Amazon OpenSearch Service, Elastic Cloud, self-hosted OpenSearch     |
-| Episodic archive    | S3 API                   | MinIO → port `9001`                          | AWS S3, Cloudflare R2, MinIO, any S3-compatible endpoint             |
-| Telemetry warehouse | ClickHouse client / HTTP | `clickhouse` → `8123` / `9000`               | ClickHouse Cloud, managed ClickHouse, self-hosted                    |
-| Coordination        | PostgreSQL               | `postgres` → `localhost:5432`                | RDS, Cloud SQL, self-hosted Postgres                                 |
-
-
-### Example Terraform (Aiven)
-
-The maintainer keeps Terraform under `infra/aiven/` as **one** convenient
-managed stack that matches the shape above. It is not the only valid
-production layout. Architectural notes are currently split between
-`infra/README.md`, `docs/architecture/inventory.md`, and the concrete Terraform
-under `infra/aiven/`.
-
-## Contributing
-
-This project is maintained independently. It is not an official offering of any
-employer unless explicitly stated elsewhere. Product and service names appear
-only to identify compatible third-party implementations.
-
-Issues and discussion are welcome. Code contributions are welcome with one
-caveat: see the license. This is not Apache 2.0. It is intentionally limited
-to noncommercial and educational use while the design is still moving.
-
-If you are sending a PR, the practical bar is:
-
-- Keep package boundaries clean. Engines do not import workers.
-- Update `scripts/smoke/deep-smoke.ts` if you change a runtime flow.
-- Add tests, or be explicit in the PR about what is not tested and why.
+Architecture specs, articles, research paper, and whitepaper: [SBPnet/cognitive-substrate-docs](https://github.com/SBPnet/cognitive-substrate-docs)
 
 ## License
 
-PolyForm Noncommercial 1.0.0. See [LICENSE](LICENSE).
-
-In short: research, study, teaching, hobby projects, nonprofits, and public
-institutions can use, modify, and redistribute the code freely. Commercial use
-is reserved. The license is not a finished decision. If something here turns
-out to be useful, the project may relicense or dual-license later. Until then,
-the noncommercial restriction is deliberate.
+PolyForm Noncommercial 1.0.0 — see `LICENSE`.
