@@ -1,0 +1,130 @@
+{
+  "experiment": "exp16",
+  "runAt": "2026-05-15T17:55:45.051Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 no-recon A-C gap inverts by epoch 100: PASS (gap=-0.0235); H2 recon-10 reduces inversion vs no-recon: PASS (-0.0148 vs -0.0235); H3 cluster-C below importanceScore baseline under both recon conditions: PASS; H4 recon-5 preserves positive A-C gap at epoch 100: PASS (gap=0.0116)",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": true,
+      "h4": true
+    },
+    "clusterCBaseline": 0.22499999999999998,
+    "reconThreshold": 0.45,
+    "epochScale": 20,
+    "conditions": {
+      "noRecon": [
+        {
+          "epochs": 0,
+          "clusterA": 0.75245990022194,
+          "clusterB": 0.591048477644266,
+          "clusterC": 0.22421618771640922,
+          "acGap": 0.5282437125055308
+        },
+        {
+          "epochs": 10,
+          "clusterA": 0.5963060725587701,
+          "clusterB": 0.48003032823217767,
+          "clusterC": 0.20631357281202828,
+          "acGap": 0.3899924997467418
+        },
+        {
+          "epochs": 20,
+          "clusterA": 0.47263340493590844,
+          "clusterB": 0.3898856743358808,
+          "clusterC": 0.18984106485662983,
+          "acGap": 0.2827923400792786
+        },
+        {
+          "epochs": 50,
+          "clusterA": 0.2355656007961437,
+          "clusterB": 0.20896858270807075,
+          "clusterC": 0.14790620801650495,
+          "acGap": 0.08765939277963875
+        },
+        {
+          "epochs": 100,
+          "clusterA": 0.07405112398425212,
+          "clusterB": 0.07397957194094094,
+          "clusterC": 0.09757622843873279,
+          "acGap": -0.023525104454480666
+        }
+      ],
+      "recon10": [
+        {
+          "epochs": 0,
+          "clusterA": 0.75245990022194,
+          "clusterB": 0.591048477644266,
+          "clusterC": 0.22421618771640922,
+          "acGap": 0.5282437125055308
+        },
+        {
+          "epochs": 10,
+          "clusterA": 0.6273060725587701,
+          "clusterB": 0.5040303282321777,
+          "clusterC": 0.20631357281202828,
+          "acGap": 0.42099249974674186
+        },
+        {
+          "epochs": 20,
+          "clusterA": 0.5282053298523235,
+          "clusterB": 0.40937398449747664,
+          "clusterC": 0.18984106485662983,
+          "acGap": 0.33836426499569366
+        },
+        {
+          "epochs": 50,
+          "clusterA": 0.2632601232332,
+          "clusterB": 0.21940619971463246,
+          "clusterC": 0.14790620801650495,
+          "acGap": 0.11535391521669508
+        },
+        {
+          "epochs": 100,
+          "clusterA": 0.08275545134774576,
+          "clusterB": 0.07767025332261228,
+          "clusterC": 0.09757622843873279,
+          "acGap": -0.01482077709098703
+        }
+      ],
+      "recon5": [
+        {
+          "epochs": 0,
+          "clusterA": 0.75245990022194,
+          "clusterB": 0.591048477644266,
+          "clusterC": 0.22421618771640922,
+          "acGap": 0.5282437125055308
+        },
+        {
+          "epochs": 10,
+          "clusterA": 0.6549049663133634,
+          "clusterB": 0.5256570069021006,
+          "clusterC": 0.20631357281202828,
+          "acGap": 0.4485913935013351
+        },
+        {
+          "epochs": 20,
+          "clusterA": 0.5776820556924392,
+          "clusterB": 0.46522893892779993,
+          "clusterC": 0.18984106485662983,
+          "acGap": 0.3878409908358094
+        },
+        {
+          "epochs": 50,
+          "clusterA": 0.3481899157939658,
+          "clusterB": 0.24921424904023515,
+          "clusterC": 0.14790620801650495,
+          "acGap": 0.20028370777746085
+        },
+        {
+          "epochs": 100,
+          "clusterA": 0.10913483560414108,
+          "clusterB": 0.08814656013414446,
+          "clusterC": 0.09757622843873279,
+          "acGap": 0.011558607165408297
+        }
+      ]
+    }
+  }
+}

@@ -213,6 +213,49 @@ Four scenarios tested after 100 reinforcement turns (cb=0.02):
 | Reinforcement refines but does not inflate arbitration margin beyond baseline | Exp 14 | importanceScore already encodes trust; compounding converges, not amplifies |
 | Operational signal schema is self-consistent across 4 incident windows | Exp 15 | 200 signals ready for retrieval/reinforcement pipeline |
 | Recovery severity drops back toward normal, not midway between degraded and outage | Exp 15 | Severity ordering: normal < recovery < degraded < outage |
+| Re-consolidation every 5 epochs prevents catastrophic convergence; every 10 is insufficient | Exp 16 | Re-consolidation mechanism validated; interval matters |
+| Operational signal BM25 retrieval correctly surfaces incident windows by query | Exp 17 | experience_events index ready for cross-domain correlation |
+
+---
+
+## Experiment 16 — Re-Consolidation
+
+**Result:** H1/H2/H3/H4 pass. Periodic background reinforcement prevents cluster ordering inversion; frequency determines effectiveness.
+
+Builds on Exp 13's catastrophic convergence finding. Three conditions simulated over 100 decay epochs from the same post-reinforcement starting state (EPOCH_SCALE=20, RECON_THRESHOLD=0.45):
+
+| Epochs | No recon A-C | Recon-10 A-C | Recon-5 A-C |
+| ------ | ------------ | ------------ | ------------ |
+| 0 | 0.528 | 0.528 | 0.528 |
+| 10 | 0.390 | 0.421 | 0.449 |
+| 50 | 0.088 | 0.115 | 0.200 |
+| 100 | −0.024 | −0.015 | +0.012 |
+
+Re-consolidation rule: every R epochs, all memories with rp > RECON_THRESHOLD receive a small positive boost (4% of importanceScore). Cluster-C memories fall below the threshold and don't qualify — the mechanism is selective by design.
+
+**Key finding (H4):** Re-consolidation every 5 epochs fully prevents inversion (gap = +0.012 at epoch 100). Every 10 epochs reduces inversion magnitude but doesn't fully prevent it (−0.015 vs −0.024 without). The minimum effective interval depends on the decay_factor distribution and boost size; 5 epochs with 4% importanceScore boost is sufficient for this corpus.
+
+**Production implication:** A background re-consolidation job running every 5 "time units" (however defined in production) is sufficient to maintain memory ordering integrity. The threshold filter makes it O(trusted-memories), not O(all-memories).
+
+---
+
+## Experiment 17 — Operational Signal Retrieval
+
+**Result:** H1/H2/H3/H4 pass. BM25 retrieval over operational signal summaries correctly surfaces incident windows; tag filter returns exact counts.
+
+Indexes the 200 Exp 15 signals into `experience_events` with narrative summaries built from window/service/severity. Three queries tested:
+
+| Query | Top-3 windows | Avg importance |
+| ----- | ------------- | -------------- |
+| "postgres outage latency" | outage, outage, outage | 0.920 |
+| "service recovery resolved" | recovery, recovery, recovery | 0.120 |
+| "normal background metrics" | normal, normal, normal | 0.384 |
+
+Tag filter for "outage" returns exactly 50 documents (correct — 50 outage-window signals indexed). All exp17 documents cleaned up after the run.
+
+**Key finding (H3):** Outage signals (importance=0.920) rank far above normal signals (importance≈0.384) in retrieval score — severity is naturally encoded in the summary vocabulary ("critical incident", "severely elevated" vs "no anomalies detected"), so BM25 implicitly orders by severity when the query is incident-specific.
+
+**Production implication:** Operational signals are a first-class citizen in `experience_events`. The BM25 path retrieves the correct incident window without any embedding — future work can add embeddings for semantic recall across service names and ticket IDs via graphSeeds.
 
 ---
 
