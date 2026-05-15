@@ -2,12 +2,16 @@ import fs from 'fs/promises';
 import path from 'path';
 
 export async function saveCorpusBatch(name: string, data: any[]) {
-  const dir = path.join(process.cwd(), 'packages/experiment-corpus/data', name);
+  // Correct path: always relative to the monorepo root
+  const monorepoRoot = path.resolve(process.cwd(), '..', '..'); // go up from package
+  const dir = path.join(monorepoRoot, 'packages/experiment-corpus/data', name);
+  
   await fs.mkdir(dir, { recursive: true });
 
-  const filePath = path.join(dir, `${name}-batch.json`);
-  await fs.writeFile(filePath, JSON.stringify(data, null, 2));
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const filePath = path.join(dir, `${name}-batch-${timestamp}.json`);
 
-  console.log(`Saved batch to ${filePath}`);
+  await fs.writeFile(filePath, JSON.stringify(data, null, 2));
+  console.log(`💾 Saved batch to ${filePath}`);
   return filePath;
 }
