@@ -50,6 +50,7 @@ export function scoreReinforcement(signal: ReinforcementSignal): ReinforcementRe
     identityImpact: clampSigned(
       signal.novelty * 0.25 + signal.emotionalWeight * 0.2 - signal.contradictionRisk * 0.3,
     ),
+    toolDependenceDelta: clampSigned(((signal.toolUsefulness ?? 0.5) - 0.5) * 0.2),
   };
 }
 

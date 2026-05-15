@@ -1,7 +1,7 @@
 {
-  "name": "@cognitive-substrate/policy-engine",
+  "name": "@cognitive-substrate/experiment-corpus",
   "version": "0.1.0",
-  "description": "Stage 4 policy drift, clamped updates, and policy snapshots for Cognitive Substrate",
+  "description": "Fixed replay corpus and experiment harness utilities for cognitive substrate evaluation",
   "license": "PolyForm-Noncommercial-1.0.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -19,9 +19,9 @@
   },
   "dependencies": {
     "@cognitive-substrate/core-types": "workspace:*",
-    "@cognitive-substrate/memory-opensearch": "workspace:*",
-    "@cognitive-substrate/telemetry-otel": "workspace:*",
-    "@opensearch-project/opensearch": "^2.7.0"
+    "@cognitive-substrate/policy-engine": "workspace:*",
+    "@cognitive-substrate/reinforcement-engine": "workspace:*",
+    "@cognitive-substrate/retrieval-engine": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

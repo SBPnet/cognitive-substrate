@@ -1,0 +1,158 @@
+# OpenSearch cluster for thor (Pop!_OS, 160GB RAM).
+#
+# Topology
+#   opensearch-node1   cluster-manager + data + ingest     9200 / 9300
+#   opensearch-node2   data + ingest                       9201 / 9301
+#   opensearch-ml1     ml only (no data, no manager)       9202 / 9302
+#   opensearch-dashboards                                   5601
+#
+# Heap sizing (rule: 50% of RAM up to 32GB per node, never exceed 31g)
+#   node1 / node2 : 24g  — data nodes need headroom for shard field data cache
+#   ml1           : 16g  — model weights live in native memory; JVM heap is
+#                          smaller but native_memory_threshold is lifted to 99%
+#
+# Prerequisites (run once on thor, survives reboots via /etc/sysctl.d):
+#   echo "vm.max_map_count=262144" | sudo tee /etc/sysctl.d/99-opensearch.conf
+#   sudo sysctl -p /etc/sysctl.d/99-opensearch.conf
+#
+# Persistent volumes are Docker named volumes; data survives container restarts.
+# To blow everything away: docker compose -f docker-compose.thor.yml down -v
+#
+# Usage:
+#   docker compose -f docker-compose.thor.yml up -d
+#   docker compose -f docker-compose.thor.yml logs -f opensearch-node1
+#   docker compose -f docker-compose.thor.yml down          # stop, keep data
+#   docker compose -f docker-compose.thor.yml down -v       # stop, delete data
+
+x-opensearch-common: &opensearch-common
+  image: opensearchproject/opensearch:3.0.0
+  restart: unless-stopped
+  ulimits:
+    memlock:
+      soft: -1
+      hard: -1
+    nofile:
+      soft: 65536
+      hard: 65536
+  environment: &opensearch-env
+    cluster.name: cognitive-substrate
+    discovery.seed_hosts: opensearch-node1,opensearch-node2,opensearch-ml1
+    cluster.initial_cluster_manager_nodes: opensearch-node1
+    # Security disabled for local experiment use — enable before any network exposure.
+    DISABLE_SECURITY_PLUGIN: "true"
+    # ML Commons settings
+    plugins.ml_commons.allow_registering_model_via_url: "true"
+    plugins.ml_commons.allow_registering_model_via_local_file: "true"
+    # Native memory threshold: allow ML node to use up to 90% of native memory for models.
+    plugins.ml_commons.native_memory_threshold: "90"
+    # JVM threshold: 0 = disabled, let native memory limit govern.
+    plugins.ml_commons.jvm_heap_memory_threshold: "0"
+    # Pin all ML inference to the dedicated ml node.
+    plugins.ml_commons.only_run_on_ml_node: "true"
+    # Allow up to 10 models loaded simultaneously on the ML node.
+    plugins.ml_commons.max_model_on_node: "10"
+    # Faiss is the knn engine used by our schemas — ensure the native lib loads.
+    knn.algo_param.index_thread_qty: "4"
+
+services:
+  # ---------------------------------------------------------------------------
+  # Node 1 — cluster-manager + data + ingest
+  # ---------------------------------------------------------------------------
+  opensearch-node1:
+    <<: *opensearch-common
+    container_name: opensearch-node1
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      <<: *opensearch-env
+      node.name: opensearch-node1
+      node.roles: cluster_manager,data,ingest
+      # 24g heap: large enough for data node field data cache and segment memory.
+      OPENSEARCH_JAVA_OPTS: "-Xms24g -Xmx24g -XX:+UseG1GC -XX:G1HeapRegionSize=32m"
+      # Expose REST on all interfaces so other containers and the host can reach it.
+      network.host: "0.0.0.0"
+      http.port: "9200"
+      transport.port: "9300"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - curl -sf http://localhost:9200/_cluster/health | grep -qE '"status":"(green|yellow)"'
+      interval: 20s
+      timeout: 15s
+      retries: 20
+      start_period: 120s
+    volumes:
+      - opensearch-node1-data:/usr/share/opensearch/data
+
+  # ---------------------------------------------------------------------------
+  # Node 2 — data + ingest
+  # ---------------------------------------------------------------------------
+  opensearch-node2:
+    <<: *opensearch-common
+    container_name: opensearch-node2
+    ports:
+      - "9201:9200"
+      - "9301:9300"
+    environment:
+      <<: *opensearch-env
+      node.name: opensearch-node2
+      node.roles: data,ingest
+      OPENSEARCH_JAVA_OPTS: "-Xms24g -Xmx24g -XX:+UseG1GC -XX:G1HeapRegionSize=32m"
+      network.host: "0.0.0.0"
+      http.port: "9200"
+      transport.port: "9300"
+    depends_on:
+      opensearch-node1:
+        condition: service_healthy
+    volumes:
+      - opensearch-node2-data:/usr/share/opensearch/data
+
+  # ---------------------------------------------------------------------------
+  # ML node — dedicated ML Commons inference, no data shards
+  # ---------------------------------------------------------------------------
+  opensearch-ml1:
+    <<: *opensearch-common
+    container_name: opensearch-ml1
+    ports:
+      - "9202:9200"
+      - "9302:9300"
+    environment:
+      <<: *opensearch-env
+      node.name: opensearch-ml1
+      node.roles: ml
+      # 16g JVM heap; the bulk of model memory is native (outside JVM heap).
+      # With native_memory_threshold=90 and ~160GB system RAM, models up to
+      # ~80GB native fit — more than enough for Nomic (768d), BGE-M3 (1024d),
+      # and Qwen3-Embedding-0.6B simultaneously.
+      OPENSEARCH_JAVA_OPTS: "-Xms16g -Xmx16g -XX:+UseG1GC"
+      network.host: "0.0.0.0"
+      http.port: "9200"
+      transport.port: "9300"
+    depends_on:
+      opensearch-node1:
+        condition: service_healthy
+    volumes:
+      - opensearch-ml1-data:/usr/share/opensearch/data
+
+  # ---------------------------------------------------------------------------
+  # Dashboards — cluster management and ML model registry UI
+  # http://thor:5601  (or localhost:5601 from thor itself)
+  # ---------------------------------------------------------------------------
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:3.0.0
+    container_name: opensearch-dashboards
+    restart: unless-stopped
+    ports:
+      - "5601:5601"
+    environment:
+      OPENSEARCH_HOSTS: '["http://opensearch-node1:9200"]'
+      DISABLE_SECURITY_DASHBOARDS_PLUGIN: "true"
+    depends_on:
+      opensearch-node1:
+        condition: service_healthy
+
+volumes:
+  opensearch-node1-data:
+  opensearch-node2-data:
+  opensearch-ml1-data:

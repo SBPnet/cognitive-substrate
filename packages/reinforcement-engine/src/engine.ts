@@ -64,7 +64,7 @@ export class ReinforcementEngine {
         memoryUsefulness: result.retrievalPriority,
         goalProgress: input.signal.goalRelevance,
       },
-      identityImpact: identityImpact(input.memoryId, result.identityImpact),
+      identityImpact: identityImpact(input.memoryId, result.identityImpact, result.toolDependenceDelta),
     };
   }
 }
@@ -78,11 +78,13 @@ export class ReinforcementEngine {
 function identityImpact(
   sourceMemoryId: string,
   impact: number,
+  toolDependenceDelta: number,
 ): IdentityImpactSignal {
   return {
     sourceMemoryId,
     curiosityDelta: Math.max(0, impact),
     cautionDelta: Math.max(0, -impact),
     stabilityDelta: -Math.abs(impact) * 0.25,
+    toolDependenceDelta,
   };
 }

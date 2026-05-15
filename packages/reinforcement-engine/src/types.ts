@@ -49,4 +49,5 @@ export interface IdentityImpactSignal {
   readonly curiosityDelta: number;
   readonly cautionDelta: number;
   readonly stabilityDelta: number;
+  readonly toolDependenceDelta: number;
 }
