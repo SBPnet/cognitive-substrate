@@ -35,7 +35,10 @@
     "exp15": "node --import tsx/esm src/experiment-15.ts",
     "exp16": "node --import tsx/esm src/experiment-16.ts",
     "exp17": "node --import tsx/esm src/experiment-17.ts",
-    "exp18": "node --import tsx/esm src/experiment-18.ts"
+    "exp18": "node --import tsx/esm src/experiment-18.ts",
+    "exp19": "node --import tsx/esm src/experiment-19.ts",
+    "exp20": "node --import tsx/esm src/experiment-20.ts",
+    "exp21": "node --import tsx/esm src/experiment-21.ts"
   },
   "dependencies": {
     "@cognitive-substrate/agents": "workspace:*",
@@ -46,6 +49,9 @@
     "@cognitive-substrate/policy-engine": "workspace:*",
     "@cognitive-substrate/reinforcement-engine": "workspace:*",
     "@cognitive-substrate/retrieval-engine": "workspace:*",
+    "@cognitive-substrate/decay-engine": "workspace:*",
+    "@cognitive-substrate/causal-engine": "workspace:*",
+    "@cognitive-substrate/affect-engine": "workspace:*",
     "@opensearch-project/opensearch": "^2.7.0",
     "uuid": "^11.1.1"
   },

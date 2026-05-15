@@ -217,6 +217,10 @@ Four scenarios tested after 100 reinforcement turns (cb=0.02):
 | Operational signal BM25 retrieval correctly surfaces incident windows by query | Exp 17 | experience_events index ready for cross-domain correlation |
 | ConsolidationEngine correctly propagates severity from experience_events to memory_semantic | Exp 18 | Full pipeline validated; requiredTags filter added to ConsolidationRequest |
 | Consolidation with empty embeddings must omit the embedding field entirely | Exp 18 | Fixed: empty-embedding guard in consolidate() write path |
+| DecayEngine correctly stratifies incident windows: outage=100% retain vs normal=35% retain | Exp 19 | Retention formula validated; compress branch gated by suppressionThreshold |
+| compress fires only when retentionScore > suppressionThreshold; low-importance old memories go to suppress/prune | Exp 19 | Architecture behaviour; not a bug — compress is for memories worth keeping before pruning |
+| CausalEngine infers incident co-occurrence structure from text; outage→latency strength=0.45 | Exp 20 | inferModel depends on event input.text vocabulary; generators must embed window labels |
+| AffectEngine norepinephrine and contradictionStress spike on outage signals and decay monotonically to baseline | Exp 21 | EMA smoothing validated; stressed state produces 11× higher coupleAttention boost |
 
 ---
 
@@ -304,5 +308,75 @@ Four incident windows consolidated from 200 Exp 15 signals:
 **Bug fixed:** `ConsolidationEngine` was writing `embedding: []` (empty array) to the `knn_vector` field when source events carried no embeddings, causing OpenSearch to reject the document with `mapper_parsing_exception`. Fixed by omitting the field when empty.
 
 *Code changes: `requiredTags` added to `ConsolidationRequest`; tag-filtered query overlay in `selectReplayCandidates`; empty-embedding guard in `consolidate()` write.*
+
+---
+
+## Experiment 19 — DecayEngine: Forgetting Plan over Operational Signals
+
+**Result:** H1/H2/H3/H4 pass. `DecayEngine.planForgetting` correctly stratifies the 200 operational signals by incident severity.
+
+| Window | Signals | Retain | Suppress | ageDays=60 retain |
+| ------ | ------- | ------ | -------- | ----------------- |
+| normal | 40 | 35% | 65% | 0% |
+| degraded | 60 | 100% | 0% | — |
+| outage | 50 | 100% | 0% | — |
+| recovery | 50 | 30% | 70% | — |
+
+**Key finding (H1):** Outage signals (importance 0.84–0.96) score retention ≥ 0.584 — all retain. Normal signals (importance 0.14–0.30) score retention ≈ 0.31 — 65% suppress. The `importanceScore` gradient from Exp 15 propagates directly into the forgetting decision.
+
+**Key finding (H2):** Zero `compress` actions at `ageDays=0`. The compress branch requires `ageDays > 30`, which is a hard precondition.
+
+**Key finding (H3):** Setting `contradictionScore=0.9` on normal-window signals drives all 40 to `retire` (retentionScore drops to near 0 from the 0.35 contradiction penalty).
+
+**Key finding (H4):** At `ageDays=60`, no normal signal retains. 26 prune + 14 suppress. compress does not fire because low-importance signals (retention ~0.21) hit the suppressionThreshold (0.35) before reaching the compress branch, which requires retention > 0.35. This is correct engine behaviour: compress is reserved for memories worth consolidating, not already-worthless ones.
+
+**Graph pruning:** 5 links input → 3 retained (strength ≥ 0.15) + 2 pruned (strength < 0.15). pruneStrengthThreshold default=0.15 verified.
+
+---
+
+## Experiment 20 — CausalEngine: Structural Causal Model over Operational Signals
+
+**Result:** H1/H2/H3/H4 pass. `CausalEngine.inferModel` recovers the incident co-occurrence structure from window-enriched event text.
+
+**Inferred model:** 6 variables, 16 edges (full); 14 edges after `abstract(minStrength=0.35)`.
+
+| Edge | Strength | Notes |
+| ---- | -------- | ----- |
+| latency ↔ degraded | 1.000 | Perfectly co-occurring in degraded window |
+| normal ↔ metrics | 0.600 | Normal window mentions both |
+| recovery ↔ normal | 0.556 | Recovery and normal share vocabulary |
+| outage ↔ latency | 0.455 | Outage signals (50) co-occur with latency (110 total) |
+| outage ↔ degraded | 0.455 | Both appear in outage-window text |
+| latency/degraded ↔ metrics | 0.400 | Incident windows mention metrics |
+
+**Key finding (H1):** `outage→latency` strength=0.455 > 0.3. The 50 outage events that mention both "outage" and "latency" yield a co-occurrence ratio of 50/110 ≈ 0.455 (denominator = total events mentioning "latency" = 50 outage + 60 degraded = 110).
+
+**Key finding (H2):** `normal→outage` strength=0. Normal-window text contains neither "outage" nor the incident vocabulary. Zero joint mentions → zero edge.
+
+**Key finding (H3):** `do(outage=1.0)` → latency baseline=0.5, counterfactual=0.955, effect=0.455. Direct causal attribution works.
+
+**Key finding (H4):** Abstraction at minStrength=0.35 drops 2 edges (recovery↔metrics at 0.333), reducing from 16 → 14.
+
+**Implementation note:** `CausalEngine.inferModel` uses `ExperienceEvent.input.text` for co-occurrence. The operational generator populates `input.text` with a generic `"Operational signal from ${service}"` — which has no window vocabulary. Exp 20 enriches each signal's `input.text` with window-specific narrative before passing it to the engine. This is the correct pattern: generators provide signals; experiments provide the richer text when testing NLP-dependent engines.
+
+---
+
+## Experiment 21 — AffectEngine: Incident Signal Modulates the Affect Vector
+
+**Result:** H1/H2/H3/H4 pass. The 5-dimensional affect vector tracks the full incident lifecycle and correctly amplifies attention boost in stressed state.
+
+| Phase | Mood | dopamine | norepinephrine | serotonin | curiosity | contradictionStress |
+| ----- | ---- | -------- | -------------- | --------- | --------- | ------------------- |
+| baseline (5 normal) | settled | 0.126 | 0.110 | 0.775 | 0.131 | 0.062 |
+| peak stress (10 outage) | stressed | 0.004 | 0.861 | 0.000 | 0.734 | 0.895 |
+| recovery (10 normal) | settled | 0.049 | 0.089 | 0.783 | 0.104 | 0.055 |
+
+**Key finding (H1):** After 10 outage signals: norepinephrine=0.861 > 0.6, contradictionStress=0.895 > 0.5, mood=`stressed`. Serotonin collapses to 0.000 (sustained success drops to 0.1).
+
+**Key finding (H2):** norepinephrine and contradictionStress decrease monotonically over the first 5 recovery steps (0.861→0.587→0.409→0.293→0.218→0.169). EMA smoothing prevents instant recovery from a high-stress state.
+
+**Key finding (H3):** After 10 normal signals post-outage, mood=`settled`. Full recovery to near-baseline levels confirmed.
+
+**Key finding (H4):** `coupleAttention` boost for a high-risk/high-urgency candidate: stressed=0.334, settled=0.030 — an **11× difference**. This quantifies how much the stressed state amplifies attention on urgent/risky items, via the norepinephrine and contradictionStress channels in the boost formula.
 
 ---
