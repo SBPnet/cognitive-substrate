@@ -498,3 +498,43 @@ curl -X POST "http://thor:9200/_plugins/_ml/models/_register" -H "Content-Type: 
 - Ingest pipeline latency ≈ sequential latency: the pipeline issues one `_predict` call per document at index time (no batching in the `text_embedding` processor as of OpenSearch 3.0). Matches the 64ms sequential baseline exactly.
 - Model chunk sub-documents: OpenSearch stores model weights as chunk records (`<model_id>_2`, `_3`, etc.) in the `.plugins-ml-model` index. The parent record ID is the one without the trailing `_N` suffix.
 - `embedding_minilm` (384-dim) is distinct from `embedding_nomic` (768-dim). Future experiments should choose based on latency budget vs precision trade-off.
+
+---
+
+## Experiment 25 — CuriosityEngine, TemporalEngine, and NarrativeEngine over Incident Lifecycle
+
+**Result:** H1/H2/H3/H4 pass. All three engines respond correctly to the baseline → outage transition. NarrativeEngine identity drift is directional and bounded by stabilityDamping.
+
+**Protocol:** Pure in-memory pipeline, no OpenSearch. Four-phase incident lifecycle: 5 baseline rounds → 10 sequential outage rounds.
+
+### CuriosityEngine (H1)
+
+| Batch | Top curiosityPriority | curiosityReward |
+| ----- | --------------------- | --------------- |
+| Normal (novelty≈0.1, uncertainty≈0.1, visitedCount≈10+) | ~0.19 | ~0.19 |
+| Outage (novelty≈0.85, uncertainty≈0.85, visitedCount=0) | ~0.90 | ~0.90 |
+
+**Key finding (H1):** Outage states rank 4.7× higher than normal states. The curiosity formula (`infoGain×0.4 + novelty×0.25 + uncertainty×0.25 + 1/(1+visitedCount)×0.1`) correctly identifies high-uncertainty, unvisited outage states as the top exploration targets. Five experiment plans are proposed for the outage batch.
+
+### TemporalEngine (H2, H3)
+
+| Plan | activeScale | density | inferenceSteps | compression |
+| ---- | ----------- | ------- | -------------- | ----------- |
+| Baseline (mid/long tasks, 0 events) | mid | 0.300 | 10 | 0.865 |
+| Outage (+ micro task dueAt+5min, 10 events) | micro | 1.000 | 16 | 0.550 |
+
+**Key finding (H2):** Adding one `micro`-scale task with `importance=0.95` and a 5-minute deadline instantly collapses the active scale from `mid` to `micro`. The incident-response task wins the priority ranking and sets the planning horizon.
+
+**Key finding (H3):** Density saturates at 1.0 under outage load (10 recent events + high cumulative effort). This drives `inferenceSteps` up from 10 → 16 and compresses output tighter (compression 0.865 → 0.550), giving downstream cognition more compute budget but forcing tighter outputs.
+
+### NarrativeEngine (H4)
+
+| Phase | caution | explorationPreference | stabilityScore | coherence |
+| ----- | ------- | --------------------- | -------------- | --------- |
+| After 5 baseline rounds | 0.501 | 0.504 | 0.649 | 0.786 |
+| After 10 outage rounds | 0.957 | 0.224 | 0.353 | 0.270 |
+| Δ | +0.456 | −0.280 | −0.296 | −0.516 |
+
+**Key finding (H4):** Sustained outage evidence (contradictionRisk=0.9, reinforcement=0.1, cautionDelta=+0.3 per round) drives `caution` to near-saturation (0.957) while `explorationPreference` collapses (0.224). Identity coherence falls from 0.786 to 0.270 — the engine correctly reports a stressed, low-stability self-model.
+
+**Key finding (narrative):** Post-outage dominant traits shift from `[stabilityScore, curiosity, explorationPreference]` (settled) to `[caution, verbosity, toolDependence]` (stressed). Themes: `outage, incident, critical, risk monitoring`. The narrative summary explicitly calls out "low coherence" — the identity engine is self-aware of the stress state.
