@@ -12,7 +12,7 @@
  */
 
 import type { Client } from "@opensearch-project/opensearch";
-import { updateDocument } from "@cognitive-substrate/memory-opensearch";
+import { getDocument, updateDocument } from "@cognitive-substrate/memory-opensearch";
 import { scoreReinforcement } from "./scoring.js";
 import type {
   IdentityImpactSignal,
@@ -25,15 +25,35 @@ export interface ReinforcementEngineConfig {
   readonly openSearch?: Client;
   /** Override hook for tests; defaults to the production `updateDocument`. */
   readonly updateMemory?: typeof updateDocument;
+  /**
+   * Exponential moving average weight applied to the prior retrieval_priority
+   * when blending with the newly computed value. 0 = stateless (Exp 7
+   * behaviour), 0.3 = mild compounding (default), 1 = never update.
+   *
+   * Formula: finalRp = prior × priorWeight + newRp × (1 - priorWeight)
+   *
+   * This implements Hebbian-style memory strengthening: each positive
+   * reinforcement nudges retrieval_priority upward rather than resetting it,
+   * so trusted memories compound away from memories that receive weak signal.
+   * Contradiction-risk memories still decay because their newRp is consistently
+   * low regardless of how large priorWeight is.
+   */
+  readonly priorWeight?: number;
+}
+
+interface PriorDoc extends Record<string, unknown> {
+  readonly retrieval_priority?: number;
 }
 
 export class ReinforcementEngine {
   private readonly openSearch: Client | undefined;
   private readonly updateMemory: typeof updateDocument;
+  private readonly priorWeight: number;
 
   constructor(config: ReinforcementEngineConfig = {}) {
     this.openSearch = config.openSearch;
     this.updateMemory = config.updateMemory ?? updateDocument;
+    this.priorWeight = config.priorWeight ?? 0;
   }
 
   /**
@@ -41,12 +61,23 @@ export class ReinforcementEngine {
    * the memory document is updated in place with the new retrieval priority,
    * decay factor, and reinforcement score so that subsequent retrieval
    * passes see the change immediately.
+   *
+   * When `priorWeight > 0`, the current retrieval_priority is read from
+   * OpenSearch before scoring and blended as an EMA prior, producing
+   * compounding reinforcement rather than stateless replacement.
    */
   async evaluate(input: ReinforcementInput): Promise<ReinforcementUpdate> {
     const result = scoreReinforcement(input.signal);
+
     if (this.openSearch) {
+      let finalRp = result.retrievalPriority;
+      if (this.priorWeight > 0) {
+        const prior = await getDocument<PriorDoc>(this.openSearch, input.memoryIndex, input.memoryId);
+        const priorRp = prior?.retrieval_priority ?? result.retrievalPriority;
+        finalRp = Math.max(0, Math.min(1, priorRp * this.priorWeight + result.retrievalPriority * (1 - this.priorWeight)));
+      }
       await this.updateMemory(this.openSearch, input.memoryIndex, input.memoryId, {
-        retrieval_priority: result.retrievalPriority,
+        retrieval_priority: finalRp,
         decay_factor: result.decayAdjustment,
         reinforcement_score: result.reinforcement,
       });

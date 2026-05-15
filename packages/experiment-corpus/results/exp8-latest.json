@@ -1,0 +1,166 @@
+{
+  "experiment": "exp8",
+  "runAt": "2026-05-15T02:08:59.707Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 mem-a1 monotonically increasing at pw=0.3: FAIL; H2 mem-c1 decays below baseline at all pw: PASS; H3 cluster-A avg rp increases monotonically with pw: FAIL; H4 A-B spread widens with pw: FAIL",
+  "data": {
+    "hypotheses": {
+      "h1": false,
+      "h2": true,
+      "h3": false,
+      "h4": false
+    },
+    "conditions": [
+      {
+        "priorWeight": 0,
+        "clusterAFinalAvg": 0.69502,
+        "clusterBFinalAvg": 0.5417,
+        "clusterCFinalAvg": 0.2237,
+        "clusterAMonotonic": true,
+        "postRanking": [
+          {
+            "memoryId": "mem-a1",
+            "cluster": "cluster-a",
+            "rank": 1,
+            "score": 1.25464
+          },
+          {
+            "memoryId": "mem-a2",
+            "cluster": "cluster-a",
+            "rank": 2,
+            "score": 1.22486
+          },
+          {
+            "memoryId": "mem-a3",
+            "cluster": "cluster-a",
+            "rank": 3,
+            "score": 1.17764
+          },
+          {
+            "memoryId": "mem-a4",
+            "cluster": "cluster-a",
+            "rank": 4,
+            "score": 1.1229401
+          },
+          {
+            "memoryId": "mem-b2",
+            "cluster": "cluster-b",
+            "rank": 5,
+            "score": 1.05874
+          }
+        ],
+        "postSnapshot": {
+          "mem-a1": 0.75464,
+          "mem-a2": 0.7248599999999998,
+          "mem-a3": 0.67764,
+          "mem-a4": 0.6229399999999999,
+          "mem-b1": 0.5371,
+          "mem-b2": 0.55874,
+          "mem-b3": 0.52926,
+          "mem-c1": 0.2478,
+          "mem-c2": 0.1996
+        }
+      },
+      {
+        "priorWeight": 0.3,
+        "clusterAFinalAvg": 0.6940712499999999,
+        "clusterBFinalAvg": 0.5412128799999999,
+        "clusterCFinalAvg": 0.21997609999999998,
+        "clusterAMonotonic": false,
+        "postRanking": [
+          {
+            "memoryId": "mem-a1",
+            "cluster": "cluster-a",
+            "rank": 1,
+            "score": 1.2520311
+          },
+          {
+            "memoryId": "mem-a2",
+            "cluster": "cluster-a",
+            "rank": 2,
+            "score": 1.2181977
+          },
+          {
+            "memoryId": "mem-a3",
+            "cluster": "cluster-a",
+            "rank": 3,
+            "score": 1.1791081
+          },
+          {
+            "memoryId": "mem-a4",
+            "cluster": "cluster-a",
+            "rank": 4,
+            "score": 1.126948
+          },
+          {
+            "memoryId": "mem-b2",
+            "cluster": "cluster-b",
+            "rank": 5,
+            "score": 1.0635388
+          }
+        ],
+        "postSnapshot": {
+          "mem-a1": 0.7520310799999999,
+          "mem-a2": 0.7181977199999998,
+          "mem-a3": 0.6791081999999999,
+          "mem-a4": 0.626948,
+          "mem-b1": 0.5372094399999999,
+          "mem-b2": 0.5635387999999999,
+          "mem-b3": 0.5228903999999999,
+          "mem-c1": 0.25523219999999996,
+          "mem-c2": 0.18472
+        }
+      },
+      {
+        "priorWeight": 0.6,
+        "clusterAFinalAvg": 0.7103008,
+        "clusterBFinalAvg": 0.55448544,
+        "clusterCFinalAvg": 0.2197784,
+        "clusterAMonotonic": false,
+        "postRanking": [
+          {
+            "memoryId": "mem-a1",
+            "cluster": "cluster-a",
+            "rank": 1,
+            "score": 1.2676086
+          },
+          {
+            "memoryId": "mem-a2",
+            "cluster": "cluster-a",
+            "rank": 2,
+            "score": 1.2283337
+          },
+          {
+            "memoryId": "mem-a3",
+            "cluster": "cluster-a",
+            "rank": 3,
+            "score": 1.1979249
+          },
+          {
+            "memoryId": "mem-a4",
+            "cluster": "cluster-a",
+            "rank": 4,
+            "score": 1.147336
+          },
+          {
+            "memoryId": "mem-b2",
+            "cluster": "cluster-b",
+            "rank": 5,
+            "score": 1.0876912
+          }
+        ],
+        "postSnapshot": {
+          "mem-a1": 0.76760864,
+          "mem-a2": 0.7283337599999998,
+          "mem-a3": 0.6979247999999999,
+          "mem-a4": 0.6473359999999999,
+          "mem-b1": 0.54845152,
+          "mem-b2": 0.5876912000000001,
+          "mem-b3": 0.5273136,
+          "mem-c1": 0.26971680000000003,
+          "mem-c2": 0.16984
+        }
+      }
+    ]
+  }
+}
