@@ -1,0 +1,316 @@
+{
+  "experiment": "exp9",
+  "runAt": "2026-05-15T02:15:22.260Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 cluster-A gap ≥ 0.05 at turn 60: FAIL (gap=-0.0068); H2 A-B spread gap ≥ 0.02 at turn 100: FAIL (gap=0.0081); H3 cluster-C deepens below turn-20 level: FAIL; H4 divergence curve convex: PASS",
+  "data": {
+    "hypotheses": {
+      "h1": false,
+      "h2": false,
+      "h3": false,
+      "h4": true
+    },
+    "conditions": [
+      {
+        "priorWeight": 0,
+        "turn20ClusterA": 0.6944632685662067,
+        "turn100ClusterA": 0.6924577261456999,
+        "turn100ClusterB": 0.5424656870368431,
+        "turn100ClusterC": 0.21842300876509826,
+        "turn100Spread": 0.14999203910885683,
+        "samples": [
+          {
+            "turn": 5,
+            "clusterAAvg": 0.666801072895428,
+            "clusterBAvg": 0.6,
+            "clusterCAvg": 0.22499999999999998,
+            "spread": 0.06680107289542803
+          },
+          {
+            "turn": 10,
+            "clusterAAvg": 0.6731576955392771,
+            "clusterBAvg": 0.5171148741939393,
+            "clusterCAvg": 0.22499999999999998,
+            "spread": 0.15604282134533776
+          },
+          {
+            "turn": 15,
+            "clusterAAvg": 0.6793271408770541,
+            "clusterBAvg": 0.5261808414395724,
+            "clusterCAvg": 0.2078463805976491,
+            "spread": 0.1531462994374817
+          },
+          {
+            "turn": 20,
+            "clusterAAvg": 0.6944632685662067,
+            "clusterBAvg": 0.5510926305972025,
+            "clusterCAvg": 0.2078463805976491,
+            "spread": 0.14337063796900418
+          },
+          {
+            "turn": 25,
+            "clusterAAvg": 0.6725635284721021,
+            "clusterBAvg": 0.5510926305972025,
+            "clusterCAvg": 0.2078463805976491,
+            "spread": 0.12147089787489962
+          },
+          {
+            "turn": 30,
+            "clusterAAvg": 0.6715131734919665,
+            "clusterBAvg": 0.5183977667951479,
+            "clusterCAvg": 0.2078463805976491,
+            "spread": 0.15311540669681856
+          },
+          {
+            "turn": 35,
+            "clusterAAvg": 0.6699132961951807,
+            "clusterBAvg": 0.5269242146954254,
+            "clusterCAvg": 0.2333609201607751,
+            "spread": 0.1429890814997553
+          },
+          {
+            "turn": 40,
+            "clusterAAvg": 0.6948505824101399,
+            "clusterBAvg": 0.5465904746724393,
+            "clusterCAvg": 0.2333609201607751,
+            "spread": 0.1482601077377006
+          },
+          {
+            "turn": 45,
+            "clusterAAvg": 0.6631005958294958,
+            "clusterBAvg": 0.5465904746724393,
+            "clusterCAvg": 0.2333609201607751,
+            "spread": 0.1165101211570565
+          },
+          {
+            "turn": 50,
+            "clusterAAvg": 0.6668728427436807,
+            "clusterBAvg": 0.5293285499396445,
+            "clusterCAvg": 0.2333609201607751,
+            "spread": 0.13754429280403624
+          },
+          {
+            "turn": 55,
+            "clusterAAvg": 0.6761059823535032,
+            "clusterBAvg": 0.530289974066627,
+            "clusterCAvg": 0.22730839139739578,
+            "spread": 0.14581600828687613
+          },
+          {
+            "turn": 60,
+            "clusterAAvg": 0.6988560378477954,
+            "clusterBAvg": 0.537840735436788,
+            "clusterCAvg": 0.22730839139739578,
+            "spread": 0.16101530241100737
+          },
+          {
+            "turn": 65,
+            "clusterAAvg": 0.6764048076728301,
+            "clusterBAvg": 0.537840735436788,
+            "clusterCAvg": 0.22730839139739578,
+            "spread": 0.13856407223604206
+          },
+          {
+            "turn": 70,
+            "clusterAAvg": 0.6841283275248214,
+            "clusterBAvg": 0.5235969956665213,
+            "clusterCAvg": 0.22730839139739578,
+            "spread": 0.16053133185830015
+          },
+          {
+            "turn": 75,
+            "clusterAAvg": 0.684470193331825,
+            "clusterBAvg": 0.5225963843054143,
+            "clusterCAvg": 0.2241375087256603,
+            "spread": 0.1618738090264107
+          },
+          {
+            "turn": 80,
+            "clusterAAvg": 0.7005737699606288,
+            "clusterBAvg": 0.5397427936976436,
+            "clusterCAvg": 0.2241375087256603,
+            "spread": 0.16083097626298526
+          },
+          {
+            "turn": 85,
+            "clusterAAvg": 0.6670791867432719,
+            "clusterBAvg": 0.5397427936976436,
+            "clusterCAvg": 0.2241375087256603,
+            "spread": 0.12733639304562838
+          },
+          {
+            "turn": 90,
+            "clusterAAvg": 0.6676101837027218,
+            "clusterBAvg": 0.5311241817678715,
+            "clusterCAvg": 0.2241375087256603,
+            "spread": 0.1364860019348504
+          },
+          {
+            "turn": 95,
+            "clusterAAvg": 0.677923699019304,
+            "clusterBAvg": 0.5311991534857676,
+            "clusterCAvg": 0.21842300876509826,
+            "spread": 0.14672454553353642
+          },
+          {
+            "turn": 100,
+            "clusterAAvg": 0.6924577261456999,
+            "clusterBAvg": 0.5424656870368431,
+            "clusterCAvg": 0.21842300876509826,
+            "spread": 0.14999203910885683
+          }
+        ]
+      },
+      {
+        "priorWeight": 0.3,
+        "turn20ClusterA": 0.6840626865534044,
+        "turn100ClusterA": 0.6907366973706084,
+        "turn100ClusterB": 0.5326106399253902,
+        "turn100ClusterC": 0.21125427738729363,
+        "turn100Spread": 0.15812605744521824,
+        "samples": [
+          {
+            "turn": 5,
+            "clusterAAvg": 0.6886769254813875,
+            "clusterBAvg": 0.6,
+            "clusterCAvg": 0.22499999999999998,
+            "spread": 0.0886769254813875
+          },
+          {
+            "turn": 10,
+            "clusterAAvg": 0.6822286453691864,
+            "clusterBAvg": 0.5424550216212028,
+            "clusterCAvg": 0.22499999999999998,
+            "spread": 0.13977362374798352
+          },
+          {
+            "turn": 15,
+            "clusterAAvg": 0.6834279276242708,
+            "clusterBAvg": 0.5383324414827038,
+            "clusterCAvg": 0.22165522143178484,
+            "spread": 0.1450954861415671
+          },
+          {
+            "turn": 20,
+            "clusterAAvg": 0.6840626865534044,
+            "clusterBAvg": 0.540414153378123,
+            "clusterCAvg": 0.22165522143178484,
+            "spread": 0.14364853317528137
+          },
+          {
+            "turn": 25,
+            "clusterAAvg": 0.6711870673729015,
+            "clusterBAvg": 0.540414153378123,
+            "clusterCAvg": 0.22165522143178484,
+            "spread": 0.13077291399477842
+          },
+          {
+            "turn": 30,
+            "clusterAAvg": 0.6759862347701217,
+            "clusterBAvg": 0.5203921243458228,
+            "clusterCAvg": 0.22165522143178484,
+            "spread": 0.15559411042429883
+          },
+          {
+            "turn": 35,
+            "clusterAAvg": 0.6767266263014706,
+            "clusterBAvg": 0.5228935516415553,
+            "clusterCAvg": 0.22094744747246767,
+            "spread": 0.15383307465991536
+          },
+          {
+            "turn": 40,
+            "clusterAAvg": 0.688430486814775,
+            "clusterBAvg": 0.5341879527048874,
+            "clusterCAvg": 0.22094744747246767,
+            "spread": 0.15424253410988764
+          },
+          {
+            "turn": 45,
+            "clusterAAvg": 0.6717608630925394,
+            "clusterBAvg": 0.5341879527048874,
+            "clusterCAvg": 0.22094744747246767,
+            "spread": 0.13757291038765196
+          },
+          {
+            "turn": 50,
+            "clusterAAvg": 0.6724425833123708,
+            "clusterBAvg": 0.5217627403120804,
+            "clusterCAvg": 0.22094744747246767,
+            "spread": 0.15067984300029047
+          },
+          {
+            "turn": 55,
+            "clusterAAvg": 0.6772477933805796,
+            "clusterBAvg": 0.524554275049433,
+            "clusterCAvg": 0.21692400701865505,
+            "spread": 0.15269351833114664
+          },
+          {
+            "turn": 60,
+            "clusterAAvg": 0.6920842891279357,
+            "clusterBAvg": 0.5353116398231429,
+            "clusterCAvg": 0.21692400701865505,
+            "spread": 0.15677264930479284
+          },
+          {
+            "turn": 65,
+            "clusterAAvg": 0.6760133282342486,
+            "clusterBAvg": 0.5353116398231429,
+            "clusterCAvg": 0.21692400701865505,
+            "spread": 0.14070168841110575
+          },
+          {
+            "turn": 70,
+            "clusterAAvg": 0.6770712653815592,
+            "clusterBAvg": 0.5239690339877022,
+            "clusterCAvg": 0.21692400701865505,
+            "spread": 0.15310223139385692
+          },
+          {
+            "turn": 75,
+            "clusterAAvg": 0.677680574562503,
+            "clusterBAvg": 0.528444181497327,
+            "clusterCAvg": 0.21519424451898211,
+            "spread": 0.149236393065176
+          },
+          {
+            "turn": 80,
+            "clusterAAvg": 0.6898465148178847,
+            "clusterBAvg": 0.5375046147220872,
+            "clusterCAvg": 0.21519424451898211,
+            "spread": 0.1523419000957975
+          },
+          {
+            "turn": 85,
+            "clusterAAvg": 0.6832657051723645,
+            "clusterBAvg": 0.5375046147220872,
+            "clusterCAvg": 0.21519424451898211,
+            "spread": 0.1457610904502773
+          },
+          {
+            "turn": 90,
+            "clusterAAvg": 0.6844213009050748,
+            "clusterBAvg": 0.528660520439883,
+            "clusterCAvg": 0.21519424451898211,
+            "spread": 0.15576078046519182
+          },
+          {
+            "turn": 95,
+            "clusterAAvg": 0.6881730112817499,
+            "clusterBAvg": 0.5291795416101476,
+            "clusterCAvg": 0.21125427738729363,
+            "spread": 0.15899346967160233
+          },
+          {
+            "turn": 100,
+            "clusterAAvg": 0.6907366973706084,
+            "clusterBAvg": 0.5326106399253902,
+            "clusterCAvg": 0.21125427738729363,
+            "spread": 0.15812605744521824
+          }
+        ]
+      }
+    ]
+  }
+}
