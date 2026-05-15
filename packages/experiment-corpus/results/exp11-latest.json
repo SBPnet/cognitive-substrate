@@ -1,0 +1,66 @@
+{
+  "experiment": "exp11",
+  "runAt": "2026-05-15T02:37:25.319Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 quality-gated mem-c1 suppressed below importanceScore=0.3: PASS; H2 quality-gated c1 rp below Exp10 bare value (0.3086): PASS; H3 arbitration A-score lift ≥ 0.02 vs baseline: FAIL (gap=0.0191); H4 A-C arbitration gap wider under compounding: PASS",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": false,
+      "h4": true
+    },
+    "c1Baseline": 0.3,
+    "exp10BareC1Reference": 0.3086,
+    "conditions": [
+      {
+        "label": "baseline (cb=0)",
+        "finalState": {
+          "memA1Rp": 0.7437834421069874,
+          "memA1Count": 0,
+          "memC1Rp": 0.24341989004945236,
+          "memC1Count": 0,
+          "clusterAAvg": 0.6845326190214458,
+          "clusterCAvg": 0.22180967831879092
+        },
+        "arbitration": {
+          "clusterAScore": 0.7927403971301851,
+          "clusterCScore": 0.4965429034956373,
+          "gap": 0.2961974936345478
+        }
+      },
+      {
+        "label": "gated cb=0.02 (fix)",
+        "finalState": {
+          "memA1Rp": 0.8097279569934778,
+          "memA1Count": 15,
+          "memC1Rp": 0.26853255808944093,
+          "memC1Count": 10,
+          "clusterAAvg": 0.7439292525957233,
+          "clusterCAvg": 0.2362860806124401
+        },
+        "arbitration": {
+          "clusterAScore": 0.8118138759280714,
+          "clusterCScore": 0.500885824183732,
+          "gap": 0.31092805174433946
+        }
+      },
+      {
+        "label": "gated cb=0.05",
+        "finalState": {
+          "memA1Rp": 0.8851825285734903,
+          "memA1Count": 15,
+          "memC1Rp": 0.2908382608613974,
+          "memC1Count": 10,
+          "clusterAAvg": 0.8181747025044559,
+          "clusterCAvg": 0.26100665678125
+        },
+        "arbitration": {
+          "clusterAScore": 0.8334740140136816,
+          "clusterCScore": 0.508301997034375,
+          "gap": 0.32517201697930664
+        }
+      }
+    ]
+  }
+}

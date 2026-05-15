@@ -514,6 +514,9 @@ importers:
 
   packages/experiment-corpus:
     dependencies:
+      '@cognitive-substrate/agents':
+        specifier: workspace:*
+        version: link:../agents
       '@cognitive-substrate/attention-engine':
         specifier: workspace:*
         version: link:../attention-engine
