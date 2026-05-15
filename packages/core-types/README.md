@@ -1,19 +1,30 @@
 # @cognitive-substrate/core-types
 
-## Purpose
+Shared TypeScript type definitions for the entire cognitive architecture. Every other package in the monorepo depends on this one.
 
-`@cognitive-substrate/core-types` is a top-level package used by the Cognitive Substrate workspace. Its public API is the package export surface, not this README.
+## What it does
 
-## Entrypoints
+Defines the canonical data shapes for all cross-cutting concerns. No implementation code lives here — only types, interfaces, and enums. Keeping these in one place prevents type drift between packages and makes the data model readable in isolation.
 
-- Source: `packages/core-types/src/index.ts`
-- Package main: `./dist/index.js`
-- Package metadata: `packages/core-types/package.json`
+### Type modules
 
-## Runtime Wiring
+| Module | Contents |
+| ------ | -------- |
+| `experience` | `Experience`, `ExperienceEvent`, sensor reading shapes |
+| `memory` | `Memory`, `SemanticMemory`, retention metadata |
+| `policy` | `Policy`, `PolicyDelta`, exploration/exploitation parameters |
+| `goal` | `Goal`, `GoalStatus`, priority and deadline fields |
+| `agent` | `Agent`, `AgentContext`, session state |
+| `reinforcement` | `ReinforcementSignal`, `ReinforcementUpdate` |
+| `world-model` | `WorldModelPrediction`, simulation output types |
+| `interaction` | `Interaction`, `UserModel`, trust/intent fields |
 
-Runtime wiring happens through apps, workers, or other packages that import this package. Kafka topic claims should be checked against `packages/kafka-bus/src/topics.ts`; OpenSearch index claims should be checked against `packages/memory-opensearch/src/schemas.ts`.
+## Usage
 
-## Evidence
+```ts
+import type { Memory, Policy, Goal } from '@cognitive-substrate/core-types';
+```
 
-Evidence is limited to build/typecheck/import coverage and any downstream smoke usage that imports this package or runs this worker.
+## Dependencies
+
+None — this package is the base of the dependency graph.

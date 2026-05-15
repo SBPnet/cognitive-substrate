@@ -1,19 +1,35 @@
 # @cognitive-substrate/narrative-engine
 
-## Purpose
+Identity formation and narrative self-model synthesis. Accumulates evidence, stabilises drift, and publishes coherent identity updates to the cognitive bus.
 
-`@cognitive-substrate/narrative-engine` is a top-level package used by the Cognitive Substrate workspace. Its public API is the package export surface, not this README.
+## What it does
 
-## Entrypoints
+The narrative engine maintains a `NarrativeSelfModel` — a structured representation of the agent's beliefs about itself: its values, capabilities, characteristic behaviours, and long-term goals. It runs a three-stage pipeline:
 
-- Source: `packages/narrative-engine/src/index.ts`
-- Package main: `./dist/index.js`
-- Package metadata: `packages/narrative-engine/package.json`
+1. **Accumulation** — ingests new evidence (observations, reinforcement signals, evaluations) and adds them to a rolling belief buffer (capped at 20 recent items).
+2. **Stabilisation** — applies a drift-damping step to prevent rapid identity swings from single high-salience events.
+3. **Synthesis** — generates a coherent narrative summary from the stabilised belief set and publishes an `IdentityUpdate` event to Kafka.
 
-## Runtime Wiring
+## API
 
-Runtime wiring happens through apps, workers, or other packages that import this package. Kafka topic claims should be checked against `packages/kafka-bus/src/topics.ts`; OpenSearch index claims should be checked against `packages/memory-opensearch/src/schemas.ts`.
+```ts
+import { NarrativeEngine, NarrativeSelfModel, IdentityFormationResult } from '@cognitive-substrate/narrative-engine';
 
-## Evidence
+const engine = new NarrativeEngine({ publisher });
+const result: IdentityFormationResult = await engine.update(evidence);
+// result.model — updated NarrativeSelfModel
+// result.driftMagnitude — how much identity shifted this cycle
+```
 
-Evidence is limited to build/typecheck/import coverage and any downstream smoke usage that imports this package or runs this worker.
+### Key exports
+
+| Export | Description |
+| ------ | ----------- |
+| `NarrativeEngine` | Main updater; inject an optional Kafka `publisher` |
+| `NarrativeSelfModel` | Structured self-model: values, capabilities, goals, beliefs |
+| `IdentityFormationResult` | Updated model + drift magnitude |
+
+## Dependencies
+
+- `@cognitive-substrate/core-types` — evidence and identity types
+- `@cognitive-substrate/kafka-bus` — publishes identity updates

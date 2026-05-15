@@ -1,19 +1,46 @@
 # @cognitive-substrate/kafka-bus
 
-## Purpose
+Typed Kafka producers, consumers, topic registry, and W3C trace-context propagation for the cognitive signal bus.
 
-`@cognitive-substrate/kafka-bus` is a top-level package used by the Cognitive Substrate workspace. Its public API is the package export surface, not this README.
+## What it does
 
-## Entrypoints
+All inter-service event traffic in the cognitive substrate flows through Kafka. This package is the single source of truth for:
 
-- Source: `packages/kafka-bus/src/index.ts`
-- Package main: `./dist/index.js`
-- Package metadata: `packages/kafka-bus/package.json`
+- **Topic registry** — `src/topics.ts` defines every topic name, key schema, and value schema. Producers and consumers both import from here, eliminating string drift.
+- **Typed client** — `KafkaClient` wraps KafkaJS with the monorepo's auth and retry defaults.
+- **Typed producers/consumers** — generic `KafkaProducer<T>` and `KafkaConsumer<T>` enforce that message payloads match the declared schema for a given topic.
+- **Trace propagation** — `injectTraceContext` / `extractTraceContext` attach and read W3C `traceparent` headers so spans cross service boundaries correctly.
 
-## Runtime Wiring
+## API
 
-Runtime wiring happens through apps, workers, or other packages that import this package. Kafka topic claims should be checked against `packages/kafka-bus/src/topics.ts`; OpenSearch index claims should be checked against `packages/memory-opensearch/src/schemas.ts`.
+```ts
+import { KafkaClient, KafkaProducer, TOPICS } from '@cognitive-substrate/kafka-bus';
 
-## Evidence
+const client = new KafkaClient({ brokers: [process.env.KAFKA_BROKER] });
+const producer = new KafkaProducer(client, TOPICS.COGNITIVE_EVENTS);
+await producer.send(event);
+```
 
-Evidence is limited to build/typecheck/import coverage and any downstream smoke usage that imports this package or runs this worker.
+### Key exports
+
+| Export | Description |
+| ------ | ----------- |
+| `TOPICS` | Registry of all topic descriptors |
+| `KafkaClient` | Authenticated KafkaJS wrapper |
+| `KafkaProducer<T>` | Type-safe producer for a given topic |
+| `KafkaConsumer<T>` | Type-safe consumer for a given topic |
+| `injectTraceContext` | Writes W3C traceparent into message headers |
+| `extractTraceContext` | Reads W3C traceparent from message headers |
+
+## Dependencies
+
+- `kafkajs` — Kafka client library
+
+## Configuration
+
+| Env var | Description |
+| ------- | ----------- |
+| `KAFKA_BROKER` | Kafka bootstrap server address |
+| `KAFKA_SSL_CA` | CA certificate for TLS (Aiven) |
+| `KAFKA_SSL_CERT` | Client certificate for mTLS |
+| `KAFKA_SSL_KEY` | Client key for mTLS |

@@ -1,19 +1,40 @@
 # @cognitive-substrate/policy-engine
 
-## Purpose
+Closed-loop policy update coordinator. Reads the current policy snapshot, computes a bounded delta from reinforcement evaluation, advances the version, and persists state.
 
-`@cognitive-substrate/policy-engine` is a top-level package used by the Cognitive Substrate workspace. Its public API is the package export surface, not this README.
+## What it does
 
-## Entrypoints
+The policy engine is the write path for all policy mutations. It wraps a pluggable `PolicyStore` and enforces that every update:
 
-- Source: `packages/policy-engine/src/index.ts`
-- Package main: `./dist/index.js`
-- Package metadata: `packages/policy-engine/package.json`
+1. Loads the current policy from the store.
+2. Computes the proposed delta via `computePolicyDelta()` using the incoming reinforcement signal.
+3. Returns the delta to the caller for constitutional approval (see `constitution-engine`) before committing.
+4. On approval, writes the new policy version and emits a `PolicyAuditEvent` for traceability.
 
-## Runtime Wiring
+It is intentionally stateless between calls — all state lives in the store.
 
-Runtime wiring happens through apps, workers, or other packages that import this package. Kafka topic claims should be checked against `packages/kafka-bus/src/topics.ts`; OpenSearch index claims should be checked against `packages/memory-opensearch/src/schemas.ts`.
+## API
 
-## Evidence
+```ts
+import { PolicyEngine, PolicyUpdateResult } from '@cognitive-substrate/policy-engine';
 
-Evidence is limited to build/typecheck/import coverage and any downstream smoke usage that imports this package or runs this worker.
+const engine = new PolicyEngine({ store, telemetry });
+const result: PolicyUpdateResult = await engine.update(reinforcementSignal);
+// result.previous — policy before update
+// result.next — proposed new policy
+// result.auditEvent — structured audit record
+```
+
+### Key exports
+
+| Export | Description |
+| ------ | ----------- |
+| `PolicyEngine` | Main updater; inject `store` and optional `telemetry` |
+| `PolicyUpdateResult` | Previous policy, proposed next policy, audit event |
+| `computePolicyDelta(policy, signal)` | Standalone delta computation (used by constitution engine) |
+
+## Dependencies
+
+- `@cognitive-substrate/core-types` — `Policy`, `ReinforcementSignal`
+- `@cognitive-substrate/memory-opensearch` — default `PolicyStore` implementation
+- `@cognitive-substrate/telemetry-otel` — emits policy update spans

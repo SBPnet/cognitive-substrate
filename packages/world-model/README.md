@@ -1,19 +1,43 @@
 # @cognitive-substrate/world-model
 
-## Purpose
+Outcome simulation and risk prediction. Runs a simulation model against a proposed action, materializes predictions, and records observed outcomes for accuracy tracking.
 
-`@cognitive-substrate/world-model` is a top-level package used by the Cognitive Substrate workspace. Its public API is the package export surface, not this README.
+## What it does
 
-## Entrypoints
+Before the cognitive loop executes an action, the world model engine simulates likely outcomes and assesses risk. After execution, it back-fills the observed outcome against the prediction to track simulation accuracy over time.
 
-- Source: `packages/world-model/src/index.ts`
-- Package main: `./dist/index.js`
-- Package metadata: `packages/world-model/package.json`
+The engine is built around a pluggable `OutcomeSimulationModel` interface:
 
-## Runtime Wiring
+- **Default** — `HeuristicOutcomeSimulationModel` uses policy parameters and historical memory scores to estimate probability and impact.
+- **Custom** — inject any model that satisfies the interface for higher-fidelity simulation.
 
-Runtime wiring happens through apps, workers, or other packages that import this package. Kafka topic claims should be checked against `packages/kafka-bus/src/topics.ts`; OpenSearch index claims should be checked against `packages/memory-opensearch/src/schemas.ts`.
+Predictions can optionally be persisted to OpenSearch and broadcast to Kafka for downstream consumers (e.g. metacog, reinforcement).
 
-## Evidence
+## API
 
-Evidence is limited to build/typecheck/import coverage and any downstream smoke usage that imports this package or runs this worker.
+```ts
+import { WorldModelEngine, WorldModelPrediction } from '@cognitive-substrate/world-model';
+
+const engine = new WorldModelEngine({ model, store, publisher });
+
+// Before action:
+const prediction: WorldModelPrediction = await engine.predict(context, proposedAction);
+// prediction.expectedOutcome, prediction.riskScore, prediction.confidence
+
+// After action:
+await engine.recordOutcome(prediction.id, actualOutcome);
+```
+
+### Key exports
+
+| Export | Description |
+| ------ | ----------- |
+| `WorldModelEngine` | Main engine; inject optional `store` and `publisher` |
+| `WorldModelPrediction` | Expected outcome, risk score, confidence, and timestamp |
+| `HeuristicOutcomeSimulationModel` | Default heuristic simulation model |
+
+## Dependencies
+
+- `@cognitive-substrate/core-types` — `AgentContext`, action and outcome types
+- `@cognitive-substrate/kafka-bus` — broadcasts predictions and outcomes
+- `@cognitive-substrate/memory-opensearch` — persists predictions for accuracy tracking

@@ -1,19 +1,40 @@
 # @cognitive-substrate/development-engine
 
-## Purpose
+Developmental capability tracking and curriculum selection. Infers the agent's current learning phase and unlocks subsystems progressively.
 
-`@cognitive-substrate/development-engine` is a top-level package used by the Cognitive Substrate workspace. Its public API is the package export surface, not this README.
+## What it does
 
-## Entrypoints
+The development engine models the agent's growth through five phases:
 
-- Source: `packages/development-engine/src/index.ts`
-- Package main: `./dist/index.js`
-- Package metadata: `packages/development-engine/package.json`
+| Phase | Unlocked subsystems |
+| ----- | ------------------- |
+| `seed` | Perception, basic memory |
+| `novice` | Attention, affect |
+| `apprentice` | Policy, reinforcement |
+| `integrative` | Causal, narrative, metacog |
+| `open_ended` | All subsystems + curiosity-driven exploration |
 
-## Runtime Wiring
+Phase transitions are triggered by accumulated capability evidence. Once in a phase, `selectCurriculum()` picks the next learning items by balancing difficulty (slight stretch over current level) against expected gain, penalising both under-stretch and over-reach.
 
-Runtime wiring happens through apps, workers, or other packages that import this package. Kafka topic claims should be checked against `packages/kafka-bus/src/topics.ts`; OpenSearch index claims should be checked against `packages/memory-opensearch/src/schemas.ts`.
+## API
 
-## Evidence
+```ts
+import { DevelopmentEngine, inferPhase, selectCurriculum } from '@cognitive-substrate/development-engine';
 
-Evidence is limited to build/typecheck/import coverage and any downstream smoke usage that imports this package or runs this worker.
+const engine = new DevelopmentEngine();
+const phase = inferPhase(capabilityRecord);
+const curriculum = selectCurriculum(phase, candidateItems);
+// curriculum[] — ordered list of next items to attempt
+```
+
+### Key exports
+
+| Export | Description |
+| ------ | ----------- |
+| `DevelopmentEngine` | Stateful tracker; wraps `inferPhase` and `selectCurriculum` |
+| `inferPhase(record)` | Maps capability evidence to a phase enum |
+| `selectCurriculum(phase, items)` | Returns stretch-optimised item ordering |
+
+## Dependencies
+
+None.

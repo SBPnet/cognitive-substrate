@@ -1,19 +1,38 @@
 # @cognitive-substrate/constitution-engine
 
-## Purpose
+Invariant-driven approval engine for policy mutations. Validates identity stability, risk tolerance, and detects reward corruption before allowing a policy update to proceed.
 
-`@cognitive-substrate/constitution-engine` is a top-level package used by the Cognitive Substrate workspace. Its public API is the package export surface, not this README.
+## What it does
 
-## Entrypoints
+Before the policy engine commits an update, the constitution engine evaluates a set of named invariants against the proposed change:
 
-- Source: `packages/constitution-engine/src/index.ts`
-- Package main: `./dist/index.js`
-- Package metadata: `packages/constitution-engine/package.json`
+| Invariant | Blocks update if… |
+| --------- | ----------------- |
+| Identity stability | Drift from baseline identity exceeds threshold |
+| Risk tolerance | Proposed policy increases risk beyond budget |
+| Reward integrity | High-importance reward has low alignment (corruption signal) |
+| Epistemic hygiene | Contradiction paired with high emotion without resolution |
 
-## Runtime Wiring
+All invariants must pass for the update to be approved. Failed invariants are returned with explanations in the `ConstitutionalAssessment`.
 
-Runtime wiring happens through apps, workers, or other packages that import this package. Kafka topic claims should be checked against `packages/kafka-bus/src/topics.ts`; OpenSearch index claims should be checked against `packages/memory-opensearch/src/schemas.ts`.
+## API
 
-## Evidence
+```ts
+import { ConstitutionEngine, ConstitutionalAssessment } from '@cognitive-substrate/constitution-engine';
 
-Evidence is limited to build/typecheck/import coverage and any downstream smoke usage that imports this package or runs this worker.
+const engine = new ConstitutionEngine(config);
+const assessment: ConstitutionalAssessment = engine.evaluate(currentPolicy, proposedDelta);
+// assessment.approved, assessment.violations[]
+```
+
+### Key exports
+
+| Export | Description |
+| ------ | ----------- |
+| `ConstitutionEngine` | Call `.evaluate(policy, delta)` |
+| `ConstitutionalAssessment` | `approved` flag + array of `InvariantViolation` |
+| `identityDrift(current, baseline)` | Standalone drift scorer |
+
+## Dependencies
+
+- `@cognitive-substrate/core-types` — `Policy`, `PolicyDelta`

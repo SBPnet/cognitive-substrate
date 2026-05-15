@@ -1,19 +1,43 @@
 # @cognitive-substrate/temporal-engine
 
-## Purpose
+Multi-timescale planning and subjective-time allocation. Ranks tasks by urgency, infers the active planning horizon, and sequences episodes within an inference budget.
 
-`@cognitive-substrate/temporal-engine` is a top-level package used by the Cognitive Substrate workspace. Its public API is the package export surface, not this README.
+## What it does
 
-## Entrypoints
+The temporal engine answers two questions before each cognitive loop cycle:
 
-- Source: `packages/temporal-engine/src/index.ts`
-- Package main: `./dist/index.js`
-- Package metadata: `packages/temporal-engine/package.json`
+1. **What should be done now?** — ranks pending tasks by a composite urgency score and returns a `TemporalPlan` with the ordered sequence for this cycle.
+2. **How much time to spend?** — `allocateSubjectiveTime()` converts the inference budget (tokens, latency headroom) into a subjective-time allocation per task, compressing time as workload density rises.
 
-## Runtime Wiring
+### Urgency formula
 
-Runtime wiring happens through apps, workers, or other packages that import this package. Kafka topic claims should be checked against `packages/kafka-bus/src/topics.ts`; OpenSearch index claims should be checked against `packages/memory-opensearch/src/schemas.ts`.
+```text
+urgency = importance×0.45 + deadlinePressure×0.40 + scaleWeight×0.15
+```
 
-## Evidence
+`deadlinePressure` spikes non-linearly as the deadline approaches. `scaleWeight` gives a small boost to tasks that operate at the current dominant planning horizon (immediate / session / long-term).
 
-Evidence is limited to build/typecheck/import coverage and any downstream smoke usage that imports this package or runs this worker.
+## API
+
+```ts
+import { TemporalEngine, TemporalPlan, computeUrgency } from '@cognitive-substrate/temporal-engine';
+
+const engine = new TemporalEngine();
+const plan: TemporalPlan = engine.plan(tasks, budget);
+// plan.ordered[] — tasks sorted by urgency
+// plan.horizon — inferred planning horizon for this cycle
+// plan.timeAllocation — subjective time per task
+```
+
+### Key exports
+
+| Export | Description |
+| ------ | ----------- |
+| `TemporalEngine` | Main planner; call `.plan(tasks, budget)` |
+| `TemporalPlan` | Ordered tasks, horizon, and time allocation map |
+| `computeUrgency(task)` | Standalone urgency scorer |
+| `allocateSubjectiveTime(budget, tasks)` | Distributes inference budget across tasks |
+
+## Dependencies
+
+- `@cognitive-substrate/core-types` — `Goal`, `ReasoningBudget` types

@@ -1,19 +1,40 @@
 # @cognitive-substrate/clickhouse-telemetry
 
-## Purpose
+ClickHouse client, table schemas, and typed batch inserters for cognitive telemetry events.
 
-`@cognitive-substrate/clickhouse-telemetry` is a top-level package used by the Cognitive Substrate workspace. Its public API is the package export surface, not this README.
+## What it does
 
-## Entrypoints
+Wraps the ClickHouse HTTP client with typed inserters for four telemetry event categories: metrics, logs, traces, and metadata. Table schemas are defined here as the single source of truth and used at migration time to create or update ClickHouse tables.
 
-- Source: `packages/clickhouse-telemetry/src/index.ts`
-- Package main: `./dist/index.js`
-- Package metadata: `packages/clickhouse-telemetry/package.json`
+This package is used by workers that emit high-volume, time-series telemetry that would be too expensive to route through OpenSearch.
 
-## Runtime Wiring
+## API
 
-Runtime wiring happens through apps, workers, or other packages that import this package. Kafka topic claims should be checked against `packages/kafka-bus/src/topics.ts`; OpenSearch index claims should be checked against `packages/memory-opensearch/src/schemas.ts`.
+```ts
+import { ClickHouseClient, insertMetrics, insertLogs } from '@cognitive-substrate/clickhouse-telemetry';
 
-## Evidence
+const client = new ClickHouseClient({ url: process.env.CLICKHOUSE_URL });
+await insertMetrics(client, metricRows);
+await insertLogs(client, logRows);
+```
 
-Evidence is limited to build/typecheck/import coverage and any downstream smoke usage that imports this package or runs this worker.
+### Key exports
+
+| Export | Description |
+| ------ | ----------- |
+| `ClickHouseClient` | Thin wrapper around `@clickhouse/client` |
+| `insertMetrics` | Typed batch insert for metric rows |
+| `insertLogs` | Typed batch insert for log rows |
+| `insertTraces` | Typed batch insert for trace rows |
+| `SCHEMAS` | Table DDL strings used during migration |
+
+## Dependencies
+
+- `@clickhouse/client` — official ClickHouse HTTP client
+
+## Configuration
+
+| Env var | Description |
+| ------- | ----------- |
+| `CLICKHOUSE_URL` | ClickHouse HTTP endpoint |
+| `CLICKHOUSE_DATABASE` | Target database name |

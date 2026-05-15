@@ -1,19 +1,41 @@
 # @cognitive-substrate/retrieval-engine
 
-## Purpose
+Hybrid memory retrieval pipeline. Resolves embeddings, executes BM25 + k-NN queries against OpenSearch, and optionally reranks results with a cross-encoder.
 
-`@cognitive-substrate/retrieval-engine` is a top-level package used by the Cognitive Substrate workspace. Its public API is the package export surface, not this README.
+## What it does
 
-## Entrypoints
+The retrieval engine is the read path for semantic memories during the cognitive loop's retrieve stage. It runs a three-stage pipeline:
 
-- Source: `packages/retrieval-engine/src/index.ts`
-- Package main: `./dist/index.js`
-- Package metadata: `packages/retrieval-engine/package.json`
+1. **Embedding resolution** — if a query embedding is not provided, calls a pluggable `Embedder` to produce one.
+2. **Hybrid query** — delegates to `memory-opensearch`'s `buildHybridQuery()` with weights drawn from the active policy. Over-fetches by a configurable factor when reranking is enabled.
+3. **Reranking (optional)** — passes the over-fetched candidate set through a pluggable `Reranker` (default: cross-encoder via OpenSearch ML), then slices to the requested top-k.
 
-## Runtime Wiring
+After retrieval, it records a `RetrievalFeedback` event to Kafka for downstream reinforcement scoring.
 
-Runtime wiring happens through apps, workers, or other packages that import this package. Kafka topic claims should be checked against `packages/kafka-bus/src/topics.ts`; OpenSearch index claims should be checked against `packages/memory-opensearch/src/schemas.ts`.
+## API
 
-## Evidence
+```ts
+import { MemoryRetriever, RetrievalRequest, RetrievalResult } from '@cognitive-substrate/retrieval-engine';
 
-Focused tests exist under `src/__tests__/` where present; otherwise evidence is limited to build/typecheck/import coverage and downstream smoke usage.
+const retriever = new MemoryRetriever({ store, embedder, reranker, policy });
+const result: RetrievalResult = await retriever.retrieve({
+  query: 'attention under load',
+  topK: 10,
+});
+// result.memories[] — ranked SemanticMemory records
+// result.scores[] — final relevance scores
+```
+
+### Key exports
+
+| Export | Description |
+| ------ | ----------- |
+| `MemoryRetriever` | Main retriever; inject `store`, optional `embedder` and `reranker` |
+| `RetrievalRequest` | Query text, optional embedding, topK, policy override |
+| `RetrievalResult` | Ranked memories with scores |
+
+## Dependencies
+
+- `@cognitive-substrate/core-types` — `Memory`, `Policy` types
+- `@cognitive-substrate/kafka-bus` — publishes retrieval feedback events
+- `@cognitive-substrate/memory-opensearch` — executes hybrid queries

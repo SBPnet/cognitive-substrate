@@ -1,0 +1,32 @@
+{
+  "experiment": "exp15",
+  "runAt": "2026-05-15T17:46:43.128Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 total signals = 200: PASS (actual=200); H2 severity ordered normal < recovery < degraded < outage: PASS; H3 outage xd_rate > normal: PASS (1.000 > 0.000); H4 schema self-consistent: PASS (violations=0)",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": true,
+      "h4": true
+    },
+    "totalSignals": 200,
+    "windowCounts": {
+      "normal": 40,
+      "degraded": 60,
+      "outage": 50,
+      "recovery": 50
+    },
+    "severities": {
+      "normal": 0.26849999999999985,
+      "degraded": 0.6799999999999998,
+      "outage": 0.9200000000000012,
+      "recovery": 0.27179999999999976
+    },
+    "crossDomainRates": {
+      "normal": 0,
+      "outage": 1
+    },
+    "schemaViolations": 0
+  }
+}

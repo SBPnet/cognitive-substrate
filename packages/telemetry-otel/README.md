@@ -1,19 +1,44 @@
 # @cognitive-substrate/telemetry-otel
 
-## Purpose
+OpenTelemetry SDK bootstrap and cognitive-semantic conventions (`cog.*`) for distributed tracing and observability across the cognitive substrate.
 
-`@cognitive-substrate/telemetry-otel` is a top-level package used by the Cognitive Substrate workspace. Its public API is the package export surface, not this README.
+## What it does
 
-## Entrypoints
+Every service in the monorepo calls `initTelemetry()` at startup to configure the OTel SDK. This package provides:
 
-- Source: `packages/telemetry-otel/src/index.ts`
-- Package main: `./dist/index.js`
-- Package metadata: `packages/telemetry-otel/package.json`
+- **SDK bootstrap** — sets up a `TracerProvider` with an OTLP HTTP exporter, batch span processor, and resource attributes derived from environment variables.
+- **`cog.*` semantic conventions** — a typed namespace of attribute keys (e.g. `cog.session_id`, `cog.loop_iteration`, `cog.memory_id`) that all packages use instead of raw strings, keeping spans queryable across services.
+- **Health-check server** — a lightweight HTTP server that returns `200 OK` once the SDK is initialised, used by container health probes.
 
-## Runtime Wiring
+## API
 
-Runtime wiring happens through apps, workers, or other packages that import this package. Kafka topic claims should be checked against `packages/kafka-bus/src/topics.ts`; OpenSearch index claims should be checked against `packages/memory-opensearch/src/schemas.ts`.
+```ts
+import { initTelemetry, COG } from '@cognitive-substrate/telemetry-otel';
 
-## Evidence
+await initTelemetry({ serviceName: 'retrieval-worker' });
 
-Evidence is limited to build/typecheck/import coverage and any downstream smoke usage that imports this package or runs this worker.
+const span = tracer.startSpan('retrieve');
+span.setAttribute(COG.SESSION_ID, sessionId);
+span.setAttribute(COG.LOOP_ITERATION, iteration);
+span.end();
+```
+
+### Key exports
+
+| Export | Description |
+| ------ | ----------- |
+| `initTelemetry(options)` | Bootstrap the OTel SDK; call once at process start |
+| `COG` | Typed `cog.*` attribute key constants |
+| `tracer` | Pre-configured OTel `Tracer` instance |
+
+## Dependencies
+
+- `@opentelemetry/sdk-node` and related OTel SDK packages
+
+## Configuration
+
+| Env var | Description |
+| ------- | ----------- |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | OTLP HTTP collector endpoint |
+| `OTEL_SERVICE_NAME` | Service name (overrides `initTelemetry` option) |
+| `OTEL_RESOURCE_ATTRIBUTES` | Extra resource attributes as `key=value` pairs |

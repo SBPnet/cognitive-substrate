@@ -1,19 +1,37 @@
 # @cognitive-substrate/causal-engine
 
-## Purpose
+Infers structural causal models from event co-occurrence and simulates counterfactual interventions.
 
-`@cognitive-substrate/causal-engine` is a top-level package used by the Cognitive Substrate workspace. Its public API is the package export surface, not this README.
+## What it does
 
-## Entrypoints
+The causal engine builds a `StructuralCausalModel` — a directed graph of cause-effect relationships — by aggregating edges extracted from event text. Once a model exists, `simulateCounterfactual()` applies an intervention (forcing a variable to a value) and propagates the effect through the graph to produce a `CounterfactualResult`.
 
-- Source: `packages/causal-engine/src/index.ts`
-- Package main: `./dist/index.js`
-- Package metadata: `packages/causal-engine/package.json`
+This gives the cognitive loop the ability to ask "what would have happened if X had been different?" without requiring a full re-run of the experience sequence.
 
-## Runtime Wiring
+## API
 
-Runtime wiring happens through apps, workers, or other packages that import this package. Kafka topic claims should be checked against `packages/kafka-bus/src/topics.ts`; OpenSearch index claims should be checked against `packages/memory-opensearch/src/schemas.ts`.
+```ts
+import { CausalEngine, StructuralCausalModel } from '@cognitive-substrate/causal-engine';
 
-## Evidence
+const engine = new CausalEngine();
+const model: StructuralCausalModel = engine.infer(events);
 
-Evidence is limited to build/typecheck/import coverage and any downstream smoke usage that imports this package or runs this worker.
+const result = engine.simulateCounterfactual(model, { variable: 'load', value: 0 });
+// result.predictedOutcome, result.affectedVariables
+```
+
+### Key exports
+
+| Export | Description |
+| ------ | ----------- |
+| `CausalEngine` | `.infer(events)` builds the model; `.simulateCounterfactual()` runs interventions |
+| `StructuralCausalModel` | Directed graph of causal edges with strengths |
+| `CounterfactualResult` | Predicted outcome and list of downstream affected variables |
+
+## Dependencies
+
+- `@cognitive-substrate/core-types` — `Experience` event type
+
+## Notes
+
+Edge inference is currently text co-occurrence based. A causal discovery algorithm (e.g. PC or FCI) is the intended upgrade path.

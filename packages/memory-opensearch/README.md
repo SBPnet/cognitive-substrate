@@ -1,19 +1,48 @@
 # @cognitive-substrate/memory-opensearch
 
-## Purpose
+OpenSearch index schemas, hybrid retrieval (BM25 + k-NN), query builder, ML inference integration, and retrieval profiles for the semantic memory layer.
 
-`@cognitive-substrate/memory-opensearch` is a top-level package used by the Cognitive Substrate workspace. Its public API is the package export surface, not this README.
+## What it does
 
-## Entrypoints
+This package is the semantic memory persistence and retrieval layer. It defines:
 
-- Source: `packages/memory-opensearch/src/index.ts`
-- Package main: `./dist/index.js`
-- Package metadata: `packages/memory-opensearch/package.json`
+- **Index schemas** (`src/schemas.ts`) — the single source of truth for all OpenSearch index mappings. Used at migration time and referenced by every package that reads or writes memories.
+- **Hybrid query builder** — combines BM25 keyword search with k-NN vector search, weighted by the active policy's `keywordWeight` / `vectorWeight` parameters.
+- **ML inference client** — calls OpenSearch ML node endpoints for embedding generation and cross-encoder reranking.
+- **Retrieval profiles** — four named profiles (precise, broad, recent, diverse) that pre-configure query parameters for common retrieval patterns.
 
-## Runtime Wiring
+## API
 
-Runtime wiring happens through apps, workers, or other packages that import this package. Kafka topic claims should be checked against `packages/kafka-bus/src/topics.ts`; OpenSearch index claims should be checked against `packages/memory-opensearch/src/schemas.ts`.
+```ts
+import { search, buildHybridQuery, PROFILES } from '@cognitive-substrate/memory-opensearch';
 
-## Evidence
+const query = buildHybridQuery({ text: 'attention under load', embedding, policy });
+const results = await search(client, query, PROFILES.precise);
+```
 
-Focused tests exist under `src/__tests__/` where present; otherwise evidence is limited to build/typecheck/import coverage and downstream smoke usage.
+### Key exports
+
+| Export | Description |
+| ------ | ----------- |
+| `search(client, query, profile)` | Executes a hybrid query; returns ranked `Memory[]` |
+| `buildHybridQuery(params)` | Constructs a hybrid BM25 + k-NN query object |
+| `PROFILES` | Named retrieval profile presets |
+| `SCHEMAS` | Index mapping definitions (used by migration scripts) |
+| `MLClient` | Wraps OpenSearch ML endpoints for embeddings and reranking |
+
+## Dependencies
+
+- `@cognitive-substrate/core-types` — `Memory`, `Policy` types
+- `@opensearch-project/opensearch` — OpenSearch JS client
+
+## Index claims
+
+All index names are defined in `src/schemas.ts`. Other packages must import from there rather than hardcoding index names.
+
+## Configuration
+
+| Env var | Description |
+| ------- | ----------- |
+| `OPENSEARCH_URL` | OpenSearch cluster endpoint |
+| `OPENSEARCH_USER` | Basic auth username |
+| `OPENSEARCH_PASSWORD` | Basic auth password |

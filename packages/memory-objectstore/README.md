@@ -1,19 +1,42 @@
 # @cognitive-substrate/memory-objectstore
 
-## Purpose
+S3-compatible episodic truth-layer client for durable storage and retrieval of raw experience events.
 
-`@cognitive-substrate/memory-objectstore` is a top-level package used by the Cognitive Substrate workspace. Its public API is the package export surface, not this README.
+## What it does
 
-## Entrypoints
+OpenSearch holds semantic memories (processed, indexed, searchable). The object store holds the raw episodic record — the append-only log of every `Experience` event as it arrived. This separation means:
 
-- Source: `packages/memory-objectstore/src/index.ts`
-- Package main: `./dist/index.js`
-- Package metadata: `packages/memory-objectstore/package.json`
+- Semantic memories can be re-derived from raw events if indexes are rebuilt.
+- Raw events are immutable; only the object store copy is authoritative.
+- Large payloads (e.g. sensor snapshots) stay out of OpenSearch.
 
-## Runtime Wiring
+The client wraps the AWS SDK S3 client with key-building helpers that encode session ID and timestamp into a deterministic path.
 
-Runtime wiring happens through apps, workers, or other packages that import this package. Kafka topic claims should be checked against `packages/kafka-bus/src/topics.ts`; OpenSearch index claims should be checked against `packages/memory-opensearch/src/schemas.ts`.
+## API
 
-## Evidence
+```ts
+import { ObjectStoreClient, buildEventKey } from '@cognitive-substrate/memory-objectstore';
 
-Evidence is limited to build/typecheck/import coverage and any downstream smoke usage that imports this package or runs this worker.
+const client = new ObjectStoreClient({ bucket: process.env.EPISODIC_BUCKET });
+await client.put(event);
+const event = await client.get(buildEventKey(sessionId, eventId));
+```
+
+### Key exports
+
+| Export | Description |
+| ------ | ----------- |
+| `ObjectStoreClient` | `.put(event)`, `.get(key)`, `.list(prefix)` |
+| `buildEventKey(sessionId, eventId)` | Constructs the canonical S3 key for an event |
+
+## Dependencies
+
+- `@aws-sdk/client-s3` — AWS SDK S3 client
+
+## Configuration
+
+| Env var | Description |
+| ------- | ----------- |
+| `EPISODIC_BUCKET` | S3 bucket name |
+| `AWS_REGION` | AWS region |
+| `AWS_ENDPOINT_URL` | Override for S3-compatible stores (e.g. MinIO) |

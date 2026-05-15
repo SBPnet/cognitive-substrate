@@ -1,19 +1,39 @@
 # @cognitive-substrate/curiosity-engine
 
-## Purpose
+Ranks candidate states by information gain and exploration potential, then proposes concrete experiments for the cognitive loop to pursue.
 
-`@cognitive-substrate/curiosity-engine` is a top-level package used by the Cognitive Substrate workspace. Its public API is the package export surface, not this README.
+## What it does
 
-## Entrypoints
+Given a set of candidate states (unexplored regions of the agent's knowledge space), the curiosity engine scores each one and returns a ranked `CuriosityAssessment`. From the top-ranked states it proposes up to five `ExperimentPlan` items describing what to try and what outcome to observe.
 
-- Source: `packages/curiosity-engine/src/index.ts`
-- Package main: `./dist/index.js`
-- Package metadata: `packages/curiosity-engine/package.json`
+### Priority formula
 
-## Runtime Wiring
+```text
+priority = informationGain×0.40 + novelty×0.25 + uncertainty×0.25 + unexploredBonus×0.10
+```
 
-Runtime wiring happens through apps, workers, or other packages that import this package. Kafka topic claims should be checked against `packages/kafka-bus/src/topics.ts`; OpenSearch index claims should be checked against `packages/memory-opensearch/src/schemas.ts`.
+States that have never been visited receive the unexplored bonus on top of their base score.
 
-## Evidence
+## API
 
-Evidence is limited to build/typecheck/import coverage and any downstream smoke usage that imports this package or runs this worker.
+```ts
+import { CuriosityEngine, CuriosityAssessment, planExperiment } from '@cognitive-substrate/curiosity-engine';
+
+const engine = new CuriosityEngine();
+const assessment: CuriosityAssessment = engine.assess(candidateStates);
+// assessment.ranked[] — sorted by priority descending
+// assessment.experiments[] — up to 5 proposed ExperimentPlans
+```
+
+### Key exports
+
+| Export | Description |
+| ------ | ----------- |
+| `CuriosityEngine` | Main assessor; call `.assess(states)` |
+| `CuriosityAssessment` | Ranked states + experiment proposals |
+| `curiosityPriority(state)` | Standalone priority scorer |
+| `planExperiment(state)` | Generates a single experiment plan from a state |
+
+## Dependencies
+
+None.

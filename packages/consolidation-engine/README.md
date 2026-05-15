@@ -1,19 +1,35 @@
 # @cognitive-substrate/consolidation-engine
 
-## Purpose
+Orchestrates sleep-cycle memory consolidation: selects replay candidates, synthesizes semantic memories, and marks source events as consolidated.
 
-`@cognitive-substrate/consolidation-engine` is a top-level package used by the Cognitive Substrate workspace. Its public API is the package export surface, not this README.
+## What it does
 
-## Entrypoints
+Consolidation runs offline (outside the hot cognitive loop) and performs three steps:
 
-- Source: `packages/consolidation-engine/src/index.ts`
-- Package main: `./dist/index.js`
-- Package metadata: `packages/consolidation-engine/package.json`
+1. **Candidate selection** — queries OpenSearch for recent experience events using a decay-aware filter, prioritising high-importance unconsolidated events.
+2. **Synthesis** — passes candidates through a `ConsolidationModel` (default: extractive) to produce `SemanticMemory` records with stability and contradiction scores.
+3. **Write-back** — persists new memories to OpenSearch and marks source events as `consolidated: true` to prevent double-processing.
 
-## Runtime Wiring
+## API
 
-Runtime wiring happens through apps, workers, or other packages that import this package. Kafka topic claims should be checked against `packages/kafka-bus/src/topics.ts`; OpenSearch index claims should be checked against `packages/memory-opensearch/src/schemas.ts`.
+```ts
+import { ConsolidationEngine, ExtractiveConsolidationModel } from '@cognitive-substrate/consolidation-engine';
 
-## Evidence
+const engine = new ConsolidationEngine({ store, model: new ExtractiveConsolidationModel() });
+const result: ConsolidationResult = await engine.run(sessionId);
+// result.consolidated = number of events processed
+// result.memoriesCreated = new SemanticMemory records written
+```
 
-Evidence is limited to build/typecheck/import coverage and any downstream smoke usage that imports this package or runs this worker.
+### Key exports
+
+| Export | Description |
+| ------ | ----------- |
+| `ConsolidationEngine` | Main runner; inject a `store` and optional `model` |
+| `ConsolidationResult` | Summary counts + any errors |
+| `ExtractiveConsolidationModel` | Default model; extracts content directly from source events |
+
+## Dependencies
+
+- `@cognitive-substrate/core-types` — `Experience`, `Memory` types
+- `@cognitive-substrate/memory-opensearch` — candidate query and memory write-back

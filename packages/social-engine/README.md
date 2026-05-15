@@ -1,19 +1,36 @@
 # @cognitive-substrate/social-engine
 
-## Purpose
+Lightweight social cognition and user-model inference. Tracks per-user intent, trust, and deception risk across interactions.
 
-`@cognitive-substrate/social-engine` is a top-level package used by the Cognitive Substrate workspace. Its public API is the package export surface, not this README.
+## What it does
 
-## Entrypoints
+The social engine maintains a `UserModel` for each user the agent interacts with. On each interaction it:
 
-- Source: `packages/social-engine/src/index.ts`
-- Package main: `./dist/index.js`
-- Package metadata: `packages/social-engine/package.json`
+1. **Infers intent** — classifies the interaction as `explanation`, `implementation`, or `general` using keyword-based heuristics.
+2. **Updates trust** — applies exponential smoothing to a trust score based on interaction outcome and alignment signals.
+3. **Tracks deception risk** — monitors for signals (inconsistency, manipulation markers) and smooths a deception risk score.
+4. **Manages belief buffer** — retains the 20 most recent beliefs per user to inform future intent classification.
 
-## Runtime Wiring
+## API
 
-Runtime wiring happens through apps, workers, or other packages that import this package. Kafka topic claims should be checked against `packages/kafka-bus/src/topics.ts`; OpenSearch index claims should be checked against `packages/memory-opensearch/src/schemas.ts`.
+```ts
+import { SocialEngine, UserModel, inferIntent } from '@cognitive-substrate/social-engine';
 
-## Evidence
+const engine = new SocialEngine();
+const model: UserModel = engine.update(userId, interaction, outcome);
+// model.intent — 'explanation' | 'implementation' | 'general'
+// model.trust — 0–1 smoothed trust score
+// model.deceptionRisk — 0–1 smoothed risk score
+```
 
-Evidence is limited to build/typecheck/import coverage and any downstream smoke usage that imports this package or runs this worker.
+### Key exports
+
+| Export | Description |
+| ------ | ----------- |
+| `SocialEngine` | Stateful per-user model tracker |
+| `UserModel` | Intent, trust, deception risk, and recent beliefs |
+| `inferIntent(interaction)` | Standalone keyword-based intent classifier |
+
+## Dependencies
+
+- `@cognitive-substrate/core-types` — `Interaction`, `UserModel` types
