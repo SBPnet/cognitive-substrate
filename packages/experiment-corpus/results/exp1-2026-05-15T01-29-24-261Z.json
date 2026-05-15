@@ -1,0 +1,368 @@
+{
+  "experiment": "exp1",
+  "runAt": "2026-05-15T01:29:24.261Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "Flat importance-ranked retrieval, no T influence. Cluster-B invisible at top-3.",
+  "data": {
+    "topK": 3,
+    "hitRate": 0.7,
+    "hits": 14,
+    "total": 20,
+    "breadth": 1,
+    "entropy": 1.584962500721156,
+    "uniqueMemoryIds": 3,
+    "clusterCoverage": 0.3333333333333333,
+    "clusterCounts": {
+      "cluster-a": 60,
+      "cluster-b": 0,
+      "cluster-c": 0
+    },
+    "distribution": [
+      {
+        "memoryId": "mem-a1",
+        "count": 20
+      },
+      {
+        "memoryId": "mem-a2",
+        "count": 20
+      },
+      {
+        "memoryId": "mem-a3",
+        "count": 20
+      }
+    ],
+    "turns": [
+      {
+        "turnId": "turn-01",
+        "memoryId": "mem-a1",
+        "groundTruthTargets": [
+          "mem-a1",
+          "mem-a2"
+        ],
+        "retrievedIds": [
+          "mem-a1",
+          "mem-a2",
+          "mem-a3"
+        ],
+        "hitIds": [
+          "mem-a1",
+          "mem-a2"
+        ],
+        "hit": true
+      },
+      {
+        "turnId": "turn-02",
+        "memoryId": "mem-a2",
+        "groundTruthTargets": [
+          "mem-a2",
+          "mem-a1"
+        ],
+        "retrievedIds": [
+          "mem-a1",
+          "mem-a2",
+          "mem-a3"
+        ],
+        "hitIds": [
+          "mem-a2",
+          "mem-a1"
+        ],
+        "hit": true
+      },
+      {
+        "turnId": "turn-03",
+        "memoryId": "mem-a3",
+        "groundTruthTargets": [
+          "mem-a3",
+          "mem-a2"
+        ],
+        "retrievedIds": [
+          "mem-a1",
+          "mem-a2",
+          "mem-a3"
+        ],
+        "hitIds": [
+          "mem-a3",
+          "mem-a2"
+        ],
+        "hit": true
+      },
+      {
+        "turnId": "turn-04",
+        "memoryId": "mem-a1",
+        "groundTruthTargets": [
+          "mem-a1",
+          "mem-a4"
+        ],
+        "retrievedIds": [
+          "mem-a1",
+          "mem-a2",
+          "mem-a3"
+        ],
+        "hitIds": [
+          "mem-a1"
+        ],
+        "hit": true
+      },
+      {
+        "turnId": "turn-05",
+        "memoryId": "mem-a4",
+        "groundTruthTargets": [
+          "mem-a4",
+          "mem-a1"
+        ],
+        "retrievedIds": [
+          "mem-a1",
+          "mem-a2",
+          "mem-a3"
+        ],
+        "hitIds": [
+          "mem-a1"
+        ],
+        "hit": true
+      },
+      {
+        "turnId": "turn-06",
+        "memoryId": "mem-a2",
+        "groundTruthTargets": [
+          "mem-a2",
+          "mem-a3"
+        ],
+        "retrievedIds": [
+          "mem-a1",
+          "mem-a2",
+          "mem-a3"
+        ],
+        "hitIds": [
+          "mem-a2",
+          "mem-a3"
+        ],
+        "hit": true
+      },
+      {
+        "turnId": "turn-07",
+        "memoryId": "mem-b1",
+        "groundTruthTargets": [
+          "mem-b1",
+          "mem-b2"
+        ],
+        "retrievedIds": [
+          "mem-a1",
+          "mem-a2",
+          "mem-a3"
+        ],
+        "hitIds": [],
+        "hit": false
+      },
+      {
+        "turnId": "turn-08",
+        "memoryId": "mem-b2",
+        "groundTruthTargets": [
+          "mem-b2",
+          "mem-b1"
+        ],
+        "retrievedIds": [
+          "mem-a1",
+          "mem-a2",
+          "mem-a3"
+        ],
+        "hitIds": [],
+        "hit": false
+      },
+      {
+        "turnId": "turn-09",
+        "memoryId": "mem-b3",
+        "groundTruthTargets": [
+          "mem-b3",
+          "mem-a1"
+        ],
+        "retrievedIds": [
+          "mem-a1",
+          "mem-a2",
+          "mem-a3"
+        ],
+        "hitIds": [
+          "mem-a1"
+        ],
+        "hit": true
+      },
+      {
+        "turnId": "turn-10",
+        "memoryId": "mem-b1",
+        "groundTruthTargets": [
+          "mem-b1",
+          "mem-b3"
+        ],
+        "retrievedIds": [
+          "mem-a1",
+          "mem-a2",
+          "mem-a3"
+        ],
+        "hitIds": [],
+        "hit": false
+      },
+      {
+        "turnId": "turn-11",
+        "memoryId": "mem-c1",
+        "groundTruthTargets": [
+          "mem-a1"
+        ],
+        "retrievedIds": [
+          "mem-a1",
+          "mem-a2",
+          "mem-a3"
+        ],
+        "hitIds": [
+          "mem-a1"
+        ],
+        "hit": true
+      },
+      {
+        "turnId": "turn-12",
+        "memoryId": "mem-c2",
+        "groundTruthTargets": [],
+        "retrievedIds": [
+          "mem-a1",
+          "mem-a2",
+          "mem-a3"
+        ],
+        "hitIds": [],
+        "hit": false
+      },
+      {
+        "turnId": "turn-13",
+        "memoryId": "mem-c1",
+        "groundTruthTargets": [
+          "mem-a1"
+        ],
+        "retrievedIds": [
+          "mem-a1",
+          "mem-a2",
+          "mem-a3"
+        ],
+        "hitIds": [
+          "mem-a1"
+        ],
+        "hit": true
+      },
+      {
+        "turnId": "turn-14",
+        "memoryId": "mem-a3",
+        "groundTruthTargets": [
+          "mem-a3",
+          "mem-b1"
+        ],
+        "retrievedIds": [
+          "mem-a1",
+          "mem-a2",
+          "mem-a3"
+        ],
+        "hitIds": [
+          "mem-a3"
+        ],
+        "hit": true
+      },
+      {
+        "turnId": "turn-15",
+        "memoryId": "mem-b2",
+        "groundTruthTargets": [
+          "mem-b2",
+          "mem-a4"
+        ],
+        "retrievedIds": [
+          "mem-a1",
+          "mem-a2",
+          "mem-a3"
+        ],
+        "hitIds": [],
+        "hit": false
+      },
+      {
+        "turnId": "turn-16",
+        "memoryId": "mem-a4",
+        "groundTruthTargets": [
+          "mem-a4",
+          "mem-a1"
+        ],
+        "retrievedIds": [
+          "mem-a1",
+          "mem-a2",
+          "mem-a3"
+        ],
+        "hitIds": [
+          "mem-a1"
+        ],
+        "hit": true
+      },
+      {
+        "turnId": "turn-17",
+        "memoryId": "mem-a1",
+        "groundTruthTargets": [
+          "mem-a1",
+          "mem-b3"
+        ],
+        "retrievedIds": [
+          "mem-a1",
+          "mem-a2",
+          "mem-a3"
+        ],
+        "hitIds": [
+          "mem-a1"
+        ],
+        "hit": true
+      },
+      {
+        "turnId": "turn-18",
+        "memoryId": "mem-b3",
+        "groundTruthTargets": [
+          "mem-b3",
+          "mem-b1",
+          "mem-a1"
+        ],
+        "retrievedIds": [
+          "mem-a1",
+          "mem-a2",
+          "mem-a3"
+        ],
+        "hitIds": [
+          "mem-a1"
+        ],
+        "hit": true
+      },
+      {
+        "turnId": "turn-19",
+        "memoryId": "mem-b1",
+        "groundTruthTargets": [
+          "mem-b1",
+          "mem-b2",
+          "mem-b3"
+        ],
+        "retrievedIds": [
+          "mem-a1",
+          "mem-a2",
+          "mem-a3"
+        ],
+        "hitIds": [],
+        "hit": false
+      },
+      {
+        "turnId": "turn-20",
+        "memoryId": "mem-a2",
+        "groundTruthTargets": [
+          "mem-a2",
+          "mem-a1",
+          "mem-b3"
+        ],
+        "retrievedIds": [
+          "mem-a1",
+          "mem-a2",
+          "mem-a3"
+        ],
+        "hitIds": [
+          "mem-a2",
+          "mem-a1"
+        ],
+        "hit": true
+      }
+    ]
+  }
+}

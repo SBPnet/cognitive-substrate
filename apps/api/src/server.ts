@@ -46,13 +46,13 @@ export function createApp(openSearchClient: Client): Hono {
   // Roadmap Stages 6-7: multi-agent activity (stub until Stage 6)
   app.route("/api/sessions/:sessionId/agents", createAgentActivityRouter(openSearchClient));
 
-  // Roadmap Stage 8: self-modification proposals (stub until Stage 8)
+  // Roadmap Stage 8: self-modification proposals (self_modifications index)
   app.route("/api/sessions/:sessionId/selfmod", createSelfmodRouter(openSearchClient));
 
-  // Roadmap Stages 9-10: identity state (stub until Stage 10)
+  // Roadmap Stages 9-10: identity state (identity_state index)
   app.route("/api/sessions/:sessionId/identity", createIdentityRouter(openSearchClient));
 
-  // Roadmap Stages 11-12: goal hierarchy (stub until Stage 12)
+  // Roadmap Stages 11-12: goal hierarchy (goal_system index)
   app.route("/api/sessions/:sessionId/goals", createGoalsRouter(openSearchClient));
 
   app.route("/api/collector", createCollectorRouter());

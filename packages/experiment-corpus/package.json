@@ -23,7 +23,8 @@
     "exp3": "node --import tsx/esm src/experiment-3.ts",
     "exp4": "node --import tsx/esm src/experiment-4.ts",
     "exp5": "node --import tsx/esm src/experiment-5.ts",
-    "exp6": "node --import tsx/esm src/experiment-6.ts"
+    "exp6": "node --import tsx/esm src/experiment-6.ts",
+    "exp7": "node --import tsx/esm src/experiment-7.ts"
   },
   "dependencies": {
     "@cognitive-substrate/attention-engine": "workspace:*",

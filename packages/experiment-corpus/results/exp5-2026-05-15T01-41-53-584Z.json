@@ -1,0 +1,5351 @@
+{
+  "experiment": "exp5",
+  "runAt": "2026-05-15T01:41:53.584Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "Graph-augmented retrieval. One-hop link expansion from top-k seeds. Primary target: mem-b3 (no inbound links, imp=0.55).",
+  "data": {
+    "topK": 5,
+    "decay": 0.5,
+    "tValues": [
+      0.1,
+      0.5,
+      0.9
+    ],
+    "tGraphValues": [
+      0.3,
+      0.7
+    ],
+    "hypotheses": {
+      "h1": false,
+      "h2": true,
+      "h3": false,
+      "h4": true
+    },
+    "graphEdges": [
+      {
+        "target_memory_id": "mem-a2",
+        "relationship_type": "causal",
+        "strength": 0.8,
+        "source_memory_id": "mem-a1",
+        "link_id": "link-a1-a2"
+      },
+      {
+        "target_memory_id": "mem-a4",
+        "relationship_type": "temporal",
+        "strength": 0.6,
+        "source_memory_id": "mem-a1",
+        "link_id": "link-a1-a4"
+      },
+      {
+        "target_memory_id": "mem-a1",
+        "relationship_type": "contradicts",
+        "strength": 0.85,
+        "source_memory_id": "mem-c1",
+        "link_id": "link-c1-a1"
+      },
+      {
+        "target_memory_id": "mem-a3",
+        "relationship_type": "causal",
+        "strength": 0.7,
+        "source_memory_id": "mem-a2",
+        "link_id": "link-a2-a3"
+      },
+      {
+        "target_memory_id": "mem-a1",
+        "relationship_type": "derived_from",
+        "strength": 0.65,
+        "source_memory_id": "mem-b3",
+        "link_id": "link-b3-a1"
+      },
+      {
+        "target_memory_id": "mem-b2",
+        "relationship_type": "semantic",
+        "strength": 0.75,
+        "source_memory_id": "mem-b1",
+        "link_id": "link-b1-b2"
+      }
+    ],
+    "subRuns": [
+      {
+        "strategy": "flat",
+        "T": 0.1,
+        "Tg": null,
+        "hitRate": 0.9,
+        "b3HitRate": 0,
+        "c1SurfaceRate": 0,
+        "breadth": 0.9705137715779508,
+        "clusterAShare": 0.8,
+        "clusterBShare": 0.2,
+        "clusterCounts": {
+          "cluster-a": 80,
+          "cluster-b": 20,
+          "cluster-c": 0
+        },
+        "avgExpansionPerTurn": 0,
+        "linkTypeHits": {},
+        "clusterPattern": "AAAAB AAAAB AAABA AAAAB AAAAB AAABA AAAAB AAAAB AAABA AAAAB AAAAB AAABA AAAAB AAAAB AAABA AAAAB AAAAB AAABA AAAAB AAAAB",
+        "turns": [
+          {
+            "turnId": "turn-01",
+            "memoryId": "mem-a1",
+            "groundTruthTargets": [
+              "mem-a1",
+              "mem-a2"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2"
+            ],
+            "hitIds": [
+              "mem-a1",
+              "mem-a2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-02",
+            "memoryId": "mem-a2",
+            "groundTruthTargets": [
+              "mem-a2",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b1"
+            ],
+            "hitIds": [
+              "mem-a2",
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-03",
+            "memoryId": "mem-a3",
+            "groundTruthTargets": [
+              "mem-a3",
+              "mem-a2"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-b2",
+              "mem-a4"
+            ],
+            "hitIds": [
+              "mem-a3",
+              "mem-a2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAABA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-04",
+            "memoryId": "mem-a1",
+            "groundTruthTargets": [
+              "mem-a1",
+              "mem-a4"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2"
+            ],
+            "hitIds": [
+              "mem-a1",
+              "mem-a4"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-05",
+            "memoryId": "mem-a4",
+            "groundTruthTargets": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b1"
+            ],
+            "hitIds": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-06",
+            "memoryId": "mem-a2",
+            "groundTruthTargets": [
+              "mem-a2",
+              "mem-a3"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-b2",
+              "mem-a4"
+            ],
+            "hitIds": [
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAABA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-07",
+            "memoryId": "mem-b1",
+            "groundTruthTargets": [
+              "mem-b1",
+              "mem-b2"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2"
+            ],
+            "hitIds": [
+              "mem-b2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-08",
+            "memoryId": "mem-b2",
+            "groundTruthTargets": [
+              "mem-b2",
+              "mem-b1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b1"
+            ],
+            "hitIds": [
+              "mem-b1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-09",
+            "memoryId": "mem-b3",
+            "groundTruthTargets": [
+              "mem-b3",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-b2",
+              "mem-a4"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAABA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-10",
+            "memoryId": "mem-b1",
+            "groundTruthTargets": [
+              "mem-b1",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2"
+            ],
+            "hitIds": [],
+            "hit": false,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-11",
+            "memoryId": "mem-c1",
+            "groundTruthTargets": [
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b1"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-12",
+            "memoryId": "mem-c2",
+            "groundTruthTargets": [],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-b2",
+              "mem-a4"
+            ],
+            "hitIds": [],
+            "hit": false,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAABA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-13",
+            "memoryId": "mem-c1",
+            "groundTruthTargets": [
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-14",
+            "memoryId": "mem-a3",
+            "groundTruthTargets": [
+              "mem-a3",
+              "mem-b1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b1"
+            ],
+            "hitIds": [
+              "mem-a3",
+              "mem-b1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-15",
+            "memoryId": "mem-b2",
+            "groundTruthTargets": [
+              "mem-b2",
+              "mem-a4"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-b2",
+              "mem-a4"
+            ],
+            "hitIds": [
+              "mem-b2",
+              "mem-a4"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAABA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-16",
+            "memoryId": "mem-a4",
+            "groundTruthTargets": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2"
+            ],
+            "hitIds": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-17",
+            "memoryId": "mem-a1",
+            "groundTruthTargets": [
+              "mem-a1",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b1"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-18",
+            "memoryId": "mem-b3",
+            "groundTruthTargets": [
+              "mem-b3",
+              "mem-b1",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-b2",
+              "mem-a4"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAABA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-19",
+            "memoryId": "mem-b1",
+            "groundTruthTargets": [
+              "mem-b1",
+              "mem-b2",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2"
+            ],
+            "hitIds": [
+              "mem-b2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-20",
+            "memoryId": "mem-a2",
+            "groundTruthTargets": [
+              "mem-a2",
+              "mem-a1",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b1"
+            ],
+            "hitIds": [
+              "mem-a2",
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          }
+        ]
+      },
+      {
+        "strategy": "flat",
+        "T": 0.5,
+        "Tg": null,
+        "hitRate": 0.95,
+        "b3HitRate": 0.5,
+        "c1SurfaceRate": 0.2,
+        "breadth": 0.9554379046216114,
+        "clusterAShare": 0.66,
+        "clusterBShare": 0.3,
+        "clusterCounts": {
+          "cluster-a": 66,
+          "cluster-b": 30,
+          "cluster-c": 4
+        },
+        "avgExpansionPerTurn": 0,
+        "linkTypeHits": {},
+        "clusterPattern": "AAAAB BBAAC AABAA ABABA ABAAA ABABA ABAAC AABAB ABAAA ABABA ABAAA ABABC AABAA ABABA ABAAA ABABA ABAAC AABAB ABAAA ABABA",
+        "turns": [
+          {
+            "turnId": "turn-01",
+            "memoryId": "mem-a1",
+            "groundTruthTargets": [
+              "mem-a1",
+              "mem-a2"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2"
+            ],
+            "hitIds": [
+              "mem-a1",
+              "mem-a2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-02",
+            "memoryId": "mem-a2",
+            "groundTruthTargets": [
+              "mem-a2",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-b1",
+              "mem-b3",
+              "mem-a1",
+              "mem-a2",
+              "mem-c1"
+            ],
+            "hitIds": [
+              "mem-a2",
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": true,
+            "clusterSlots": "BBAAC",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-03",
+            "memoryId": "mem-a3",
+            "groundTruthTargets": [
+              "mem-a3",
+              "mem-a2"
+            ],
+            "retrievedIds": [
+              "mem-a3",
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-a2"
+            ],
+            "hitIds": [
+              "mem-a3",
+              "mem-a2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AABAA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-04",
+            "memoryId": "mem-a1",
+            "groundTruthTargets": [
+              "mem-a1",
+              "mem-a4"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-b1",
+              "mem-a2",
+              "mem-b3",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "ABABA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-05",
+            "memoryId": "mem-a4",
+            "groundTruthTargets": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "ABAAA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-06",
+            "memoryId": "mem-a2",
+            "groundTruthTargets": [
+              "mem-a2",
+              "mem-a3"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-b1",
+              "mem-a2",
+              "mem-b3",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "ABABA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-07",
+            "memoryId": "mem-b1",
+            "groundTruthTargets": [
+              "mem-b1",
+              "mem-b2"
+            ],
+            "retrievedIds": [
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-a2",
+              "mem-c1"
+            ],
+            "hitIds": [
+              "mem-b2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": true,
+            "clusterSlots": "ABAAC",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-08",
+            "memoryId": "mem-b2",
+            "groundTruthTargets": [
+              "mem-b2",
+              "mem-b1"
+            ],
+            "retrievedIds": [
+              "mem-a3",
+              "mem-a1",
+              "mem-b1",
+              "mem-a2",
+              "mem-b3"
+            ],
+            "hitIds": [
+              "mem-b1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "AABAB",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-09",
+            "memoryId": "mem-b3",
+            "groundTruthTargets": [
+              "mem-b3",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "ABAAA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-10",
+            "memoryId": "mem-b1",
+            "groundTruthTargets": [
+              "mem-b1",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-b1",
+              "mem-a2",
+              "mem-b3",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-b1",
+              "mem-b3"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "ABABA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-11",
+            "memoryId": "mem-c1",
+            "groundTruthTargets": [
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "ABAAA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-12",
+            "memoryId": "mem-c2",
+            "groundTruthTargets": [],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-b1",
+              "mem-a2",
+              "mem-b3",
+              "mem-c1"
+            ],
+            "hitIds": [],
+            "hit": false,
+            "hitB3": true,
+            "surfacedC1": true,
+            "clusterSlots": "ABABC",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-13",
+            "memoryId": "mem-c1",
+            "groundTruthTargets": [
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a3",
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-a2"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AABAA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-14",
+            "memoryId": "mem-a3",
+            "groundTruthTargets": [
+              "mem-a3",
+              "mem-b1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-b1",
+              "mem-a2",
+              "mem-b3",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-a3",
+              "mem-b1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "ABABA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-15",
+            "memoryId": "mem-b2",
+            "groundTruthTargets": [
+              "mem-b2",
+              "mem-a4"
+            ],
+            "retrievedIds": [
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-b2",
+              "mem-a4"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "ABAAA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-16",
+            "memoryId": "mem-a4",
+            "groundTruthTargets": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-b1",
+              "mem-a2",
+              "mem-b3",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "ABABA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-17",
+            "memoryId": "mem-a1",
+            "groundTruthTargets": [
+              "mem-a1",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-a2",
+              "mem-c1"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": true,
+            "clusterSlots": "ABAAC",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-18",
+            "memoryId": "mem-b3",
+            "groundTruthTargets": [
+              "mem-b3",
+              "mem-b1",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a3",
+              "mem-a1",
+              "mem-b1",
+              "mem-a2",
+              "mem-b3"
+            ],
+            "hitIds": [
+              "mem-b3",
+              "mem-b1",
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "AABAB",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-19",
+            "memoryId": "mem-b1",
+            "groundTruthTargets": [
+              "mem-b1",
+              "mem-b2",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-b2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "ABAAA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-20",
+            "memoryId": "mem-a2",
+            "groundTruthTargets": [
+              "mem-a2",
+              "mem-a1",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-b1",
+              "mem-a2",
+              "mem-b3",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-a2",
+              "mem-a1",
+              "mem-b3"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "ABABA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          }
+        ]
+      },
+      {
+        "strategy": "flat",
+        "T": 0.9,
+        "Tg": null,
+        "hitRate": 0.95,
+        "b3HitRate": 0.5,
+        "c1SurfaceRate": 0.35,
+        "breadth": 0.9765389766726609,
+        "clusterAShare": 0.56,
+        "clusterBShare": 0.3,
+        "clusterCounts": {
+          "cluster-a": 56,
+          "cluster-b": 30,
+          "cluster-c": 14
+        },
+        "avgExpansionPerTurn": 0,
+        "linkTypeHits": {},
+        "clusterPattern": "AAAAB BBCCA AAABA BBAAA ABCAC AABBA ABAAA BBCAC AAABA BBAAA ABCAC AABBA ABAAA BBCAC AAABA BBAAA ABCAC AABBA ABAAA BBCAC",
+        "turns": [
+          {
+            "turnId": "turn-01",
+            "memoryId": "mem-a1",
+            "groundTruthTargets": [
+              "mem-a1",
+              "mem-a2"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2"
+            ],
+            "hitIds": [
+              "mem-a1",
+              "mem-a2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-02",
+            "memoryId": "mem-a2",
+            "groundTruthTargets": [
+              "mem-a2",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-b1",
+              "mem-b3",
+              "mem-c1",
+              "mem-c2",
+              "mem-a1"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": true,
+            "clusterSlots": "BBCCA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-03",
+            "memoryId": "mem-a3",
+            "groundTruthTargets": [
+              "mem-a3",
+              "mem-a2"
+            ],
+            "retrievedIds": [
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2",
+              "mem-a1"
+            ],
+            "hitIds": [
+              "mem-a3",
+              "mem-a2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAABA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-04",
+            "memoryId": "mem-a1",
+            "groundTruthTargets": [
+              "mem-a1",
+              "mem-a4"
+            ],
+            "retrievedIds": [
+              "mem-b1",
+              "mem-b3",
+              "mem-a1",
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "BBAAA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-05",
+            "memoryId": "mem-a4",
+            "groundTruthTargets": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a4",
+              "mem-b2",
+              "mem-c1",
+              "mem-a1",
+              "mem-c2"
+            ],
+            "hitIds": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": true,
+            "clusterSlots": "ABCAC",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-06",
+            "memoryId": "mem-a2",
+            "groundTruthTargets": [
+              "mem-a2",
+              "mem-a3"
+            ],
+            "retrievedIds": [
+              "mem-a2",
+              "mem-a3",
+              "mem-b1",
+              "mem-b3",
+              "mem-a1"
+            ],
+            "hitIds": [
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "AABBA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-07",
+            "memoryId": "mem-b1",
+            "groundTruthTargets": [
+              "mem-b1",
+              "mem-b2"
+            ],
+            "retrievedIds": [
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-b2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "ABAAA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-08",
+            "memoryId": "mem-b2",
+            "groundTruthTargets": [
+              "mem-b2",
+              "mem-b1"
+            ],
+            "retrievedIds": [
+              "mem-b1",
+              "mem-b3",
+              "mem-c1",
+              "mem-a1",
+              "mem-c2"
+            ],
+            "hitIds": [
+              "mem-b1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": true,
+            "clusterSlots": "BBCAC",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-09",
+            "memoryId": "mem-b3",
+            "groundTruthTargets": [
+              "mem-b3",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2",
+              "mem-a1"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAABA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-10",
+            "memoryId": "mem-b1",
+            "groundTruthTargets": [
+              "mem-b1",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-b1",
+              "mem-b3",
+              "mem-a1",
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-b1",
+              "mem-b3"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "BBAAA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-11",
+            "memoryId": "mem-c1",
+            "groundTruthTargets": [
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a4",
+              "mem-b2",
+              "mem-c1",
+              "mem-a1",
+              "mem-c2"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": true,
+            "clusterSlots": "ABCAC",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-12",
+            "memoryId": "mem-c2",
+            "groundTruthTargets": [],
+            "retrievedIds": [
+              "mem-a2",
+              "mem-a3",
+              "mem-b1",
+              "mem-b3",
+              "mem-a1"
+            ],
+            "hitIds": [],
+            "hit": false,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "AABBA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-13",
+            "memoryId": "mem-c1",
+            "groundTruthTargets": [
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "ABAAA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-14",
+            "memoryId": "mem-a3",
+            "groundTruthTargets": [
+              "mem-a3",
+              "mem-b1"
+            ],
+            "retrievedIds": [
+              "mem-b1",
+              "mem-b3",
+              "mem-c1",
+              "mem-a1",
+              "mem-c2"
+            ],
+            "hitIds": [
+              "mem-b1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": true,
+            "clusterSlots": "BBCAC",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-15",
+            "memoryId": "mem-b2",
+            "groundTruthTargets": [
+              "mem-b2",
+              "mem-a4"
+            ],
+            "retrievedIds": [
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2",
+              "mem-a1"
+            ],
+            "hitIds": [
+              "mem-b2",
+              "mem-a4"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAABA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-16",
+            "memoryId": "mem-a4",
+            "groundTruthTargets": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-b1",
+              "mem-b3",
+              "mem-a1",
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "BBAAA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-17",
+            "memoryId": "mem-a1",
+            "groundTruthTargets": [
+              "mem-a1",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-a4",
+              "mem-b2",
+              "mem-c1",
+              "mem-a1",
+              "mem-c2"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": true,
+            "clusterSlots": "ABCAC",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-18",
+            "memoryId": "mem-b3",
+            "groundTruthTargets": [
+              "mem-b3",
+              "mem-b1",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a2",
+              "mem-a3",
+              "mem-b1",
+              "mem-b3",
+              "mem-a1"
+            ],
+            "hitIds": [
+              "mem-b3",
+              "mem-b1",
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "AABBA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-19",
+            "memoryId": "mem-b1",
+            "groundTruthTargets": [
+              "mem-b1",
+              "mem-b2",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-b2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "ABAAA",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          },
+          {
+            "turnId": "turn-20",
+            "memoryId": "mem-a2",
+            "groundTruthTargets": [
+              "mem-a2",
+              "mem-a1",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-b1",
+              "mem-b3",
+              "mem-c1",
+              "mem-a1",
+              "mem-c2"
+            ],
+            "hitIds": [
+              "mem-a1",
+              "mem-b3"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": true,
+            "clusterSlots": "BBCAC",
+            "expansionCount": 0,
+            "viaGraph": [],
+            "linkTypeHits": {}
+          }
+        ]
+      },
+      {
+        "strategy": "graph",
+        "T": 0.1,
+        "Tg": 0.3,
+        "hitRate": 0.9,
+        "b3HitRate": 0,
+        "c1SurfaceRate": 0,
+        "breadth": 0.9705137715779508,
+        "clusterAShare": 0.8,
+        "clusterBShare": 0.2,
+        "clusterCounts": {
+          "cluster-a": 80,
+          "cluster-b": 20,
+          "cluster-c": 0
+        },
+        "avgExpansionPerTurn": 3,
+        "linkTypeHits": {
+          "contradicts": 20,
+          "derived_from": 20,
+          "semantic": 20
+        },
+        "clusterPattern": "AAAAB AAAAB AAABA AAAAB AAAAB AAABA AAAAB AAAAB AAABA AAAAB AAAAB AAABA AAAAB AAAAB AAABA AAAAB AAAAB AAABA AAAAB AAAAB",
+        "turns": [
+          {
+            "turnId": "turn-01",
+            "memoryId": "mem-a1",
+            "groundTruthTargets": [
+              "mem-a1",
+              "mem-a2"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2"
+            ],
+            "hitIds": [
+              "mem-a1",
+              "mem-a2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-02",
+            "memoryId": "mem-a2",
+            "groundTruthTargets": [
+              "mem-a2",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b1"
+            ],
+            "hitIds": [
+              "mem-a2",
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-03",
+            "memoryId": "mem-a3",
+            "groundTruthTargets": [
+              "mem-a3",
+              "mem-a2"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-b2",
+              "mem-a4"
+            ],
+            "hitIds": [
+              "mem-a3",
+              "mem-a2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAABA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-04",
+            "memoryId": "mem-a1",
+            "groundTruthTargets": [
+              "mem-a1",
+              "mem-a4"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2"
+            ],
+            "hitIds": [
+              "mem-a1",
+              "mem-a4"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-05",
+            "memoryId": "mem-a4",
+            "groundTruthTargets": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b1"
+            ],
+            "hitIds": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-06",
+            "memoryId": "mem-a2",
+            "groundTruthTargets": [
+              "mem-a2",
+              "mem-a3"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-b2",
+              "mem-a4"
+            ],
+            "hitIds": [
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAABA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-07",
+            "memoryId": "mem-b1",
+            "groundTruthTargets": [
+              "mem-b1",
+              "mem-b2"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2"
+            ],
+            "hitIds": [
+              "mem-b2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-08",
+            "memoryId": "mem-b2",
+            "groundTruthTargets": [
+              "mem-b2",
+              "mem-b1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b1"
+            ],
+            "hitIds": [
+              "mem-b1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-09",
+            "memoryId": "mem-b3",
+            "groundTruthTargets": [
+              "mem-b3",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-b2",
+              "mem-a4"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAABA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-10",
+            "memoryId": "mem-b1",
+            "groundTruthTargets": [
+              "mem-b1",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2"
+            ],
+            "hitIds": [],
+            "hit": false,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-11",
+            "memoryId": "mem-c1",
+            "groundTruthTargets": [
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b1"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-12",
+            "memoryId": "mem-c2",
+            "groundTruthTargets": [],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-b2",
+              "mem-a4"
+            ],
+            "hitIds": [],
+            "hit": false,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAABA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-13",
+            "memoryId": "mem-c1",
+            "groundTruthTargets": [
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-14",
+            "memoryId": "mem-a3",
+            "groundTruthTargets": [
+              "mem-a3",
+              "mem-b1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b1"
+            ],
+            "hitIds": [
+              "mem-a3",
+              "mem-b1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-15",
+            "memoryId": "mem-b2",
+            "groundTruthTargets": [
+              "mem-b2",
+              "mem-a4"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-b2",
+              "mem-a4"
+            ],
+            "hitIds": [
+              "mem-b2",
+              "mem-a4"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAABA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-16",
+            "memoryId": "mem-a4",
+            "groundTruthTargets": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2"
+            ],
+            "hitIds": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-17",
+            "memoryId": "mem-a1",
+            "groundTruthTargets": [
+              "mem-a1",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b1"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-18",
+            "memoryId": "mem-b3",
+            "groundTruthTargets": [
+              "mem-b3",
+              "mem-b1",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-b2",
+              "mem-a4"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAABA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-19",
+            "memoryId": "mem-b1",
+            "groundTruthTargets": [
+              "mem-b1",
+              "mem-b2",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2"
+            ],
+            "hitIds": [
+              "mem-b2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-20",
+            "memoryId": "mem-a2",
+            "groundTruthTargets": [
+              "mem-a2",
+              "mem-a1",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b1"
+            ],
+            "hitIds": [
+              "mem-a2",
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          }
+        ]
+      },
+      {
+        "strategy": "graph",
+        "T": 0.1,
+        "Tg": 0.7,
+        "hitRate": 0.9,
+        "b3HitRate": 0,
+        "c1SurfaceRate": 0,
+        "breadth": 0.9705137715779508,
+        "clusterAShare": 0.8,
+        "clusterBShare": 0.2,
+        "clusterCounts": {
+          "cluster-a": 80,
+          "cluster-b": 20,
+          "cluster-c": 0
+        },
+        "avgExpansionPerTurn": 3,
+        "linkTypeHits": {
+          "contradicts": 20,
+          "derived_from": 20,
+          "semantic": 20
+        },
+        "clusterPattern": "AAAAB AAAAB AAABA AAAAB AAAAB AAABA AAAAB AAAAB AAABA AAAAB AAAAB AAABA AAAAB AAAAB AAABA AAAAB AAAAB AAABA AAAAB AAAAB",
+        "turns": [
+          {
+            "turnId": "turn-01",
+            "memoryId": "mem-a1",
+            "groundTruthTargets": [
+              "mem-a1",
+              "mem-a2"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2"
+            ],
+            "hitIds": [
+              "mem-a1",
+              "mem-a2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-02",
+            "memoryId": "mem-a2",
+            "groundTruthTargets": [
+              "mem-a2",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b1"
+            ],
+            "hitIds": [
+              "mem-a2",
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-03",
+            "memoryId": "mem-a3",
+            "groundTruthTargets": [
+              "mem-a3",
+              "mem-a2"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-b2",
+              "mem-a4"
+            ],
+            "hitIds": [
+              "mem-a3",
+              "mem-a2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAABA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-04",
+            "memoryId": "mem-a1",
+            "groundTruthTargets": [
+              "mem-a1",
+              "mem-a4"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2"
+            ],
+            "hitIds": [
+              "mem-a1",
+              "mem-a4"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-05",
+            "memoryId": "mem-a4",
+            "groundTruthTargets": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b1"
+            ],
+            "hitIds": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-06",
+            "memoryId": "mem-a2",
+            "groundTruthTargets": [
+              "mem-a2",
+              "mem-a3"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-b2",
+              "mem-a4"
+            ],
+            "hitIds": [
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAABA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-07",
+            "memoryId": "mem-b1",
+            "groundTruthTargets": [
+              "mem-b1",
+              "mem-b2"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2"
+            ],
+            "hitIds": [
+              "mem-b2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-08",
+            "memoryId": "mem-b2",
+            "groundTruthTargets": [
+              "mem-b2",
+              "mem-b1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b1"
+            ],
+            "hitIds": [
+              "mem-b1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-09",
+            "memoryId": "mem-b3",
+            "groundTruthTargets": [
+              "mem-b3",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-b2",
+              "mem-a4"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAABA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-10",
+            "memoryId": "mem-b1",
+            "groundTruthTargets": [
+              "mem-b1",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2"
+            ],
+            "hitIds": [],
+            "hit": false,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-11",
+            "memoryId": "mem-c1",
+            "groundTruthTargets": [
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b1"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-12",
+            "memoryId": "mem-c2",
+            "groundTruthTargets": [],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-b2",
+              "mem-a4"
+            ],
+            "hitIds": [],
+            "hit": false,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAABA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-13",
+            "memoryId": "mem-c1",
+            "groundTruthTargets": [
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-14",
+            "memoryId": "mem-a3",
+            "groundTruthTargets": [
+              "mem-a3",
+              "mem-b1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b1"
+            ],
+            "hitIds": [
+              "mem-a3",
+              "mem-b1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-15",
+            "memoryId": "mem-b2",
+            "groundTruthTargets": [
+              "mem-b2",
+              "mem-a4"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-b2",
+              "mem-a4"
+            ],
+            "hitIds": [
+              "mem-b2",
+              "mem-a4"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAABA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-16",
+            "memoryId": "mem-a4",
+            "groundTruthTargets": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2"
+            ],
+            "hitIds": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-17",
+            "memoryId": "mem-a1",
+            "groundTruthTargets": [
+              "mem-a1",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b1"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-18",
+            "memoryId": "mem-b3",
+            "groundTruthTargets": [
+              "mem-b3",
+              "mem-b1",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-b2",
+              "mem-a4"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAABA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-19",
+            "memoryId": "mem-b1",
+            "groundTruthTargets": [
+              "mem-b1",
+              "mem-b2",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2"
+            ],
+            "hitIds": [
+              "mem-b2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-20",
+            "memoryId": "mem-a2",
+            "groundTruthTargets": [
+              "mem-a2",
+              "mem-a1",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b1"
+            ],
+            "hitIds": [
+              "mem-a2",
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          }
+        ]
+      },
+      {
+        "strategy": "graph",
+        "T": 0.5,
+        "Tg": 0.3,
+        "hitRate": 0.95,
+        "b3HitRate": 0.5,
+        "c1SurfaceRate": 0.2,
+        "breadth": 0.9554379046216114,
+        "clusterAShare": 0.66,
+        "clusterBShare": 0.3,
+        "clusterCounts": {
+          "cluster-a": 66,
+          "cluster-b": 30,
+          "cluster-c": 4
+        },
+        "avgExpansionPerTurn": 3,
+        "linkTypeHits": {
+          "contradicts": 16,
+          "derived_from": 10,
+          "semantic": 20,
+          "temporal": 10,
+          "causal": 4
+        },
+        "clusterPattern": "AAAAB BBAAC AABAA ABABA ABAAA ABABA ABAAC AABAB ABAAA ABABA ABAAA ABABC AABAA ABABA ABAAA ABABA ABAAC AABAB ABAAA ABABA",
+        "turns": [
+          {
+            "turnId": "turn-01",
+            "memoryId": "mem-a1",
+            "groundTruthTargets": [
+              "mem-a1",
+              "mem-a2"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2"
+            ],
+            "hitIds": [
+              "mem-a1",
+              "mem-a2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-02",
+            "memoryId": "mem-a2",
+            "groundTruthTargets": [
+              "mem-a2",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-b1",
+              "mem-b3",
+              "mem-a1",
+              "mem-a2",
+              "mem-c1"
+            ],
+            "hitIds": [
+              "mem-a2",
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": true,
+            "clusterSlots": "BBAAC",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "temporal": 1,
+              "causal": 1
+            }
+          },
+          {
+            "turnId": "turn-03",
+            "memoryId": "mem-a3",
+            "groundTruthTargets": [
+              "mem-a3",
+              "mem-a2"
+            ],
+            "retrievedIds": [
+              "mem-a3",
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-a2"
+            ],
+            "hitIds": [
+              "mem-a3",
+              "mem-a2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AABAA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-04",
+            "memoryId": "mem-a1",
+            "groundTruthTargets": [
+              "mem-a1",
+              "mem-a4"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-b1",
+              "mem-a2",
+              "mem-b3",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "ABABA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "temporal": 1,
+              "contradicts": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-05",
+            "memoryId": "mem-a4",
+            "groundTruthTargets": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "ABAAA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-06",
+            "memoryId": "mem-a2",
+            "groundTruthTargets": [
+              "mem-a2",
+              "mem-a3"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-b1",
+              "mem-a2",
+              "mem-b3",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "ABABA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "temporal": 1,
+              "contradicts": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-07",
+            "memoryId": "mem-b1",
+            "groundTruthTargets": [
+              "mem-b1",
+              "mem-b2"
+            ],
+            "retrievedIds": [
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-a2",
+              "mem-c1"
+            ],
+            "hitIds": [
+              "mem-b2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": true,
+            "clusterSlots": "ABAAC",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "derived_from": 1,
+              "causal": 1
+            }
+          },
+          {
+            "turnId": "turn-08",
+            "memoryId": "mem-b2",
+            "groundTruthTargets": [
+              "mem-b2",
+              "mem-b1"
+            ],
+            "retrievedIds": [
+              "mem-a3",
+              "mem-a1",
+              "mem-b1",
+              "mem-a2",
+              "mem-b3"
+            ],
+            "hitIds": [
+              "mem-b1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "AABAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "temporal": 1,
+              "contradicts": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-09",
+            "memoryId": "mem-b3",
+            "groundTruthTargets": [
+              "mem-b3",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "ABAAA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-10",
+            "memoryId": "mem-b1",
+            "groundTruthTargets": [
+              "mem-b1",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-b1",
+              "mem-a2",
+              "mem-b3",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-b1",
+              "mem-b3"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "ABABA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "temporal": 1,
+              "contradicts": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-11",
+            "memoryId": "mem-c1",
+            "groundTruthTargets": [
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "ABAAA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-12",
+            "memoryId": "mem-c2",
+            "groundTruthTargets": [],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-b1",
+              "mem-a2",
+              "mem-b3",
+              "mem-c1"
+            ],
+            "hitIds": [],
+            "hit": false,
+            "hitB3": true,
+            "surfacedC1": true,
+            "clusterSlots": "ABABC",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "temporal": 1,
+              "semantic": 1,
+              "causal": 1
+            }
+          },
+          {
+            "turnId": "turn-13",
+            "memoryId": "mem-c1",
+            "groundTruthTargets": [
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a3",
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-a2"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AABAA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-14",
+            "memoryId": "mem-a3",
+            "groundTruthTargets": [
+              "mem-a3",
+              "mem-b1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-b1",
+              "mem-a2",
+              "mem-b3",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-a3",
+              "mem-b1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "ABABA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "temporal": 1,
+              "contradicts": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-15",
+            "memoryId": "mem-b2",
+            "groundTruthTargets": [
+              "mem-b2",
+              "mem-a4"
+            ],
+            "retrievedIds": [
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-b2",
+              "mem-a4"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "ABAAA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-16",
+            "memoryId": "mem-a4",
+            "groundTruthTargets": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-b1",
+              "mem-a2",
+              "mem-b3",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "ABABA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "temporal": 1,
+              "contradicts": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-17",
+            "memoryId": "mem-a1",
+            "groundTruthTargets": [
+              "mem-a1",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-a2",
+              "mem-c1"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": true,
+            "clusterSlots": "ABAAC",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "derived_from": 1,
+              "causal": 1
+            }
+          },
+          {
+            "turnId": "turn-18",
+            "memoryId": "mem-b3",
+            "groundTruthTargets": [
+              "mem-b3",
+              "mem-b1",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a3",
+              "mem-a1",
+              "mem-b1",
+              "mem-a2",
+              "mem-b3"
+            ],
+            "hitIds": [
+              "mem-b3",
+              "mem-b1",
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "AABAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "temporal": 1,
+              "contradicts": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-19",
+            "memoryId": "mem-b1",
+            "groundTruthTargets": [
+              "mem-b1",
+              "mem-b2",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-b2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "ABAAA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-20",
+            "memoryId": "mem-a2",
+            "groundTruthTargets": [
+              "mem-a2",
+              "mem-a1",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-b1",
+              "mem-a2",
+              "mem-b3",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-a2",
+              "mem-a1",
+              "mem-b3"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "ABABA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "temporal": 1,
+              "contradicts": 1,
+              "semantic": 1
+            }
+          }
+        ]
+      },
+      {
+        "strategy": "graph",
+        "T": 0.5,
+        "Tg": 0.7,
+        "hitRate": 0.85,
+        "b3HitRate": 0.5,
+        "c1SurfaceRate": 0.5,
+        "breadth": 0.9739760316291207,
+        "clusterAShare": 0.6,
+        "clusterBShare": 0.3,
+        "clusterCounts": {
+          "cluster-a": 60,
+          "cluster-b": 30,
+          "cluster-c": 10
+        },
+        "avgExpansionPerTurn": 2.55,
+        "linkTypeHits": {
+          "contradicts": 20,
+          "derived_from": 10,
+          "semantic": 1,
+          "temporal": 10,
+          "causal": 10
+        },
+        "clusterPattern": "ACAAA BBBAA AAAAC BABAB AAAAC BABAB AAAAC BABAB AAAAC BABAB AAAAC BABAB AAAAC BABAB AAAAC BABAB AAAAC BABAB AAAAC BABAB",
+        "turns": [
+          {
+            "turnId": "turn-01",
+            "memoryId": "mem-a1",
+            "groundTruthTargets": [
+              "mem-a1",
+              "mem-a2"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-c1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4"
+            ],
+            "hitIds": [
+              "mem-a1",
+              "mem-a2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": true,
+            "clusterSlots": "ACAAA",
+            "expansionCount": 3,
+            "viaGraph": [
+              "mem-c1"
+            ],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-02",
+            "memoryId": "mem-a2",
+            "groundTruthTargets": [
+              "mem-a2",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-b2",
+              "mem-b1",
+              "mem-b3",
+              "mem-a1",
+              "mem-a2"
+            ],
+            "hitIds": [
+              "mem-a2",
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "BBBAA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "temporal": 1,
+              "contradicts": 1,
+              "causal": 1
+            }
+          },
+          {
+            "turnId": "turn-03",
+            "memoryId": "mem-a3",
+            "groundTruthTargets": [
+              "mem-a3",
+              "mem-a2"
+            ],
+            "retrievedIds": [
+              "mem-a3",
+              "mem-a4",
+              "mem-a1",
+              "mem-a2",
+              "mem-c1"
+            ],
+            "hitIds": [
+              "mem-a3",
+              "mem-a2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": true,
+            "clusterSlots": "AAAAC",
+            "expansionCount": 2,
+            "viaGraph": [
+              "mem-c1"
+            ],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-04",
+            "memoryId": "mem-a1",
+            "groundTruthTargets": [
+              "mem-a1",
+              "mem-a4"
+            ],
+            "retrievedIds": [
+              "mem-b2",
+              "mem-a1",
+              "mem-b1",
+              "mem-a2",
+              "mem-b3"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "BABAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "temporal": 1,
+              "contradicts": 1,
+              "causal": 1
+            }
+          },
+          {
+            "turnId": "turn-05",
+            "memoryId": "mem-a4",
+            "groundTruthTargets": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a3",
+              "mem-a4",
+              "mem-a1",
+              "mem-a2",
+              "mem-c1"
+            ],
+            "hitIds": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": true,
+            "clusterSlots": "AAAAC",
+            "expansionCount": 2,
+            "viaGraph": [
+              "mem-c1"
+            ],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-06",
+            "memoryId": "mem-a2",
+            "groundTruthTargets": [
+              "mem-a2",
+              "mem-a3"
+            ],
+            "retrievedIds": [
+              "mem-b2",
+              "mem-a1",
+              "mem-b1",
+              "mem-a2",
+              "mem-b3"
+            ],
+            "hitIds": [
+              "mem-a2"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "BABAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "temporal": 1,
+              "contradicts": 1,
+              "causal": 1
+            }
+          },
+          {
+            "turnId": "turn-07",
+            "memoryId": "mem-b1",
+            "groundTruthTargets": [
+              "mem-b1",
+              "mem-b2"
+            ],
+            "retrievedIds": [
+              "mem-a3",
+              "mem-a4",
+              "mem-a1",
+              "mem-a2",
+              "mem-c1"
+            ],
+            "hitIds": [],
+            "hit": false,
+            "hitB3": false,
+            "surfacedC1": true,
+            "clusterSlots": "AAAAC",
+            "expansionCount": 2,
+            "viaGraph": [
+              "mem-c1"
+            ],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-08",
+            "memoryId": "mem-b2",
+            "groundTruthTargets": [
+              "mem-b2",
+              "mem-b1"
+            ],
+            "retrievedIds": [
+              "mem-b2",
+              "mem-a1",
+              "mem-b1",
+              "mem-a2",
+              "mem-b3"
+            ],
+            "hitIds": [
+              "mem-b2",
+              "mem-b1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "BABAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "temporal": 1,
+              "contradicts": 1,
+              "causal": 1
+            }
+          },
+          {
+            "turnId": "turn-09",
+            "memoryId": "mem-b3",
+            "groundTruthTargets": [
+              "mem-b3",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a3",
+              "mem-a4",
+              "mem-a1",
+              "mem-a2",
+              "mem-c1"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": true,
+            "clusterSlots": "AAAAC",
+            "expansionCount": 2,
+            "viaGraph": [
+              "mem-c1"
+            ],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-10",
+            "memoryId": "mem-b1",
+            "groundTruthTargets": [
+              "mem-b1",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-b2",
+              "mem-a1",
+              "mem-b1",
+              "mem-a2",
+              "mem-b3"
+            ],
+            "hitIds": [
+              "mem-b1",
+              "mem-b3"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "BABAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "temporal": 1,
+              "contradicts": 1,
+              "causal": 1
+            }
+          },
+          {
+            "turnId": "turn-11",
+            "memoryId": "mem-c1",
+            "groundTruthTargets": [
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a3",
+              "mem-a4",
+              "mem-a1",
+              "mem-a2",
+              "mem-c1"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": true,
+            "clusterSlots": "AAAAC",
+            "expansionCount": 2,
+            "viaGraph": [
+              "mem-c1"
+            ],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-12",
+            "memoryId": "mem-c2",
+            "groundTruthTargets": [],
+            "retrievedIds": [
+              "mem-b2",
+              "mem-a1",
+              "mem-b1",
+              "mem-a2",
+              "mem-b3"
+            ],
+            "hitIds": [],
+            "hit": false,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "BABAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "temporal": 1,
+              "contradicts": 1,
+              "causal": 1
+            }
+          },
+          {
+            "turnId": "turn-13",
+            "memoryId": "mem-c1",
+            "groundTruthTargets": [
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a3",
+              "mem-a4",
+              "mem-a1",
+              "mem-a2",
+              "mem-c1"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": true,
+            "clusterSlots": "AAAAC",
+            "expansionCount": 2,
+            "viaGraph": [
+              "mem-c1"
+            ],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-14",
+            "memoryId": "mem-a3",
+            "groundTruthTargets": [
+              "mem-a3",
+              "mem-b1"
+            ],
+            "retrievedIds": [
+              "mem-b2",
+              "mem-a1",
+              "mem-b1",
+              "mem-a2",
+              "mem-b3"
+            ],
+            "hitIds": [
+              "mem-b1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "BABAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "temporal": 1,
+              "contradicts": 1,
+              "causal": 1
+            }
+          },
+          {
+            "turnId": "turn-15",
+            "memoryId": "mem-b2",
+            "groundTruthTargets": [
+              "mem-b2",
+              "mem-a4"
+            ],
+            "retrievedIds": [
+              "mem-a3",
+              "mem-a4",
+              "mem-a1",
+              "mem-a2",
+              "mem-c1"
+            ],
+            "hitIds": [
+              "mem-a4"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": true,
+            "clusterSlots": "AAAAC",
+            "expansionCount": 2,
+            "viaGraph": [
+              "mem-c1"
+            ],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-16",
+            "memoryId": "mem-a4",
+            "groundTruthTargets": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-b2",
+              "mem-a1",
+              "mem-b1",
+              "mem-a2",
+              "mem-b3"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "BABAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "temporal": 1,
+              "contradicts": 1,
+              "causal": 1
+            }
+          },
+          {
+            "turnId": "turn-17",
+            "memoryId": "mem-a1",
+            "groundTruthTargets": [
+              "mem-a1",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-a3",
+              "mem-a4",
+              "mem-a1",
+              "mem-a2",
+              "mem-c1"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": true,
+            "clusterSlots": "AAAAC",
+            "expansionCount": 2,
+            "viaGraph": [
+              "mem-c1"
+            ],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-18",
+            "memoryId": "mem-b3",
+            "groundTruthTargets": [
+              "mem-b3",
+              "mem-b1",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-b2",
+              "mem-a1",
+              "mem-b1",
+              "mem-a2",
+              "mem-b3"
+            ],
+            "hitIds": [
+              "mem-b3",
+              "mem-b1",
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "BABAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "temporal": 1,
+              "contradicts": 1,
+              "causal": 1
+            }
+          },
+          {
+            "turnId": "turn-19",
+            "memoryId": "mem-b1",
+            "groundTruthTargets": [
+              "mem-b1",
+              "mem-b2",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-a3",
+              "mem-a4",
+              "mem-a1",
+              "mem-a2",
+              "mem-c1"
+            ],
+            "hitIds": [],
+            "hit": false,
+            "hitB3": false,
+            "surfacedC1": true,
+            "clusterSlots": "AAAAC",
+            "expansionCount": 2,
+            "viaGraph": [
+              "mem-c1"
+            ],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-20",
+            "memoryId": "mem-a2",
+            "groundTruthTargets": [
+              "mem-a2",
+              "mem-a1",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-b2",
+              "mem-a1",
+              "mem-b1",
+              "mem-a2",
+              "mem-b3"
+            ],
+            "hitIds": [
+              "mem-a2",
+              "mem-a1",
+              "mem-b3"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "BABAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "temporal": 1,
+              "contradicts": 1,
+              "causal": 1
+            }
+          }
+        ]
+      },
+      {
+        "strategy": "graph",
+        "T": 0.9,
+        "Tg": 0.3,
+        "hitRate": 0.95,
+        "b3HitRate": 0.5,
+        "c1SurfaceRate": 0.35,
+        "breadth": 0.9765389766726609,
+        "clusterAShare": 0.56,
+        "clusterBShare": 0.3,
+        "clusterCounts": {
+          "cluster-a": 56,
+          "cluster-b": 30,
+          "cluster-c": 14
+        },
+        "avgExpansionPerTurn": 3,
+        "linkTypeHits": {
+          "contradicts": 13,
+          "derived_from": 10,
+          "semantic": 20,
+          "causal": 7,
+          "temporal": 10
+        },
+        "clusterPattern": "AAAAB BBCCA AAABA BBAAA ABCAC AABBA ABAAA BBCAC AAABA BBAAA ABCAC AABBA ABAAA BBCAC AAABA BBAAA ABCAC AABBA ABAAA BBCAC",
+        "turns": [
+          {
+            "turnId": "turn-01",
+            "memoryId": "mem-a1",
+            "groundTruthTargets": [
+              "mem-a1",
+              "mem-a2"
+            ],
+            "retrievedIds": [
+              "mem-a1",
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2"
+            ],
+            "hitIds": [
+              "mem-a1",
+              "mem-a2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAAAB",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-02",
+            "memoryId": "mem-a2",
+            "groundTruthTargets": [
+              "mem-a2",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-b1",
+              "mem-b3",
+              "mem-c1",
+              "mem-c2",
+              "mem-a1"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": true,
+            "clusterSlots": "BBCCA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "causal": 1,
+              "temporal": 1
+            }
+          },
+          {
+            "turnId": "turn-03",
+            "memoryId": "mem-a3",
+            "groundTruthTargets": [
+              "mem-a3",
+              "mem-a2"
+            ],
+            "retrievedIds": [
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2",
+              "mem-a1"
+            ],
+            "hitIds": [
+              "mem-a3",
+              "mem-a2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAABA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-04",
+            "memoryId": "mem-a1",
+            "groundTruthTargets": [
+              "mem-a1",
+              "mem-a4"
+            ],
+            "retrievedIds": [
+              "mem-b1",
+              "mem-b3",
+              "mem-a1",
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "BBAAA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "temporal": 1,
+              "contradicts": 1
+            }
+          },
+          {
+            "turnId": "turn-05",
+            "memoryId": "mem-a4",
+            "groundTruthTargets": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a4",
+              "mem-b2",
+              "mem-c1",
+              "mem-a1",
+              "mem-c2"
+            ],
+            "hitIds": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": true,
+            "clusterSlots": "ABCAC",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "causal": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-06",
+            "memoryId": "mem-a2",
+            "groundTruthTargets": [
+              "mem-a2",
+              "mem-a3"
+            ],
+            "retrievedIds": [
+              "mem-a2",
+              "mem-a3",
+              "mem-b1",
+              "mem-b3",
+              "mem-a1"
+            ],
+            "hitIds": [
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "AABBA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "temporal": 1,
+              "contradicts": 1
+            }
+          },
+          {
+            "turnId": "turn-07",
+            "memoryId": "mem-b1",
+            "groundTruthTargets": [
+              "mem-b1",
+              "mem-b2"
+            ],
+            "retrievedIds": [
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-b2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "ABAAA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-08",
+            "memoryId": "mem-b2",
+            "groundTruthTargets": [
+              "mem-b2",
+              "mem-b1"
+            ],
+            "retrievedIds": [
+              "mem-b1",
+              "mem-b3",
+              "mem-c1",
+              "mem-a1",
+              "mem-c2"
+            ],
+            "hitIds": [
+              "mem-b1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": true,
+            "clusterSlots": "BBCAC",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "causal": 1,
+              "temporal": 1
+            }
+          },
+          {
+            "turnId": "turn-09",
+            "memoryId": "mem-b3",
+            "groundTruthTargets": [
+              "mem-b3",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2",
+              "mem-a1"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAABA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-10",
+            "memoryId": "mem-b1",
+            "groundTruthTargets": [
+              "mem-b1",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-b1",
+              "mem-b3",
+              "mem-a1",
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-b1",
+              "mem-b3"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "BBAAA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "temporal": 1,
+              "contradicts": 1
+            }
+          },
+          {
+            "turnId": "turn-11",
+            "memoryId": "mem-c1",
+            "groundTruthTargets": [
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a4",
+              "mem-b2",
+              "mem-c1",
+              "mem-a1",
+              "mem-c2"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": true,
+            "clusterSlots": "ABCAC",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "causal": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-12",
+            "memoryId": "mem-c2",
+            "groundTruthTargets": [],
+            "retrievedIds": [
+              "mem-a2",
+              "mem-a3",
+              "mem-b1",
+              "mem-b3",
+              "mem-a1"
+            ],
+            "hitIds": [],
+            "hit": false,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "AABBA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "temporal": 1,
+              "contradicts": 1
+            }
+          },
+          {
+            "turnId": "turn-13",
+            "memoryId": "mem-c1",
+            "groundTruthTargets": [
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "ABAAA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-14",
+            "memoryId": "mem-a3",
+            "groundTruthTargets": [
+              "mem-a3",
+              "mem-b1"
+            ],
+            "retrievedIds": [
+              "mem-b1",
+              "mem-b3",
+              "mem-c1",
+              "mem-a1",
+              "mem-c2"
+            ],
+            "hitIds": [
+              "mem-b1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": true,
+            "clusterSlots": "BBCAC",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "causal": 1,
+              "temporal": 1
+            }
+          },
+          {
+            "turnId": "turn-15",
+            "memoryId": "mem-b2",
+            "groundTruthTargets": [
+              "mem-b2",
+              "mem-a4"
+            ],
+            "retrievedIds": [
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2",
+              "mem-a1"
+            ],
+            "hitIds": [
+              "mem-b2",
+              "mem-a4"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAABA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-16",
+            "memoryId": "mem-a4",
+            "groundTruthTargets": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-b1",
+              "mem-b3",
+              "mem-a1",
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "BBAAA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "temporal": 1,
+              "contradicts": 1
+            }
+          },
+          {
+            "turnId": "turn-17",
+            "memoryId": "mem-a1",
+            "groundTruthTargets": [
+              "mem-a1",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-a4",
+              "mem-b2",
+              "mem-c1",
+              "mem-a1",
+              "mem-c2"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": true,
+            "clusterSlots": "ABCAC",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "causal": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-18",
+            "memoryId": "mem-b3",
+            "groundTruthTargets": [
+              "mem-b3",
+              "mem-b1",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a2",
+              "mem-a3",
+              "mem-b1",
+              "mem-b3",
+              "mem-a1"
+            ],
+            "hitIds": [
+              "mem-b3",
+              "mem-b1",
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": false,
+            "clusterSlots": "AABBA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "temporal": 1,
+              "contradicts": 1
+            }
+          },
+          {
+            "turnId": "turn-19",
+            "memoryId": "mem-b1",
+            "groundTruthTargets": [
+              "mem-b1",
+              "mem-b2",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hitIds": [
+              "mem-b2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "ABAAA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-20",
+            "memoryId": "mem-a2",
+            "groundTruthTargets": [
+              "mem-a2",
+              "mem-a1",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-b1",
+              "mem-b3",
+              "mem-c1",
+              "mem-a1",
+              "mem-c2"
+            ],
+            "hitIds": [
+              "mem-a1",
+              "mem-b3"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": true,
+            "clusterSlots": "BBCAC",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "causal": 1,
+              "temporal": 1
+            }
+          }
+        ]
+      },
+      {
+        "strategy": "graph",
+        "T": 0.9,
+        "Tg": 0.7,
+        "hitRate": 0.85,
+        "b3HitRate": 0.5,
+        "c1SurfaceRate": 0.5,
+        "breadth": 0.9806988192301037,
+        "clusterAShare": 0.53,
+        "clusterBShare": 0.3,
+        "clusterCounts": {
+          "cluster-a": 53,
+          "cluster-b": 30,
+          "cluster-c": 17
+        },
+        "avgExpansionPerTurn": 3.35,
+        "linkTypeHits": {
+          "contradicts": 20,
+          "derived_from": 11,
+          "semantic": 20,
+          "causal": 7,
+          "temporal": 9
+        },
+        "clusterPattern": "CABAB AABCA ABBCA AABAA BBCAC AAABA BBCAA AABAC ABBCA AABAA BBCAC AAABA BBCAA AABAC ABBCA AABAA BBCAC AAABA BBCAA AABAC",
+        "turns": [
+          {
+            "turnId": "turn-01",
+            "memoryId": "mem-a1",
+            "groundTruthTargets": [
+              "mem-a1",
+              "mem-a2"
+            ],
+            "retrievedIds": [
+              "mem-c1",
+              "mem-a1",
+              "mem-b1",
+              "mem-a2",
+              "mem-b3"
+            ],
+            "hitIds": [
+              "mem-a1",
+              "mem-a2"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": true,
+            "clusterSlots": "CABAB",
+            "expansionCount": 3,
+            "viaGraph": [
+              "mem-c1",
+              "mem-b1",
+              "mem-b3"
+            ],
+            "linkTypeHits": {
+              "contradicts": 1,
+              "derived_from": 1,
+              "semantic": 1
+            }
+          },
+          {
+            "turnId": "turn-02",
+            "memoryId": "mem-a2",
+            "groundTruthTargets": [
+              "mem-a2",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a3",
+              "mem-a4",
+              "mem-b2",
+              "mem-c2",
+              "mem-a1"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AABCA",
+            "expansionCount": 4,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "causal": 1,
+              "semantic": 1,
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-03",
+            "memoryId": "mem-a3",
+            "groundTruthTargets": [
+              "mem-a3",
+              "mem-a2"
+            ],
+            "retrievedIds": [
+              "mem-a2",
+              "mem-b1",
+              "mem-b3",
+              "mem-c1",
+              "mem-a1"
+            ],
+            "hitIds": [
+              "mem-a2"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": true,
+            "clusterSlots": "ABBCA",
+            "expansionCount": 3,
+            "viaGraph": [
+              "mem-c1"
+            ],
+            "linkTypeHits": {
+              "semantic": 1,
+              "temporal": 1,
+              "contradicts": 1
+            }
+          },
+          {
+            "turnId": "turn-04",
+            "memoryId": "mem-a1",
+            "groundTruthTargets": [
+              "mem-a1",
+              "mem-a4"
+            ],
+            "retrievedIds": [
+              "mem-a3",
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-a2"
+            ],
+            "hitIds": [
+              "mem-a1",
+              "mem-a4"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AABAA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-05",
+            "memoryId": "mem-a4",
+            "groundTruthTargets": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-b1",
+              "mem-b3",
+              "mem-c1",
+              "mem-a1",
+              "mem-c2"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": true,
+            "clusterSlots": "BBCAC",
+            "expansionCount": 4,
+            "viaGraph": [
+              "mem-c1"
+            ],
+            "linkTypeHits": {
+              "semantic": 1,
+              "temporal": 1,
+              "contradicts": 1,
+              "causal": 1
+            }
+          },
+          {
+            "turnId": "turn-06",
+            "memoryId": "mem-a2",
+            "groundTruthTargets": [
+              "mem-a2",
+              "mem-a3"
+            ],
+            "retrievedIds": [
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2",
+              "mem-a1"
+            ],
+            "hitIds": [
+              "mem-a2",
+              "mem-a3"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAABA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-07",
+            "memoryId": "mem-b1",
+            "groundTruthTargets": [
+              "mem-b1",
+              "mem-b2"
+            ],
+            "retrievedIds": [
+              "mem-b1",
+              "mem-b3",
+              "mem-c1",
+              "mem-a1",
+              "mem-a2"
+            ],
+            "hitIds": [
+              "mem-b1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": true,
+            "clusterSlots": "BBCAA",
+            "expansionCount": 3,
+            "viaGraph": [
+              "mem-c1"
+            ],
+            "linkTypeHits": {
+              "semantic": 1,
+              "temporal": 1,
+              "contradicts": 1
+            }
+          },
+          {
+            "turnId": "turn-08",
+            "memoryId": "mem-b2",
+            "groundTruthTargets": [
+              "mem-b2",
+              "mem-b1"
+            ],
+            "retrievedIds": [
+              "mem-a3",
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-c2"
+            ],
+            "hitIds": [
+              "mem-b2"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AABAC",
+            "expansionCount": 4,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "causal": 1,
+              "semantic": 1,
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-09",
+            "memoryId": "mem-b3",
+            "groundTruthTargets": [
+              "mem-b3",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a2",
+              "mem-b1",
+              "mem-b3",
+              "mem-c1",
+              "mem-a1"
+            ],
+            "hitIds": [
+              "mem-b3",
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": true,
+            "clusterSlots": "ABBCA",
+            "expansionCount": 3,
+            "viaGraph": [
+              "mem-c1"
+            ],
+            "linkTypeHits": {
+              "semantic": 1,
+              "temporal": 1,
+              "contradicts": 1
+            }
+          },
+          {
+            "turnId": "turn-10",
+            "memoryId": "mem-b1",
+            "groundTruthTargets": [
+              "mem-b1",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-a3",
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-a2"
+            ],
+            "hitIds": [],
+            "hit": false,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AABAA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-11",
+            "memoryId": "mem-c1",
+            "groundTruthTargets": [
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-b1",
+              "mem-b3",
+              "mem-c1",
+              "mem-a1",
+              "mem-c2"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": true,
+            "clusterSlots": "BBCAC",
+            "expansionCount": 4,
+            "viaGraph": [
+              "mem-c1"
+            ],
+            "linkTypeHits": {
+              "semantic": 1,
+              "temporal": 1,
+              "contradicts": 1,
+              "causal": 1
+            }
+          },
+          {
+            "turnId": "turn-12",
+            "memoryId": "mem-c2",
+            "groundTruthTargets": [],
+            "retrievedIds": [
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2",
+              "mem-a1"
+            ],
+            "hitIds": [],
+            "hit": false,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAABA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-13",
+            "memoryId": "mem-c1",
+            "groundTruthTargets": [
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-b1",
+              "mem-b3",
+              "mem-c1",
+              "mem-a1",
+              "mem-a2"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": true,
+            "clusterSlots": "BBCAA",
+            "expansionCount": 3,
+            "viaGraph": [
+              "mem-c1"
+            ],
+            "linkTypeHits": {
+              "semantic": 1,
+              "temporal": 1,
+              "contradicts": 1
+            }
+          },
+          {
+            "turnId": "turn-14",
+            "memoryId": "mem-a3",
+            "groundTruthTargets": [
+              "mem-a3",
+              "mem-b1"
+            ],
+            "retrievedIds": [
+              "mem-a3",
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-c2"
+            ],
+            "hitIds": [
+              "mem-a3"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AABAC",
+            "expansionCount": 4,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "causal": 1,
+              "semantic": 1,
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-15",
+            "memoryId": "mem-b2",
+            "groundTruthTargets": [
+              "mem-b2",
+              "mem-a4"
+            ],
+            "retrievedIds": [
+              "mem-a2",
+              "mem-b1",
+              "mem-b3",
+              "mem-c1",
+              "mem-a1"
+            ],
+            "hitIds": [],
+            "hit": false,
+            "hitB3": true,
+            "surfacedC1": true,
+            "clusterSlots": "ABBCA",
+            "expansionCount": 3,
+            "viaGraph": [
+              "mem-c1"
+            ],
+            "linkTypeHits": {
+              "semantic": 1,
+              "temporal": 1,
+              "contradicts": 1
+            }
+          },
+          {
+            "turnId": "turn-16",
+            "memoryId": "mem-a4",
+            "groundTruthTargets": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a3",
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-a2"
+            ],
+            "hitIds": [
+              "mem-a4",
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AABAA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-17",
+            "memoryId": "mem-a1",
+            "groundTruthTargets": [
+              "mem-a1",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-b1",
+              "mem-b3",
+              "mem-c1",
+              "mem-a1",
+              "mem-c2"
+            ],
+            "hitIds": [
+              "mem-a1",
+              "mem-b3"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": true,
+            "clusterSlots": "BBCAC",
+            "expansionCount": 4,
+            "viaGraph": [
+              "mem-c1"
+            ],
+            "linkTypeHits": {
+              "semantic": 1,
+              "temporal": 1,
+              "contradicts": 1,
+              "causal": 1
+            }
+          },
+          {
+            "turnId": "turn-18",
+            "memoryId": "mem-b3",
+            "groundTruthTargets": [
+              "mem-b3",
+              "mem-b1",
+              "mem-a1"
+            ],
+            "retrievedIds": [
+              "mem-a2",
+              "mem-a3",
+              "mem-a4",
+              "mem-b2",
+              "mem-a1"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AAABA",
+            "expansionCount": 3,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "semantic": 1,
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          },
+          {
+            "turnId": "turn-19",
+            "memoryId": "mem-b1",
+            "groundTruthTargets": [
+              "mem-b1",
+              "mem-b2",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-b1",
+              "mem-b3",
+              "mem-c1",
+              "mem-a1",
+              "mem-a2"
+            ],
+            "hitIds": [
+              "mem-b1",
+              "mem-b3"
+            ],
+            "hit": true,
+            "hitB3": true,
+            "surfacedC1": true,
+            "clusterSlots": "BBCAA",
+            "expansionCount": 3,
+            "viaGraph": [
+              "mem-c1"
+            ],
+            "linkTypeHits": {
+              "semantic": 1,
+              "temporal": 1,
+              "contradicts": 1
+            }
+          },
+          {
+            "turnId": "turn-20",
+            "memoryId": "mem-a2",
+            "groundTruthTargets": [
+              "mem-a2",
+              "mem-a1",
+              "mem-b3"
+            ],
+            "retrievedIds": [
+              "mem-a3",
+              "mem-a4",
+              "mem-b2",
+              "mem-a1",
+              "mem-c2"
+            ],
+            "hitIds": [
+              "mem-a1"
+            ],
+            "hit": true,
+            "hitB3": false,
+            "surfacedC1": false,
+            "clusterSlots": "AABAC",
+            "expansionCount": 4,
+            "viaGraph": [],
+            "linkTypeHits": {
+              "causal": 1,
+              "semantic": 1,
+              "contradicts": 1,
+              "derived_from": 1
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

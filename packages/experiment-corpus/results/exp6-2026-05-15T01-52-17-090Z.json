@@ -1,0 +1,429 @@
+{
+  "experiment": "exp6",
+  "runAt": "2026-05-15T01:52:17.090Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "Graph diversity slot + AttentionEngine integration. Part A: reserved slot for graph neighbour. Part B: verify explorationFactor shifts salience in production engine.",
+  "data": {
+    "topK": 5,
+    "decay": 0.5,
+    "tGraphScored": 0.3,
+    "tValues": [
+      0.1,
+      0.5,
+      0.9
+    ],
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": true,
+      "h4": true,
+      "h5": true
+    },
+    "partA": {
+      "strategies": [
+        "flat",
+        "graph-scored",
+        "graph-slot"
+      ],
+      "results": [
+        {
+          "strategy": "flat",
+          "T": 0.1,
+          "hitRate": 0.9,
+          "b3HitRate": 0,
+          "c1SurfaceRate": 0,
+          "graphSlotUsedRate": 0,
+          "breadth": 0.9705137715779508,
+          "clusterCounts": {
+            "cluster-a": 80,
+            "cluster-b": 20,
+            "cluster-c": 0
+          },
+          "clusterPattern": "AAAAB AAAAB AAABA AAAAB AAAAB AAABA AAAAB AAAAB AAABA AAAAB AAAAB AAABA AAAAB AAAAB AAABA AAAAB AAAAB AAABA AAAAB AAAAB"
+        },
+        {
+          "strategy": "graph-scored",
+          "T": 0.1,
+          "hitRate": 0.9,
+          "b3HitRate": 0,
+          "c1SurfaceRate": 0,
+          "graphSlotUsedRate": 0,
+          "breadth": 0.9705137715779508,
+          "clusterCounts": {
+            "cluster-a": 80,
+            "cluster-b": 20,
+            "cluster-c": 0
+          },
+          "clusterPattern": "AAAAB AAAAB AAABA AAAAB AAAAB AAABA AAAAB AAAAB AAABA AAAAB AAAAB AAABA AAAAB AAAAB AAABA AAAAB AAAAB AAABA AAAAB AAAAB"
+        },
+        {
+          "strategy": "graph-slot",
+          "T": 0.1,
+          "hitRate": 0.85,
+          "b3HitRate": 0.16666666666666666,
+          "c1SurfaceRate": 0.5,
+          "graphSlotUsedRate": 1,
+          "breadth": 0.9406426982957874,
+          "clusterCounts": {
+            "cluster-a": 70,
+            "cluster-b": 20,
+            "cluster-c": 10
+          },
+          "clusterPattern": "AAAAC AAABB AAAAC AAABB AAAAC AAABB AAAAC AAABB AAAAC AAABB AAAAC AAABB AAAAC AAABB AAAAC AAABB AAAAC AAABB AAAAC AAABB"
+        },
+        {
+          "strategy": "flat",
+          "T": 0.5,
+          "hitRate": 0.95,
+          "b3HitRate": 0.5,
+          "c1SurfaceRate": 0.2,
+          "graphSlotUsedRate": 0,
+          "breadth": 0.9554379046216114,
+          "clusterCounts": {
+            "cluster-a": 66,
+            "cluster-b": 30,
+            "cluster-c": 4
+          },
+          "clusterPattern": "AAAAB BBAAC AABAA ABABA ABAAA ABABA ABAAC AABAB ABAAA ABABA ABAAA ABABC AABAA ABABA ABAAA ABABA ABAAC AABAB ABAAA ABABA"
+        },
+        {
+          "strategy": "graph-scored",
+          "T": 0.5,
+          "hitRate": 0.95,
+          "b3HitRate": 0.5,
+          "c1SurfaceRate": 0.2,
+          "graphSlotUsedRate": 0,
+          "breadth": 0.9554379046216114,
+          "clusterCounts": {
+            "cluster-a": 66,
+            "cluster-b": 30,
+            "cluster-c": 4
+          },
+          "clusterPattern": "AAAAB BBAAC AABAA ABABA ABAAA ABABA ABAAC AABAB ABAAA ABABA ABAAA ABABC AABAA ABABA ABAAA ABABA ABAAC AABAB ABAAA ABABA"
+        },
+        {
+          "strategy": "graph-slot",
+          "T": 0.5,
+          "hitRate": 0.85,
+          "b3HitRate": 0.5,
+          "c1SurfaceRate": 0.55,
+          "graphSlotUsedRate": 1,
+          "breadth": 0.9769542725830623,
+          "clusterCounts": {
+            "cluster-a": 59,
+            "cluster-b": 30,
+            "cluster-c": 11
+          },
+          "clusterPattern": "AAAAC BBBAC AAAAC BABAB AAAAC BABAB AAAAC BABAB AAAAC BABAB AAAAC BABAB AAAAC BABAB AAAAC BABAB AAAAC BABAB AAAAC BABAB"
+        },
+        {
+          "strategy": "flat",
+          "T": 0.9,
+          "hitRate": 0.95,
+          "b3HitRate": 0.5,
+          "c1SurfaceRate": 0.35,
+          "graphSlotUsedRate": 0,
+          "breadth": 0.9765389766726609,
+          "clusterCounts": {
+            "cluster-a": 56,
+            "cluster-b": 30,
+            "cluster-c": 14
+          },
+          "clusterPattern": "AAAAB BBCCA AAABA BBAAA ABCAC AABBA ABAAA BBCAC AAABA BBAAA ABCAC AABBA ABAAA BBCAC AAABA BBAAA ABCAC AABBA ABAAA BBCAC"
+        },
+        {
+          "strategy": "graph-scored",
+          "T": 0.9,
+          "hitRate": 0.95,
+          "b3HitRate": 0.5,
+          "c1SurfaceRate": 0.35,
+          "graphSlotUsedRate": 0,
+          "breadth": 0.9765389766726609,
+          "clusterCounts": {
+            "cluster-a": 56,
+            "cluster-b": 30,
+            "cluster-c": 14
+          },
+          "clusterPattern": "AAAAB BBCCA AAABA BBAAA ABCAC AABBA ABAAA BBCAC AAABA BBAAA ABCAC AABBA ABAAA BBCAC AAABA BBAAA ABCAC AABBA ABAAA BBCAC"
+        },
+        {
+          "strategy": "graph-slot",
+          "T": 0.9,
+          "hitRate": 0.8,
+          "b3HitRate": 0.5,
+          "c1SurfaceRate": 0.75,
+          "graphSlotUsedRate": 1,
+          "breadth": 0.9729516371446922,
+          "clusterCounts": {
+            "cluster-a": 50,
+            "cluster-b": 30,
+            "cluster-c": 20
+          },
+          "clusterPattern": "AAAAC BBBCA AAAAC BBBAC AAAAC BBBCA AAAAC BBBAC AAAAC BBBCA AAAAC BBBAC AAAAC BBBCA AAAAC BBBAC AAAAC BBBCA AAAAC BBBAC"
+        }
+      ]
+    },
+    "partB": {
+      "results": [
+        {
+          "T": 0.1,
+          "primaryIds": [
+            "mem-a1",
+            "mem-a2",
+            "mem-a3",
+            "mem-a4",
+            "mem-b2"
+          ],
+          "harnessTop5": [
+            "mem-a1",
+            "mem-a2",
+            "mem-a3",
+            "mem-a4",
+            "mem-b2"
+          ],
+          "harnessEngineAgreement": 1,
+          "clusterBPrimaryCount": 1,
+          "clusterBAvgRank": 6,
+          "clusterBAvgSalience": 0.38400000000000006,
+          "rankings": [
+            {
+              "memoryId": "mem-a1",
+              "cluster": "cluster-a",
+              "salience": 0.4875,
+              "rank": 1,
+              "lane": "primary"
+            },
+            {
+              "memoryId": "mem-a2",
+              "cluster": "cluster-a",
+              "salience": 0.466,
+              "rank": 2,
+              "lane": "primary"
+            },
+            {
+              "memoryId": "mem-a3",
+              "cluster": "cluster-a",
+              "salience": 0.4445,
+              "rank": 3,
+              "lane": "primary"
+            },
+            {
+              "memoryId": "mem-a4",
+              "cluster": "cluster-a",
+              "salience": 0.423,
+              "rank": 4,
+              "lane": "primary"
+            },
+            {
+              "memoryId": "mem-b2",
+              "cluster": "cluster-b",
+              "salience": 0.40900000000000003,
+              "rank": 5,
+              "lane": "primary"
+            },
+            {
+              "memoryId": "mem-b1",
+              "cluster": "cluster-b",
+              "salience": 0.383,
+              "rank": 6,
+              "lane": "background"
+            },
+            {
+              "memoryId": "mem-b3",
+              "cluster": "cluster-b",
+              "salience": 0.36,
+              "rank": 7,
+              "lane": "background"
+            },
+            {
+              "memoryId": "mem-c1",
+              "cluster": "cluster-c",
+              "salience": 0.27449999999999997,
+              "rank": 8,
+              "lane": "background"
+            },
+            {
+              "memoryId": "mem-c2",
+              "cluster": "cluster-c",
+              "salience": 0.20400000000000001,
+              "rank": 9,
+              "lane": "background"
+            }
+          ]
+        },
+        {
+          "T": 0.5,
+          "primaryIds": [
+            "mem-a1",
+            "mem-b2",
+            "mem-a2",
+            "mem-a3",
+            "mem-a4"
+          ],
+          "harnessTop5": [
+            "mem-b2",
+            "mem-b1",
+            "mem-b3",
+            "mem-a2",
+            "mem-a3"
+          ],
+          "harnessEngineAgreement": 0.6,
+          "clusterBPrimaryCount": 1,
+          "clusterBAvgRank": 5,
+          "clusterBAvgSalience": 0.496,
+          "rankings": [
+            {
+              "memoryId": "mem-a1",
+              "cluster": "cluster-a",
+              "salience": 0.5235,
+              "rank": 1,
+              "lane": "primary"
+            },
+            {
+              "memoryId": "mem-b2",
+              "cluster": "cluster-b",
+              "salience": 0.523,
+              "rank": 2,
+              "lane": "primary"
+            },
+            {
+              "memoryId": "mem-a2",
+              "cluster": "cluster-a",
+              "salience": 0.514,
+              "rank": 3,
+              "lane": "primary"
+            },
+            {
+              "memoryId": "mem-a3",
+              "cluster": "cluster-a",
+              "salience": 0.5045,
+              "rank": 4,
+              "lane": "primary"
+            },
+            {
+              "memoryId": "mem-a4",
+              "cluster": "cluster-a",
+              "salience": 0.495,
+              "rank": 5,
+              "lane": "primary"
+            },
+            {
+              "memoryId": "mem-b1",
+              "cluster": "cluster-b",
+              "salience": 0.491,
+              "rank": 6,
+              "lane": "background"
+            },
+            {
+              "memoryId": "mem-b3",
+              "cluster": "cluster-b",
+              "salience": 0.474,
+              "rank": 7,
+              "lane": "background"
+            },
+            {
+              "memoryId": "mem-c1",
+              "cluster": "cluster-c",
+              "salience": 0.3765,
+              "rank": 8,
+              "lane": "background"
+            },
+            {
+              "memoryId": "mem-c2",
+              "cluster": "cluster-c",
+              "salience": 0.318,
+              "rank": 9,
+              "lane": "background"
+            }
+          ]
+        },
+        {
+          "T": 0.9,
+          "primaryIds": [
+            "mem-b2",
+            "mem-b1",
+            "mem-b3",
+            "mem-a4",
+            "mem-a3"
+          ],
+          "harnessTop5": [
+            "mem-b2",
+            "mem-b1",
+            "mem-b3",
+            "mem-a4",
+            "mem-a3"
+          ],
+          "harnessEngineAgreement": 1,
+          "clusterBPrimaryCount": 3,
+          "clusterBAvgRank": 2,
+          "clusterBAvgSalience": 0.608,
+          "rankings": [
+            {
+              "memoryId": "mem-b2",
+              "cluster": "cluster-b",
+              "salience": 0.637,
+              "rank": 1,
+              "lane": "primary"
+            },
+            {
+              "memoryId": "mem-b1",
+              "cluster": "cluster-b",
+              "salience": 0.599,
+              "rank": 2,
+              "lane": "primary"
+            },
+            {
+              "memoryId": "mem-b3",
+              "cluster": "cluster-b",
+              "salience": 0.5880000000000001,
+              "rank": 3,
+              "lane": "primary"
+            },
+            {
+              "memoryId": "mem-a4",
+              "cluster": "cluster-a",
+              "salience": 0.567,
+              "rank": 4,
+              "lane": "primary"
+            },
+            {
+              "memoryId": "mem-a3",
+              "cluster": "cluster-a",
+              "salience": 0.5645,
+              "rank": 5,
+              "lane": "primary"
+            },
+            {
+              "memoryId": "mem-a2",
+              "cluster": "cluster-a",
+              "salience": 0.562,
+              "rank": 6,
+              "lane": "background"
+            },
+            {
+              "memoryId": "mem-a1",
+              "cluster": "cluster-a",
+              "salience": 0.5595,
+              "rank": 7,
+              "lane": "background"
+            },
+            {
+              "memoryId": "mem-c1",
+              "cluster": "cluster-c",
+              "salience": 0.4785,
+              "rank": 8,
+              "lane": "background"
+            },
+            {
+              "memoryId": "mem-c2",
+              "cluster": "cluster-c",
+              "salience": 0.432,
+              "rank": 9,
+              "lane": "background"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
