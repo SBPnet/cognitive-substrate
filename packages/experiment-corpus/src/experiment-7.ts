@@ -58,7 +58,7 @@ const T = 0.5; // post-reinforcement retrieval temperature
 // Types
 // ---------------------------------------------------------------------------
 
-interface SemanticDoc {
+interface SemanticDoc extends Record<string, unknown> {
   memory_id: string;
   semantic_cluster: string;
   importance_score: number;

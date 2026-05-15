@@ -103,7 +103,7 @@ function jitterSignal(signal: ReinforcementSignal): ReinforcementSignal {
     emotionalWeight: jitter(signal.emotionalWeight),
     contradictionRisk: jitter(signal.contradictionRisk),
     policyAlignment: jitter(signal.policyAlignment),
-    toolUsefulness: signal.toolUsefulness !== undefined ? jitter(signal.toolUsefulness) : undefined,
+    ...(signal.toolUsefulness !== undefined ? { toolUsefulness: jitter(signal.toolUsefulness) } : {}),
   };
 }
 
