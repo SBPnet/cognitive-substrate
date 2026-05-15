@@ -316,69 +316,6 @@ Four incident windows consolidated from 200 Exp 15 signals:
 
 ---
 
-## Experiment 22 — AbstractionEngine: Compression Ladder over Operational Data
-
-**Result:** H1/H2/H3/H4 pass. Ladder structure is correct. Symbolic-label ceiling documented: all levels share the same dominant token — embeddings are required to differentiate labels across levels.
-
-Three input configurations tested:
-
-| Config | Sources | Root token | Confidence (experience) | Confidence (worldview) |
-| ------ | ------- | ---------- | ----------------------- | ---------------------- |
-| A — 200 events | 200 | "service" | 1.000 | 1.000 |
-| B — 4 memories | 4 | "latency" | 0.500 | 1.000 |
-| C — 200 events + 4 memories | 204 | "service" | 1.000 | 1.000 |
-
-**Key finding (H1):** Every ladder has exactly 5 nodes in the canonical order `experience → pattern → concept → principle → worldview`, with `compressionRatio` exactly 0.2 / 0.4 / 0.6 / 0.8 / 1.0.
-
-**Key finding (H2):** Root label is always incident-domain vocabulary — "service" for event-heavy inputs (200 events all saying "service=..."), "latency" for memory-only inputs (whose `generalization` field mentions "latency" frequently). Never falls back to "general-abstraction".
-
-**Key finding (H3):** Confidence scales with source count. At the `experience` level: A=1.000 vs B=0.500 (4/8). At `worldview`: both saturate at 1.000 (formula is `min(1, sources / max(1, 8-depth))` = `min(1, 4/1)` at depth 4).
-
-**Key finding (H4):** Mixed ladder sourceIds contain IDs from both event set (200) and memory set (4) at every node — 204 unique IDs total.
-
-**Ceiling documented:** All five levels share the identical dominant token (`service` for Config A, `latency` for Config B). The engine uses the same source corpus at every level — no per-level clustering. The engine comment explicitly acknowledges this: "Future revisions are expected to build the ladder incrementally by clustering at each level." This is the natural trigger point for introducing embeddings: once embeddings are available, each level can cluster a subset of sources by similarity, producing meaningfully differentiated labels.
-
----
-
-## Experiment 23 — Embeddings: nomic-embed-text + knn Retrieval + AbstractionEngine Clustering
-
-**Result:** H1/H2/H3/H4 pass. First real embedding pipeline validated end-to-end: embed → index → knn retrieve → cosine-centroid cluster.
-
-**Model:** `nomic-embed-text` (768-dim) via ollama at `http://localhost:11434`. Field: `embedding_nomic` (already mapped as `knn_vector dim=768` in the index schemas).
-
-**knn retrieval:**
-
-| Query | Window hits in top-5 | Result |
-| ----- | -------------------- | ------ |
-| "critical infrastructure failure high latency severe incident outage" | outage: 5/5 | ✓ |
-| "steady state background metrics no anomalies quiet" | normal: 5/5 | ✓ |
-
-Scores ~1.81–1.86 (innerproduct space, nomic vectors are pre-normalized).
-
-**AbstractionEngine ladder (cosine-centroid clustering, 200 embedded events):**
-
-| Level | Sources | Label |
-| ----- | ------- | ----- |
-| experience | 200 | experience:service |
-| pattern | 100 | pattern:service |
-| concept | 25 | concept:degraded |
-| principle | 4 | principle:degraded |
-| worldview | 2 | worldview:degraded |
-
-Source counts: 200 → 100 → 25 → 4 → 2 (halving each level). Label shifts from "service" (dominant across all 200 events) to "degraded" (centroid's closest semantic cluster) as the source set concentrates around the most representative signals.
-
-**Key finding (H3):** Label changes between pattern→concept level — the centroid of the top-100 sources is closest to the degraded-window cluster. The worldview node represents the 2 most semantically central events in the entire corpus.
-
-**Key finding (H4):** Strictly decreasing source counts confirm the per-level centroid clustering is active. Without embeddings (Exp 22) all levels had 200 sources; with embeddings each level halves.
-
-**Infrastructure notes:**
-
-- OpenSearch 3.0 knn requires all docs in a shard to have the `knn_vector` field — mixed-doc shards cause `ConjunctionDISI` errors. Exp 23 uses a dedicated `exp23_events` index (single shard, dropped after cleanup).
-- `@cognitive-substrate/abstraction-engine` must be rebuilt (`pnpm build`) before tsx picks up source changes — tsx resolves via `dist/` from `package.json` exports.
-- `exactOptionalPropertyTypes` requires conditional spread (`...(x ? { field: v } : {})`) rather than `field: x ? v : undefined` when the field is optional.
-
----
-
 ## Experiment 19 — DecayEngine: Forgetting Plan over Operational Signals
 
 **Result:** H1/H2/H3/H4 pass. `DecayEngine.planForgetting` correctly stratifies the 200 operational signals by incident severity.
@@ -448,3 +385,65 @@ Source counts: 200 → 100 → 25 → 4 → 2 (halving each level). Label shifts
 **Key finding (H4):** `coupleAttention` boost for a high-risk/high-urgency candidate: stressed=0.334, settled=0.030 — an **11× difference**. This quantifies how much the stressed state amplifies attention on urgent/risky items, via the norepinephrine and contradictionStress channels in the boost formula.
 
 ---
+---
+
+## Experiment 22 — AbstractionEngine: Compression Ladder over Operational Data
+
+**Result:** H1/H2/H3/H4 pass. Ladder structure is correct. Symbolic-label ceiling documented: all levels share the same dominant token — embeddings are required to differentiate labels across levels.
+
+Three input configurations tested:
+
+| Config | Sources | Root token | Confidence (experience) | Confidence (worldview) |
+| ------ | ------- | ---------- | ----------------------- | ---------------------- |
+| A — 200 events | 200 | "service" | 1.000 | 1.000 |
+| B — 4 memories | 4 | "latency" | 0.500 | 1.000 |
+| C — 200 events + 4 memories | 204 | "service" | 1.000 | 1.000 |
+
+**Key finding (H1):** Every ladder has exactly 5 nodes in the canonical order `experience → pattern → concept → principle → worldview`, with `compressionRatio` exactly 0.2 / 0.4 / 0.6 / 0.8 / 1.0.
+
+**Key finding (H2):** Root label is always incident-domain vocabulary — "service" for event-heavy inputs (200 events all saying "service=..."), "latency" for memory-only inputs (whose `generalization` field mentions "latency" frequently). Never falls back to "general-abstraction".
+
+**Key finding (H3):** Confidence scales with source count. At the `experience` level: A=1.000 vs B=0.500 (4/8). At `worldview`: both saturate at 1.000 (formula is `min(1, sources / max(1, 8-depth))` = `min(1, 4/1)` at depth 4).
+
+**Key finding (H4):** Mixed ladder sourceIds contain IDs from both event set (200) and memory set (4) at every node — 204 unique IDs total.
+
+**Ceiling documented:** All five levels share the identical dominant token (`service` for Config A, `latency` for Config B). The engine uses the same source corpus at every level — no per-level clustering. The engine comment explicitly acknowledges this: "Future revisions are expected to build the ladder incrementally by clustering at each level." This is the natural trigger point for introducing embeddings: once embeddings are available, each level can cluster a subset of sources by similarity, producing meaningfully differentiated labels.
+
+---
+
+## Experiment 23 — Embeddings: nomic-embed-text + knn Retrieval + AbstractionEngine Clustering
+
+**Result:** H1/H2/H3/H4 pass. First real embedding pipeline validated end-to-end: embed → index → knn retrieve → cosine-centroid cluster.
+
+**Model:** `nomic-embed-text` (768-dim) via ollama at `http://localhost:11434`. Field: `embedding_nomic` (already mapped as `knn_vector dim=768` in the index schemas).
+
+**knn retrieval:**
+
+| Query | Window hits in top-5 | Result |
+| ----- | -------------------- | ------ |
+| "critical infrastructure failure high latency severe incident outage" | outage: 5/5 | ✓ |
+| "steady state background metrics no anomalies quiet" | normal: 5/5 | ✓ |
+
+Scores ~1.81–1.86 (innerproduct space, nomic vectors are pre-normalized).
+
+**AbstractionEngine ladder (cosine-centroid clustering, 200 embedded events):**
+
+| Level | Sources | Label |
+| ----- | ------- | ----- |
+| experience | 200 | experience:service |
+| pattern | 100 | pattern:service |
+| concept | 25 | concept:degraded |
+| principle | 4 | principle:degraded |
+| worldview | 2 | worldview:degraded |
+
+Source counts: 200 → 100 → 25 → 4 → 2 (halving each level). Label shifts from "service" (dominant across all 200 events) to "degraded" (centroid's closest semantic cluster) as the source set concentrates around the most representative signals.
+
+**Key finding (H3):** Label changes between pattern→concept level — the centroid of the top-100 sources is closest to the degraded-window cluster. The worldview node represents the 2 most semantically central events in the entire corpus.
+
+**Key finding (H4):** Strictly decreasing source counts confirm the per-level centroid clustering is active. Without embeddings (Exp 22) all levels had 200 sources; with embeddings each level halves.
+
+**Infrastructure notes:**
+
+- OpenSearch 3.0 knn requires all docs in a shard to have the `knn_vector` field — mixed-doc shards cause `ConjunctionDISI` errors. Exp 23 uses a dedicated `exp23_events` index (single shard, dropped after cleanup).
+- `@cognitive-substrate/abstraction-engine` must be rebuilt (`pnpm build`) before tsx picks up source changes — tsx resolves via `dist/` from `package.json` exports.
+- `exactOptionalPropertyTypes` requires conditional spread (`...(x ? { field: v } : {})`) rather than `field: x ? v : undefined` when the field is optional.
