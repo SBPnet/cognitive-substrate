@@ -223,6 +223,9 @@ Four scenarios tested after 100 reinforcement turns (cb=0.02):
 | AffectEngine norepinephrine and contradictionStress spike on outage signals and decay monotonically to baseline | Exp 21 | EMA smoothing validated; stressed state produces 11× higher coupleAttention boost |
 | AbstractionEngine ladder structure (5 nodes, compressionRatio 0.2→1.0, confidence scales with source count) is correct | Exp 22 | Structure validated; symbolic-label ceiling hit: all levels share same token — embeddings required for differentiation |
 | AbstractionEngine symbolic-label assigns same dominant token to all 5 levels — no per-level clustering | Exp 22 | Known limitation documented in engine; embedding-based clustering is the fix |
+| nomic-embed-text (768-dim) via ollama correctly separates incident windows in knn space | Exp 23 | First real embedding pipeline; embedding_nomic field in experience_events now usable |
+| AbstractionEngine cosine-centroid clustering produces strictly decreasing source counts and label shift across levels | Exp 23 | Engine upgraded; requires dist rebuild before tsx picks up changes |
+| OpenSearch 3.0 knn requires dedicated single-shard index — mixed-doc shards cause ConjunctionDISI errors | Exp 23 | Use separate exp index or ensure all docs in shard have the knn_vector field |
 
 ---
 
@@ -334,6 +337,45 @@ Three input configurations tested:
 **Key finding (H4):** Mixed ladder sourceIds contain IDs from both event set (200) and memory set (4) at every node — 204 unique IDs total.
 
 **Ceiling documented:** All five levels share the identical dominant token (`service` for Config A, `latency` for Config B). The engine uses the same source corpus at every level — no per-level clustering. The engine comment explicitly acknowledges this: "Future revisions are expected to build the ladder incrementally by clustering at each level." This is the natural trigger point for introducing embeddings: once embeddings are available, each level can cluster a subset of sources by similarity, producing meaningfully differentiated labels.
+
+---
+
+## Experiment 23 — Embeddings: nomic-embed-text + knn Retrieval + AbstractionEngine Clustering
+
+**Result:** H1/H2/H3/H4 pass. First real embedding pipeline validated end-to-end: embed → index → knn retrieve → cosine-centroid cluster.
+
+**Model:** `nomic-embed-text` (768-dim) via ollama at `http://localhost:11434`. Field: `embedding_nomic` (already mapped as `knn_vector dim=768` in the index schemas).
+
+**knn retrieval:**
+
+| Query | Window hits in top-5 | Result |
+| ----- | -------------------- | ------ |
+| "critical infrastructure failure high latency severe incident outage" | outage: 5/5 | ✓ |
+| "steady state background metrics no anomalies quiet" | normal: 5/5 | ✓ |
+
+Scores ~1.81–1.86 (innerproduct space, nomic vectors are pre-normalized).
+
+**AbstractionEngine ladder (cosine-centroid clustering, 200 embedded events):**
+
+| Level | Sources | Label |
+| ----- | ------- | ----- |
+| experience | 200 | experience:service |
+| pattern | 100 | pattern:service |
+| concept | 25 | concept:degraded |
+| principle | 4 | principle:degraded |
+| worldview | 2 | worldview:degraded |
+
+Source counts: 200 → 100 → 25 → 4 → 2 (halving each level). Label shifts from "service" (dominant across all 200 events) to "degraded" (centroid's closest semantic cluster) as the source set concentrates around the most representative signals.
+
+**Key finding (H3):** Label changes between pattern→concept level — the centroid of the top-100 sources is closest to the degraded-window cluster. The worldview node represents the 2 most semantically central events in the entire corpus.
+
+**Key finding (H4):** Strictly decreasing source counts confirm the per-level centroid clustering is active. Without embeddings (Exp 22) all levels had 200 sources; with embeddings each level halves.
+
+**Infrastructure notes:**
+
+- OpenSearch 3.0 knn requires all docs in a shard to have the `knn_vector` field — mixed-doc shards cause `ConjunctionDISI` errors. Exp 23 uses a dedicated `exp23_events` index (single shard, dropped after cleanup).
+- `@cognitive-substrate/abstraction-engine` must be rebuilt (`pnpm build`) before tsx picks up source changes — tsx resolves via `dist/` from `package.json` exports.
+- `exactOptionalPropertyTypes` requires conditional spread (`...(x ? { field: v } : {})`) rather than `field: x ? v : undefined` when the field is optional.
 
 ---
 
