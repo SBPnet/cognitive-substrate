@@ -52,6 +52,8 @@ export interface OperationalPayload {
   temporalWindowMinutes?: number;
 }
 
+import { ExperienceEvent } from './experience.js';
+
 /** Full unified operational signal (extends ExperienceEvent) */
 export interface OperationalSignal extends ExperienceEvent {
   readonly payload: OperationalPayload;

@@ -17,7 +17,7 @@ export function generateOperationalBatch(
   for (let i = 0; i < count; i++) {
     const offsetMinutes = i * (window === 'outage' ? 0.5 : 1);
     const ts = new Date(baseTime.getTime() + offsetMinutes * 60_000);
-    const service = services[i % services.length];
+    const service = services[i % services.length]!;
     const isCorrelated = Math.random() > 0.6 || window === 'outage' || window === 'degraded';
 
     let payload: OperationalPayload;
@@ -34,22 +34,24 @@ export function generateOperationalBatch(
           threshold: 200,
           tags: ['slow-query', window === 'outage' ? 'outage' : 'degraded']
         },
-        zendesk: window !== 'normal' ? {
-          ticketId: `ZD-${1000 + Math.floor(Math.random() * 900)}`,
-          title: `Slow queries and timeouts on ${service}`,
-          priority: window === 'outage' ? 'urgent' : 'high',
-          status: window === 'recovery' ? 'solved' : 'open',
-          tags: ['performance', 'database'],
-          resolutionTimeMs: window === 'recovery' ? 4500000 : undefined
-        } : undefined,
-        slack: window !== 'normal' ? {
-          channel: '#ops-alerts',
-          threadTs: `t${ts.getTime()}`,
-          participantCount: 4 + Math.floor(Math.random() * 7),
-          reactionScore: window === 'outage' ? 18 + Math.random() * 12 : 2 + Math.random() * 4,
-          keywords: ['slow', 'postgres', 'redis', service],
-          sentiment: window === 'outage' ? -0.8 : -0.4
-        } : undefined,
+        ...(window !== 'normal' ? {
+          zendesk: {
+            ticketId: `ZD-${1000 + Math.floor(Math.random() * 900)}`,
+            title: `Slow queries and timeouts on ${service}`,
+            priority: (window === 'outage' ? 'urgent' : 'high') as 'urgent' | 'high',
+            status: window === 'recovery' ? 'solved' : 'open',
+            tags: ['performance', 'database'],
+            ...(window === 'recovery' ? { resolutionTimeMs: 4500000 } : {}),
+          },
+          slack: {
+            channel: '#ops-alerts',
+            threadTs: `t${ts.getTime()}`,
+            participantCount: 4 + Math.floor(Math.random() * 7),
+            reactionScore: window === 'outage' ? 18 + Math.random() * 12 : 2 + Math.random() * 4,
+            keywords: ['slow', 'postgres', 'redis', service],
+            sentiment: window === 'outage' ? -0.8 : -0.4,
+          },
+        } : {}),
         severity: window === 'outage' ? 0.92 : window === 'degraded' ? 0.68 : 0.45,
         affectedServices: [service],
         temporalWindowMinutes: window === 'outage' ? 15 : 45
@@ -62,7 +64,7 @@ export function generateOperationalBatch(
           service,
           metric: ['qps', 'cpu', 'disk_io'][Math.floor(Math.random()*3)] as any,
           value: 40 + Math.random() * 60,
-          unit: ['req/s', '%', 'iops'][Math.floor(Math.random()*3)],
+          unit: ['req/s', '%', 'iops'][Math.floor(Math.random()*3)]!,
           tags: ['normal']
         },
         severity: 0.12,
@@ -81,7 +83,7 @@ export function generateOperationalBatch(
       input: {
         text: `Operational signal from ${service}`,
         embedding: new Array(384).fill(0).map(() => Math.random()), // placeholder
-        structured: payload
+        structured: payload as unknown as Readonly<Record<string, unknown>>
       },
       importanceScore: payload.severity,
       tags: ['operational', service, window],

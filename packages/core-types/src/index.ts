@@ -6,3 +6,5 @@ export * from "./agent.js";
 export * from "./reinforcement.js";
 export * from "./world-model.js";
 export * from "./interaction.js";
+export * from "./operational.js";
+export * from "./operational-plugin.js";

@@ -1,4 +1,4 @@
-import { OperationalSignal } from '../core-types';
+import { OperationalSignal } from './operational.js';
 
 export interface OperationalSourcePlugin {
   sourceType: string;
