@@ -1,0 +1,61 @@
+{
+  "experiment": "exp26",
+  "runAt": "2026-05-15T21:55:23.918Z",
+  "opensearchUrl": "(unknown)",
+  "observations": "H1 outage importance 1.000>normal 0.450, probes=3: PASS; H2 risky riskScore=0.750>0.5, risky conf<safe, supported conf>safe: PASS; H3 healthy approved, low-stability quarantine+identity_stability violation: PASS; H4 reward corruption: approved=false, violations=[]: FAIL",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": true,
+      "h4": false
+    },
+    "grounding": {
+      "normalMaxImportance": 0.45,
+      "outageMaxImportance": 1,
+      "probesNormal": 3,
+      "probesOutage": 3,
+      "predictionFeedback": {
+        "error": 1150,
+        "accuracy": 0
+      }
+    },
+    "worldModel": {
+      "safe": {
+        "riskScore": 0.2,
+        "confidence": 0.36000000000000004
+      },
+      "risky": {
+        "riskScore": 0.75,
+        "confidence": 0.25
+      },
+      "supported": {
+        "riskScore": 0,
+        "confidence": 0.8800000000000001
+      }
+    },
+    "constitution": {
+      "healthy": {
+        "approved": true,
+        "quarantine": false
+      },
+      "lowStability": {
+        "approved": false,
+        "violations": [
+          "stable-identity:identity_stability_below_minimum"
+        ]
+      },
+      "corruption": {
+        "approved": true,
+        "violations": []
+      },
+      "postOutage": {
+        "approved": false,
+        "drift": 0.26583140020195756,
+        "violations": [
+          "stable-identity:identity_drift_above_maximum"
+        ]
+      }
+    }
+  }
+}

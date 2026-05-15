@@ -42,7 +42,9 @@
     "exp22": "node --import tsx/esm src/experiment-22.ts",
     "exp23": "node --import tsx/esm src/experiment-23.ts",
     "exp24": "node --import tsx/esm src/experiment-24.ts",
-    "exp25": "node --import tsx/esm src/experiment-25.ts"
+    "exp25": "node --import tsx/esm src/experiment-25.ts",
+    "exp26": "node --import tsx/esm src/experiment-26.ts",
+    "exp27": "node --import tsx/esm src/experiment-27.ts"
   },
   "dependencies": {
     "@cognitive-substrate/agents": "workspace:*",
@@ -60,6 +62,14 @@
     "@cognitive-substrate/curiosity-engine": "workspace:*",
     "@cognitive-substrate/temporal-engine": "workspace:*",
     "@cognitive-substrate/narrative-engine": "workspace:*",
+    "@cognitive-substrate/grounding-engine": "workspace:*",
+    "@cognitive-substrate/world-model": "workspace:*",
+    "@cognitive-substrate/constitution-engine": "workspace:*",
+    "@cognitive-substrate/budget-engine": "workspace:*",
+    "@cognitive-substrate/development-engine": "workspace:*",
+    "@cognitive-substrate/dream-engine": "workspace:*",
+    "@cognitive-substrate/metacog-engine": "workspace:*",
+    "@cognitive-substrate/social-engine": "workspace:*",
     "@opensearch-project/opensearch": "^2.7.0",
     "uuid": "^11.1.1"
   },

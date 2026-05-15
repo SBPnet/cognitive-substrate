@@ -1,0 +1,56 @@
+{
+  "experiment": "exp25",
+  "runAt": "2026-05-15T21:49:39.611Z",
+  "opensearchUrl": "(unknown)",
+  "observations": "H1 outage curiosityPriority 0.8973 > normal 0.1896: PASS; H2 activeScale outage=micro baseline=mid: PASS; H3 density outage=1.000 > baseline=0.300: PASS; H4 cautionRise=0.456>0.1 explorationDrop=0.280>0.1: PASS",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": true,
+      "h4": true
+    },
+    "curiosity": {
+      "topNormalPriority": 0.18963844313304276,
+      "topOutagePriority": 0.8973075239194928,
+      "outageExperiments": 5
+    },
+    "temporal": {
+      "baseline": {
+        "activeScale": "mid",
+        "density": 0.3,
+        "inferenceSteps": 10
+      },
+      "outage": {
+        "activeScale": "micro",
+        "density": 1,
+        "inferenceSteps": 16
+      }
+    },
+    "narrative": {
+      "settled": {
+        "caution": 0.5008,
+        "explorationPreference": 0.5044
+      },
+      "postOutage": {
+        "caution": 0.9567999999999998,
+        "explorationPreference": 0.22439999999999974
+      },
+      "cautionRise": 0.45599999999999974,
+      "explorationDrop": 0.28000000000000025,
+      "dominantTraits": [
+        "caution",
+        "verbosity",
+        "toolDependence"
+      ],
+      "themes": [
+        "outage",
+        "incident",
+        "critical",
+        "risk monitoring",
+        "explanatory detail"
+      ],
+      "coherence": 0.27012942985129396
+    }
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "experiment": "exp27",
+  "runAt": "2026-05-15T21:55:24.339Z",
+  "opensearchUrl": "(unknown)",
+  "observations": "H1 budget approved/slow then rejected (quota_exceeded): PASS; H2 novice→integrative phase transition, subsystems unlocked: PASS; H3 dream stress[0]=0.775>0.5 with dream tags: PASS; H4 calibrationError=0.848>0.5 proposal emitted, trust/deception correct: PASS",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": true,
+      "h4": true
+    },
+    "budget": {
+      "highUtility": {
+        "approved": true,
+        "mode": "slow"
+      },
+      "exhausted": {
+        "approved": false,
+        "reason": "quota_exceeded",
+        "exhaustion": 0.48500000000000004
+      },
+      "lowUtility": {
+        "approved": false,
+        "reason": "utility_below_threshold"
+      }
+    },
+    "development": {
+      "novicePhase": "novice",
+      "integrativePhase": "integrative",
+      "transitionDetected": true,
+      "noviceUnlocked": [
+        "ingestion",
+        "retrieval",
+        "consolidation",
+        "policy"
+      ],
+      "integrativeUnlocked": [
+        "ingestion",
+        "retrieval",
+        "consolidation",
+        "policy",
+        "agents",
+        "world-model",
+        "goals",
+        "attention",
+        "affect",
+        "metacognition"
+      ]
+    },
+    "dream": {
+      "scenarios": [
+        {
+          "stressScore": 0.7749999999999999,
+          "adversarialPressure": 0.825
+        },
+        {
+          "stressScore": 0.064,
+          "adversarialPressure": 0.04
+        }
+      ],
+      "stressFailures": 1
+    },
+    "metacog": {
+      "meanCalibrationError": 0.6144444444444445,
+      "watchdogAlerts": [
+        "calibration_drift_detected"
+      ],
+      "reflectionCalibrationError": 0.5700000000000001,
+      "proposalEmitted": true,
+      "failureAttribution": "risk_underestimated"
+    },
+    "social": {
+      "afterSuccess": {
+        "trustScore": 0.592,
+        "intent": "implementation_request"
+      },
+      "afterDeception": {
+        "trustScore": 0.5656,
+        "deceptionRisk": 0.264
+      }
+    }
+  }
+}

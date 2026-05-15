@@ -1,0 +1,36 @@
+{
+  "experiment": "exp24",
+  "runAt": "2026-05-15T21:36:40.320Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 batch faster than sequential: 9288ms vs 12822ms (1.4×): PASS; H2 batch ≤50ms/doc (5× ollama): 46.4ms/doc: PASS; H3 ingest pipeline populated embedding_minilm dim=384: PASS; H4 outage knn top-5 outage count=5/5 ≥3: PASS",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": true,
+      "h4": true
+    },
+    "modelId": "YIGOLZ4BgYB_vs2kWaTT",
+    "model": "all-MiniLM-L6-v2",
+    "dimension": 384,
+    "throughput": {
+      "ollamaBaselineMs": 250,
+      "sequentialMsPerDoc": 64.11,
+      "batchMsPerDoc": 46.44,
+      "ingestMsPerDoc": 65.05,
+      "speedupVsOllama": 5.383290267011198,
+      "speedupBatchVsSeq": 1.3804909560723515
+    },
+    "knn": {
+      "outageQuery": "critical infrastructure failure high latency severe incident outage",
+      "top5Windows": [
+        "outage",
+        "outage",
+        "outage",
+        "outage",
+        "outage"
+      ],
+      "outageCount": 5
+    }
+  }
+}

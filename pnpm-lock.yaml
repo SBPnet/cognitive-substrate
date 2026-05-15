@@ -526,21 +526,45 @@ importers:
       '@cognitive-substrate/attention-engine':
         specifier: workspace:*
         version: link:../attention-engine
+      '@cognitive-substrate/budget-engine':
+        specifier: workspace:*
+        version: link:../budget-engine
       '@cognitive-substrate/causal-engine':
         specifier: workspace:*
         version: link:../causal-engine
       '@cognitive-substrate/consolidation-engine':
         specifier: workspace:*
         version: link:../consolidation-engine
+      '@cognitive-substrate/constitution-engine':
+        specifier: workspace:*
+        version: link:../constitution-engine
       '@cognitive-substrate/core-types':
         specifier: workspace:*
         version: link:../core-types
+      '@cognitive-substrate/curiosity-engine':
+        specifier: workspace:*
+        version: link:../curiosity-engine
       '@cognitive-substrate/decay-engine':
         specifier: workspace:*
         version: link:../decay-engine
+      '@cognitive-substrate/development-engine':
+        specifier: workspace:*
+        version: link:../development-engine
+      '@cognitive-substrate/dream-engine':
+        specifier: workspace:*
+        version: link:../dream-engine
+      '@cognitive-substrate/grounding-engine':
+        specifier: workspace:*
+        version: link:../grounding-engine
       '@cognitive-substrate/memory-opensearch':
         specifier: workspace:*
         version: link:../memory-opensearch
+      '@cognitive-substrate/metacog-engine':
+        specifier: workspace:*
+        version: link:../metacog-engine
+      '@cognitive-substrate/narrative-engine':
+        specifier: workspace:*
+        version: link:../narrative-engine
       '@cognitive-substrate/policy-engine':
         specifier: workspace:*
         version: link:../policy-engine
@@ -550,6 +574,15 @@ importers:
       '@cognitive-substrate/retrieval-engine':
         specifier: workspace:*
         version: link:../retrieval-engine
+      '@cognitive-substrate/social-engine':
+        specifier: workspace:*
+        version: link:../social-engine
+      '@cognitive-substrate/temporal-engine':
+        specifier: workspace:*
+        version: link:../temporal-engine
+      '@cognitive-substrate/world-model':
+        specifier: workspace:*
+        version: link:../world-model
       '@opensearch-project/opensearch':
         specifier: ^2.7.0
         version: 2.13.0
