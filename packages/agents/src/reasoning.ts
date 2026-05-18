@@ -11,7 +11,7 @@
  * success. It is also intended only for tests and smoke runs.
  */
 
-import type { AgentContext, EventResult } from "@cognitive-substrate/core-types";
+import type { AgentContext, EventResult, ToolCapability } from "@cognitive-substrate/core-types";
 import type {
   ActionRequest,
   ReasoningDecision,
@@ -45,5 +45,15 @@ export class LocalToolExecutor implements ToolExecutor {
       output: `Executed ${action.tool}`,
       success: true,
     };
+  }
+
+  listTools(): ReadonlyArray<ToolCapability> {
+    return [
+      {
+        tool: "respond",
+        description: "Emit a text response to the current event.",
+        parameters: [{ name: "text", type: "string", required: true }],
+      },
+    ];
   }
 }

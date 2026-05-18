@@ -26,6 +26,7 @@ import type {
   Goal,
   MemoryReference,
   PolicyState,
+  ToolCapability,
 } from "@cognitive-substrate/core-types";
 import type { PolicyEvaluationInput } from "@cognitive-substrate/policy-engine";
 
@@ -89,6 +90,15 @@ export interface ActionRequest {
 /** Side-effect surface for action requests. */
 export interface ToolExecutor {
   execute(action: ActionRequest, context: AgentContext): Promise<EventResult>;
+  /**
+   * Returns the tools this executor can dispatch. The CognitiveLoop calls
+   * this once at context-build time and injects the result into
+   * `AgentContext.capabilities` so that agents can reason about what is
+   * available without knowing which executor is wired in.
+   *
+   * Implementations that do not declare a surface return an empty array.
+   */
+  listTools(): ReadonlyArray<ToolCapability>;
 }
 
 /** Outbound publisher for policy evaluation deltas (typically Kafka). */

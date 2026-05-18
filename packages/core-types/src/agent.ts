@@ -17,6 +17,21 @@ export type AgentType =
   | "world_model"
   | "meta_cognition";
 
+/**
+ * A single tool that the ToolExecutor can invoke. Agents receive the
+ * capability manifest at context-build time so that planners can scope
+ * proposals to available tools and critics can flag unavailable ones.
+ */
+export interface ToolCapability {
+  readonly tool: string;
+  readonly description: string;
+  readonly parameters?: ReadonlyArray<{
+    readonly name: string;
+    readonly type: string;
+    readonly required: boolean;
+  }>;
+}
+
 /** Shared context injected into every agent execution. */
 export interface AgentContext {
   readonly sessionId: string;
@@ -25,6 +40,11 @@ export interface AgentContext {
   readonly memories: ReadonlyArray<MemoryReference>;
   readonly goals: ReadonlyArray<Goal>;
   readonly policy: PolicyState;
+  /**
+   * Tools available to the ToolExecutor in this deployment. Empty when
+   * the executor has not declared its capability surface (e.g. stubs).
+   */
+  readonly capabilities: ReadonlyArray<ToolCapability>;
 }
 
 /** The proposal produced by a single agent. */

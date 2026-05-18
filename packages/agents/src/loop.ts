@@ -76,6 +76,7 @@ export class CognitiveLoop {
       memories: retrieval.memories,
       goals,
       policy,
+      capabilities: this.config.toolExecutor.listTools(),
     };
 
     const decision = await this.config.reasoningModel.reason(context);

@@ -65,7 +65,9 @@ export class PlannerAgent extends DeterministicAgent {
   protected readonly agentType = "planner";
 
   protected propose(context: AgentContext): string {
-    return `Plan next step for: ${context.input.input.text}`;
+    const toolList = context.capabilities.map((c) => c.tool).join(", ");
+    const toolHint = toolList ? ` using available tools [${toolList}]` : "";
+    return `Plan next step for: ${context.input.input.text}${toolHint}`;
   }
 }
 
@@ -95,7 +97,11 @@ export class CriticAgent extends DeterministicAgent {
   }
 
   protected override critique(context: AgentContext): string {
-    return `Risk review: policy risk tolerance is ${context.policy.riskTolerance.toFixed(2)} with ${context.memories.length} memory references.`;
+    const availableTools = new Set(context.capabilities.map((c) => c.tool));
+    const toolWarning = availableTools.size === 0
+      ? " No tool surface declared."
+      : ` Available tools: [${[...availableTools].join(", ")}].`;
+    return `Risk review: policy risk tolerance is ${context.policy.riskTolerance.toFixed(2)} with ${context.memories.length} memory references.${toolWarning}`;
   }
 }
 
