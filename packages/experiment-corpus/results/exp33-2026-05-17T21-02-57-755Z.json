@@ -1,0 +1,53 @@
+{
+  "experiment": "exp33",
+  "runAt": "2026-05-17T21:02:57.755Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 compression clusters=1 largest=363: PASS; H2 all windows consolidated ≥10 sources: PASS; H3 severity ordering outage>0.920 > degraded>0.680 > normal>0.450: PASS; H4 retire/prune low=100.0% retain high=100.0%: PASS",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": true,
+      "h4": true
+    },
+    "ageDays": 45,
+    "decay": {
+      "totalCandidates": 2000,
+      "actionCounts": {
+        "compress": 363,
+        "prune": 537,
+        "retain": 1100
+      },
+      "compressionClusters": 1,
+      "largestClusterSize": 363,
+      "lowRetentionRetiredRate": 1,
+      "highRetentionRetainedRate": 1
+    },
+    "consolidation": [
+      {
+        "window": "normal",
+        "sourceCount": 100,
+        "importanceScore": 0.4500000000000004,
+        "memoryId": "ff62a99a-1ee5-40ab-8979-a946fa1bd51e"
+      },
+      {
+        "window": "degraded",
+        "sourceCount": 100,
+        "importanceScore": 0.6800000000000002,
+        "memoryId": "e91f3f7b-d9f9-47d3-b73e-b8137beae20f"
+      },
+      {
+        "window": "outage",
+        "sourceCount": 100,
+        "importanceScore": 0.9200000000000014,
+        "memoryId": "03f31fcd-5ac1-4ecc-ae58-05f5fd07a145"
+      },
+      {
+        "window": "recovery",
+        "sourceCount": 100,
+        "importanceScore": 0.4500000000000004,
+        "memoryId": "45e0711e-32cf-4a24-a099-10301c56170d"
+      }
+    ]
+  }
+}

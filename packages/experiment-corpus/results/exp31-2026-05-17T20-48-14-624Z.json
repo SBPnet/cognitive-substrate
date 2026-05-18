@@ -1,0 +1,43 @@
+{
+  "experiment": "exp31",
+  "runAt": "2026-05-17T20:48:14.624Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 baseline recall: normal=10,degraded=10,outage=10,recovery=10: PASS; H2 post-write recall: normal=10,degraded=10,outage=10,recovery=10: PASS; H3 priority improvement 94/250 (37.6%): FAIL; H4 post-forcemerge recall: normal=10,degraded=10,outage=10,recovery=10: PASS",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": false,
+      "h4": true
+    },
+    "modelId": "YIGOLZ4BgYB_vs2kWaTT",
+    "writeCount": 500,
+    "writeDocs": 250,
+    "writesEach": 2,
+    "recall": {
+      "baseline": {
+        "normal": 10,
+        "degraded": 10,
+        "outage": 10,
+        "recovery": 10
+      },
+      "postWrite": {
+        "normal": 10,
+        "degraded": 10,
+        "outage": 10,
+        "recovery": 10
+      },
+      "postMerge": {
+        "normal": 10,
+        "degraded": 10,
+        "outage": 10,
+        "recovery": 10
+      }
+    },
+    "priority": {
+      "compared": 250,
+      "improved": 94,
+      "rate": 0.376
+    }
+  }
+}

@@ -4,11 +4,21 @@
  * `DecayEngine.planForgetting` evaluates each candidate against a
  * cascading set of thresholds:
  *
- *   1. High contradiction with low retention -> retire.
- *   2. Retention below `retirementThreshold`  -> prune.
- *   3. Retention below `suppressionThreshold` -> suppress.
- *   4. Old (>30 days) and low importance      -> compress.
- *   5. Otherwise                              -> retain.
+ *   1. High contradiction with low retention          -> retire.
+ *   2. Retention ≤ retirementThreshold (0.22)         -> prune.
+ *   3. Retention ≤ suppressionThreshold (0.28)        -> suppress.
+ *   4. Retention ≤ compressionThreshold (0.45)
+ *      AND ageDays > compressAgeDays (30)             -> compress.
+ *   5. Otherwise                                      -> retain.
+ *
+ * The compress gate is retention-band based, not importance-score based.
+ * This means any signal whose retention has decayed into the mid-band
+ * (0.28–0.45) after 30+ days gets consolidated, regardless of its original
+ * importance. Concretely at default parameters:
+ *   - normal signals: suppress ~0–14d, prune from ~14d onward
+ *   - recovery signals: retain ~0–30d, compress from ~45d
+ *   - degraded signals: retain ~0–44d, compress from ~45d
+ *   - outage signals: retain ~0–89d, compress from ~90d
  *
  * In parallel it prunes the association graph by removing memory links
  * whose strength falls below `pruneStrengthThreshold`. The thresholds are
@@ -26,10 +36,17 @@ import type {
 } from "./types.js";
 
 export interface DecayEngineOptions {
-  /** Retention below this triggers `suppress`. */
+  /** Retention below this triggers `suppress`. Default 0.28. */
   readonly suppressionThreshold?: number;
-  /** Retention below this triggers `prune`. */
+  /** Retention below this triggers `prune`. Default 0.22. */
   readonly retirementThreshold?: number;
+  /**
+   * Retention at or below this triggers `compress` when the candidate is also
+   * older than `compressAgeDays`. Must be > suppressionThreshold. Default 0.45.
+   */
+  readonly compressionThreshold?: number;
+  /** Age in days above which a mid-retention candidate is compressed. Default 30. */
+  readonly compressAgeDays?: number;
   /** Memory-graph edges below this strength are dropped during pruning. */
   readonly pruneStrengthThreshold?: number;
 }
@@ -37,11 +54,15 @@ export interface DecayEngineOptions {
 export class DecayEngine {
   private readonly suppressionThreshold: number;
   private readonly retirementThreshold: number;
+  private readonly compressionThreshold: number;
+  private readonly compressAgeDays: number;
   private readonly pruneStrengthThreshold: number;
 
   constructor(options: DecayEngineOptions = {}) {
-    this.suppressionThreshold = options.suppressionThreshold ?? 0.35;
-    this.retirementThreshold = options.retirementThreshold ?? 0.2;
+    this.suppressionThreshold = options.suppressionThreshold ?? 0.28;
+    this.retirementThreshold = options.retirementThreshold ?? 0.22;
+    this.compressionThreshold = options.compressionThreshold ?? 0.45;
+    this.compressAgeDays = options.compressAgeDays ?? 30;
     this.pruneStrengthThreshold = options.pruneStrengthThreshold ?? 0.15;
   }
 
@@ -81,7 +102,7 @@ export class DecayEngine {
     if (retentionScore <= this.suppressionThreshold) {
       return decision(candidate, "suppress", suppressionWeight, retentionScore, "retrieval_suppression");
     }
-    if ((candidate.ageDays ?? 0) > 30 && candidate.memory.importanceScore < 0.5) {
+    if (retentionScore <= this.compressionThreshold && (candidate.ageDays ?? 0) > this.compressAgeDays) {
       return decision(candidate, "compress", suppressionWeight, retentionScore, "compression_candidate");
     }
     return decision(candidate, "retain", suppressionWeight, retentionScore, "retained");

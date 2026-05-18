@@ -1,0 +1,54 @@
+{
+  "experiment": "exp30",
+  "runAt": "2026-05-17T20:38:36.095Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 throughput 4940.7 docs/s ≥83: PASS; H2 per-window consolidation all ≥10 sourceEvents: PASS; H3 outage importance (0.9200) > normal (0.4500): PASS; H4 retrieval_count bump 50/50 (100.0%): PASS",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": true,
+      "h4": true
+    },
+    "seed": {
+      "docsPerSec": 4940.711462450593,
+      "seedMs": 2024,
+      "total": 10000
+    },
+    "rounds": [
+      {
+        "window": "normal",
+        "sourceCount": 100,
+        "importanceScore": 0.4500000000000004,
+        "semanticCluster": "operational",
+        "memoryId": "4e757def-e969-46a7-84b5-aa744c7342cd"
+      },
+      {
+        "window": "degraded",
+        "sourceCount": 100,
+        "importanceScore": 0.6800000000000002,
+        "semanticCluster": "operational",
+        "memoryId": "88e9880e-2023-4f5c-ace5-46c08f521b22"
+      },
+      {
+        "window": "outage",
+        "sourceCount": 100,
+        "importanceScore": 0.9200000000000014,
+        "semanticCluster": "operational",
+        "memoryId": "407c6489-9b2f-4efb-8de9-02fe951bfa9f"
+      },
+      {
+        "window": "recovery",
+        "sourceCount": 100,
+        "importanceScore": 0.4500000000000004,
+        "semanticCluster": "operational",
+        "memoryId": "becdbfc5-123f-4811-86e0-4007545b4494"
+      }
+    ],
+    "bumpCheck": {
+      "bumpedCount": 50,
+      "sampleChecked": 50,
+      "bumpRate": 1
+    }
+  }
+}

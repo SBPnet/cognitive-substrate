@@ -1,0 +1,70 @@
+{
+  "experiment": "exp34",
+  "runAt": "2026-05-18T01:10:00.709Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 all models ≥9/10 recall: FAIL; H2 mpnet recall ≥ MiniLM all windows: PASS; H3 mpnet meanScore=1.7703 > MiniLM=0.0000: PASS; H4 distilbert outage=0 ≥ MiniLM=0: PASS",
+  "data": {
+    "hypotheses": {
+      "h1": false,
+      "h2": true,
+      "h3": true,
+      "h4": true
+    },
+    "models": [
+      {
+        "name": "huggingface/sentence-transformers/all-MiniLM-L6-v2",
+        "id": "YIGOLZ4BgYB_vs2kWaTT",
+        "dim": 384,
+        "recall": {
+          "normal": 0,
+          "degraded": 0,
+          "outage": 0,
+          "recovery": 0
+        },
+        "meanScore": 0,
+        "perWindowScore": {
+          "normal": 0,
+          "degraded": 0,
+          "outage": 0,
+          "recovery": 0
+        }
+      },
+      {
+        "name": "huggingface/sentence-transformers/msmarco-distilbert-base-tas-b",
+        "id": "me2WOJ4BnkXnszLYZ7M1",
+        "dim": 768,
+        "recall": {
+          "normal": 0,
+          "degraded": 0,
+          "outage": 0,
+          "recovery": 0
+        },
+        "meanScore": 0,
+        "perWindowScore": {
+          "normal": 0,
+          "degraded": 0,
+          "outage": 0,
+          "recovery": 0
+        }
+      },
+      {
+        "name": "huggingface/sentence-transformers/all-mpnet-base-v2",
+        "id": "YYGXOJ4BgYB_vs2klaSo",
+        "dim": 768,
+        "recall": {
+          "normal": 10,
+          "degraded": 10,
+          "outage": 10,
+          "recovery": 10
+        },
+        "meanScore": 1.7702509999999998,
+        "perWindowScore": {
+          "normal": 1.7711301,
+          "degraded": 1.8103459,
+          "outage": 1.855455,
+          "recovery": 1.644073
+        }
+      }
+    ]
+  }
+}

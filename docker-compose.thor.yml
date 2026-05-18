@@ -187,8 +187,57 @@ services:
       opensearch-node1:
         condition: service_healthy
 
+  # ---------------------------------------------------------------------------
+  # Kafka — KRaft single-broker (no ZooKeeper)
+  #
+  # Listens on two interfaces:
+  #   PLAINTEXT://0.0.0.0:9092  — host / Cloudflare Tunnel (external clients)
+  #   CONTROLLER://0.0.0.0:9093 — KRaft internal controller quorum
+  #
+  # KAFKA_ADVERTISED_LISTENERS uses the host name "thor" so that both
+  # containers on the Docker network and external clients (blog VPS via
+  # Cloudflare Tunnel) resolve to the correct address.
+  #
+  # Single-broker: replication factor 1 is enforced via KAFKA_TOPIC_REPLICATION_FACTOR=1
+  # in any worker that calls ensureKafkaTopics().
+  # ---------------------------------------------------------------------------
+  kafka:
+    image: apache/kafka:3.9.0
+    container_name: kafka
+    restart: unless-stopped
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://thor:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_LOG_RETENTION_HOURS: 168
+      KAFKA_LOG_SEGMENT_BYTES: 1073741824
+      KAFKA_NUM_PARTITIONS: 1
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - /opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 > /dev/null 2>&1
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
 volumes:
   opensearch-node1-data:
   opensearch-node2-data:
   opensearch-ml1-data:
   opensearch-ml2-data:
+  kafka-data:

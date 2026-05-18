@@ -1,0 +1,118 @@
+{
+  "experiment": "exp29",
+  "runAt": "2026-05-17T19:05:23.988Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 bulk ingest ≥50 docs/s: 218.0 docs/s over 10,000 docs: PASS; H2 knn recall at scale all windows ≥6/10: normal=10,degraded=10,outage=10,recovery=10 : PASS; H3 outage retain ≥2× normal at ageDays=0: outage=100.0% normal=47.2% ratio=2.12: PASS; H4 compress fires on mid-importance age45 candidates: compress=0/200 clusters=0: FAIL",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": true,
+      "h4": false
+    },
+    "modelId": "YIGOLZ4BgYB_vs2kWaTT",
+    "model": "all-MiniLM-L6-v2",
+    "dimension": 384,
+    "corpus": {
+      "totalGenerated": 10000,
+      "totalIndexed": 10000,
+      "windowCounts": {
+        "normal": 2000,
+        "degraded": 3000,
+        "outage": 2500,
+        "recovery": 2500
+      },
+      "bulkChunkSize": 500,
+      "ingestErrors": 0
+    },
+    "throughput": {
+      "totalMs": 45882,
+      "docsPerSecond": 217.95039449021402,
+      "msPerDoc": 4.5882000000000005
+    },
+    "recall": {
+      "k": 10,
+      "windowResults": {
+        "normal": {
+          "matchCount": 10,
+          "topWindows": [
+            "normal",
+            "normal",
+            "normal",
+            "normal",
+            "normal",
+            "normal",
+            "normal",
+            "normal",
+            "normal",
+            "normal"
+          ]
+        },
+        "degraded": {
+          "matchCount": 10,
+          "topWindows": [
+            "degraded",
+            "degraded",
+            "degraded",
+            "degraded",
+            "degraded",
+            "degraded",
+            "degraded",
+            "degraded",
+            "degraded",
+            "degraded"
+          ]
+        },
+        "outage": {
+          "matchCount": 10,
+          "topWindows": [
+            "outage",
+            "outage",
+            "outage",
+            "outage",
+            "outage",
+            "outage",
+            "outage",
+            "outage",
+            "outage",
+            "outage"
+          ]
+        },
+        "recovery": {
+          "matchCount": 10,
+          "topWindows": [
+            "recovery",
+            "recovery",
+            "recovery",
+            "recovery",
+            "recovery",
+            "recovery",
+            "recovery",
+            "recovery",
+            "recovery",
+            "recovery"
+          ]
+        }
+      },
+      "avgCorrectPerK": 10
+    },
+    "decay": {
+      "sampleSize": 500,
+      "age0": {
+        "outageRetainCount": 125,
+        "normalRetainCount": 59,
+        "outageRetainRate": 1,
+        "normalRetainRate": 0.472,
+        "retainRatio": 2.1186440677966103
+      },
+      "age45": {
+        "syntheticCandidates": 200,
+        "compressCount": 0,
+        "retainCount": 0,
+        "pruneCount": 0,
+        "clusterCount": 0,
+        "clusters": []
+      }
+    }
+  }
+}

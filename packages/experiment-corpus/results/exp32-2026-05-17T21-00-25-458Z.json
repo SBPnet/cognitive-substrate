@@ -1,0 +1,41 @@
+{
+  "experiment": "exp32",
+  "runAt": "2026-05-17T21:00:25.458Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 outage interrupt lane: PASS; H2 causal latency estimate after do(outage=1.0)=1.500 ≥0.7: PASS; H3 affect norepinephrine=0.415 ≥0.7: FAIL; H4 consolidation importanceScore=0.9200 sources=50: PASS",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": false,
+      "h4": true
+    },
+    "modelId": "YIGOLZ4BgYB_vs2kWaTT",
+    "pipeline": {
+      "retrieval": {
+        "hits": 5,
+        "top1Window": "outage"
+      },
+      "attention": {
+        "primary": 0,
+        "interrupts": 5
+      },
+      "causal": {
+        "edges": 6,
+        "latencyBaseline": 0.5,
+        "latencyCounterfactual": 1.5,
+        "effect": 1
+      },
+      "affect": {
+        "norepinephrine": 0.415,
+        "dopamine": 0.35,
+        "mood": "settled"
+      },
+      "consolidation": {
+        "sourceCount": 50,
+        "importanceScore": 0.9200000000000012,
+        "memoryId": "4e553640-7f89-42a4-99e1-e65247929b8e"
+      }
+    }
+  }
+}

@@ -616,6 +616,37 @@ importers:
         specifier: ^5.5.0
         version: 5.9.3
 
+  packages/ingest-worker:
+    dependencies:
+      '@cognitive-substrate/core-types':
+        specifier: workspace:*
+        version: link:../core-types
+      '@cognitive-substrate/kafka-bus':
+        specifier: workspace:*
+        version: link:../kafka-bus
+      '@cognitive-substrate/memory-opensearch':
+        specifier: workspace:*
+        version: link:../memory-opensearch
+      '@opensearch-project/opensearch':
+        specifier: ^2.7.0
+        version: 2.13.0
+      uuid:
+        specifier: ^11.1.1
+        version: 11.1.1
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.19.18
+      '@types/uuid':
+        specifier: ^10.0.0
+        version: 10.0.0
+      tsx:
+        specifier: ^4.19.0
+        version: 4.21.0
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
+
   packages/kafka-bus:
     dependencies:
       kafkajs:
