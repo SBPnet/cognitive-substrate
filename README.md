@@ -34,7 +34,7 @@ TypeScript monorepo implementing a persistent, learnable cognitive memory substr
 | `clickhouse-telemetry` | ClickHouse telemetry sink for operational metrics |
 | `telemetry-otel` | OpenTelemetry instrumentation |
 | `aiven-client` | Aiven platform client utilities |
-| `experiment-corpus` | Fixed-replay corpus and experiment harness (Experiments 1–17) |
+| `experiment-corpus` | Fixed-replay corpus and experiment harness (Experiments 1–44) |
 
 ## Getting started
 
@@ -43,19 +43,15 @@ pnpm install
 pnpm build
 ```
 
-Requires Node 20+, pnpm 9+. A running OpenSearch instance is needed for retrieval and reinforcement experiments — see `deploy/` for Docker Compose and Aiven configurations.
+Requires Node 22+, pnpm 10+. A running OpenSearch instance is needed for retrieval and reinforcement experiments — see `deploy/` for Docker Compose and Aiven configurations.
 
 ## Experiments
 
-`packages/experiment-corpus` contains a numbered experiment series validating substrate behaviour end-to-end. Results are in `packages/experiment-corpus/results/`. The lab notebook is at `docs/experiments.md`.
+`packages/experiment-corpus` contains a numbered experiment series validating substrate behaviour end-to-end. Results are in `packages/experiment-corpus/results/`. The lab notebook is at `packages/experiment-corpus/src/experiments.md`.
 
 ```bash
-OPENSEARCH_URL=http://localhost:9200 pnpm --filter @cognitive-substrate/experiment-corpus exp17
+OPENSEARCH_URL=http://localhost:9200 pnpm --filter @cognitive-substrate/experiment-corpus exp44
 ```
-
-## Implementation status
-
-`docs/architecture/inventory.md` is the source of truth for what is built vs drafted.
 
 ## Documentation
 

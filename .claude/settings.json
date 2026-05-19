@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cmd=$(jq -r '.tool_input.command'); if echo \"$cmd\" | grep -qE '(npm|pnpm|yarn|bun)\\s+(install|add|up|update|upgrade)(\\s+\\S+)*\\s+\\S+@latest|(npm|pnpm|yarn|bun)\\s+(update|upgrade)\\s+--latest'; then echo '{\"decision\":\"block\",\"reason\":\"Supply-chain policy: do not upgrade to @latest until the release is 30+ days old. Pin to a specific version you have verified is mature.\"}'; fi",
+            "statusMessage": "Checking package upgrade policy..."
+          }
+        ]
+      }
+    ]
+  }
+}
