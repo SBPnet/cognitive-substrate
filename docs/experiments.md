@@ -1102,6 +1102,12 @@ These limitations do not invalidate the experimental results. Each experiment de
 
 ---
 
+## Experiment 45 — Blog Telemetry Pipeline Integrity & Retrieval Quality
+
+**Result:** First experiment using real data from bigpines.net reader-behaviour events. Pipeline integrity (H1), importance ordering (H2), kNN recall by article slug (H3), and multi-session salience (H4) validated against the live `experience_events` index on thor. H3 and H4 skip gracefully when the ML node is unavailable or the index is still accumulating data.
+
+---
+
 ## AgentContext Capability Manifest
 
 *Not an experiment — a subsystem addition made alongside experiments 35–44.*

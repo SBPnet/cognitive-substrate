@@ -1,0 +1,336 @@
+{
+  "experiment": "experiment-45",
+  "runAt": "2026-05-19T20:37:18.517Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 pipeline integrity: PASS (totalDocs=123, eventTypes=8)\nH2 importance ordering: PASS (article_complete=0.9357 page_view=0.1000)\nH3 kNN recall: PASS (18/18 slugs)\nH4 multi-session salience: FAIL (5 multi-session articles)",
+  "data": {
+    "totalDocs": 123,
+    "byEventType": [
+      {
+        "eventType": "scroll_depth",
+        "count": 73
+      },
+      {
+        "eventType": "page_view",
+        "count": 25
+      },
+      {
+        "eventType": "article_complete",
+        "count": 14
+      },
+      {
+        "eventType": "copy_code",
+        "count": 4
+      },
+      {
+        "eventType": "time_on_page",
+        "count": 3
+      },
+      {
+        "eventType": "search_query",
+        "count": 2
+      },
+      {
+        "eventType": "focus_loss",
+        "count": 1
+      },
+      {
+        "eventType": "related_article_click",
+        "count": 1
+      }
+    ],
+    "importanceDist": [
+      {
+        "eventType": "article_complete",
+        "meanImportance": 0.9357142959322248,
+        "count": 14
+      },
+      {
+        "eventType": "search_query",
+        "meanImportance": 0.5999999940395355,
+        "count": 2
+      },
+      {
+        "eventType": "related_article_click",
+        "meanImportance": 0.4000000059604645,
+        "count": 1
+      },
+      {
+        "eventType": "scroll_depth",
+        "meanImportance": 0.3068965611786678,
+        "count": 73
+      },
+      {
+        "eventType": "focus_loss",
+        "meanImportance": 0.17499999701976776,
+        "count": 1
+      },
+      {
+        "eventType": "page_view",
+        "meanImportance": 0.10000000149011612,
+        "count": 25
+      },
+      {
+        "eventType": "copy_code",
+        "meanImportance": 0,
+        "count": 4
+      },
+      {
+        "eventType": "time_on_page",
+        "meanImportance": 0,
+        "count": 3
+      }
+    ],
+    "knnResults": [
+      {
+        "slug": "ai-as-search",
+        "pass": true,
+        "topTags": [
+          "blog",
+          "event:page_view",
+          "article:ai-as-search",
+          "event:scroll_depth",
+          "engagement:shallow"
+        ]
+      },
+      {
+        "slug": "cognitive-loop",
+        "pass": true,
+        "topTags": [
+          "blog",
+          "event:article_complete",
+          "article:cognitive-loop",
+          "engagement:deep",
+          "event:page_view"
+        ]
+      },
+      {
+        "slug": "memory-retrieval",
+        "pass": true,
+        "topTags": [
+          "blog",
+          "event:article_complete",
+          "article:memory-retrieval",
+          "engagement:deep",
+          "event:page_view",
+          "event:search_query"
+        ]
+      },
+      {
+        "slug": "arbitration",
+        "pass": true,
+        "topTags": [
+          "blog",
+          "event:article_complete",
+          "article:arbitration",
+          "engagement:deep",
+          "event:page_view",
+          "event:related_article_click"
+        ]
+      },
+      {
+        "slug": "policy-engine",
+        "pass": true,
+        "topTags": [
+          "blog",
+          "event:article_complete",
+          "article:policy-engine",
+          "engagement:deep",
+          "event:page_view",
+          "event:scroll_depth"
+        ]
+      },
+      {
+        "slug": "attention",
+        "pass": true,
+        "topTags": [
+          "blog",
+          "event:article_complete",
+          "article:attention",
+          "engagement:deep",
+          "event:page_view",
+          "article:goals"
+        ]
+      },
+      {
+        "slug": "consolidation",
+        "pass": true,
+        "topTags": [
+          "blog",
+          "event:article_complete",
+          "article:consolidation",
+          "engagement:deep",
+          "event:page_view",
+          "event:scroll_depth"
+        ]
+      },
+      {
+        "slug": "experience-ingestion",
+        "pass": true,
+        "topTags": [
+          "blog",
+          "event:page_view",
+          "article:experience-ingestion",
+          "event:focus_loss",
+          "engagement:exit",
+          "event:scroll_depth"
+        ]
+      },
+      {
+        "slug": "goals",
+        "pass": true,
+        "topTags": [
+          "blog",
+          "event:article_complete",
+          "article:goals",
+          "engagement:deep",
+          "event:page_view",
+          "article:reinforcement"
+        ]
+      },
+      {
+        "slug": "identity",
+        "pass": true,
+        "topTags": [
+          "blog",
+          "event:article_complete",
+          "article:identity",
+          "engagement:deep",
+          "event:page_view",
+          "article:arbitration"
+        ]
+      },
+      {
+        "slug": "opensearch-ml-inference",
+        "pass": true,
+        "topTags": [
+          "blog",
+          "event:article_complete",
+          "article:opensearch-ml-inference",
+          "engagement:deep",
+          "event:page_view",
+          "event:scroll_depth"
+        ]
+      },
+      {
+        "slug": "reinforcement",
+        "pass": true,
+        "topTags": [
+          "blog",
+          "event:page_view",
+          "article:reinforcement",
+          "event:article_complete",
+          "engagement:deep",
+          "article:consolidation"
+        ]
+      },
+      {
+        "slug": "temporal",
+        "pass": true,
+        "topTags": [
+          "blog",
+          "event:article_complete",
+          "article:temporal",
+          "engagement:deep",
+          "event:page_view",
+          "article:reinforcement"
+        ]
+      },
+      {
+        "slug": "world-model",
+        "pass": true,
+        "topTags": [
+          "blog",
+          "event:article_complete",
+          "article:world-model",
+          "engagement:deep",
+          "event:page_view",
+          "article:economics"
+        ]
+      },
+      {
+        "slug": "multi-agent",
+        "pass": true,
+        "topTags": [
+          "blog",
+          "event:page_view",
+          "article:multi-agent",
+          "event:related_article_click",
+          "article:agent-society",
+          "event:scroll_depth"
+        ]
+      },
+      {
+        "slug": "agent-society",
+        "pass": true,
+        "topTags": [
+          "blog",
+          "event:page_view",
+          "article:agent-society",
+          "event:scroll_depth",
+          "engagement:shallow",
+          "article:multi-agent"
+        ]
+      },
+      {
+        "slug": "economics",
+        "pass": true,
+        "topTags": [
+          "blog",
+          "event:page_view",
+          "article:economics",
+          "event:scroll_depth",
+          "engagement:shallow",
+          "event:article_complete"
+        ]
+      },
+      {
+        "slug": "reflection",
+        "pass": true,
+        "topTags": [
+          "blog",
+          "event:page_view",
+          "article:reflection",
+          "event:article_complete",
+          "article:arbitration",
+          "engagement:deep"
+        ]
+      }
+    ],
+    "multiSessionCount": 5,
+    "singleSessionCount": 13,
+    "multiSessionArticles": [
+      {
+        "articleTag": "article:ai-as-search",
+        "sessionCount": 2,
+        "medianImportance": 0.30000001192092896
+      },
+      {
+        "articleTag": "article:cognitive-loop",
+        "sessionCount": 2,
+        "medianImportance": 0.30000001192092896
+      },
+      {
+        "articleTag": "article:memory-retrieval",
+        "sessionCount": 2,
+        "medianImportance": 0.30000001192092896
+      },
+      {
+        "articleTag": "article:arbitration",
+        "sessionCount": 2,
+        "medianImportance": 0.15000000596046448
+      },
+      {
+        "articleTag": "article:experience-ingestion",
+        "sessionCount": 2,
+        "medianImportance": 0.15000000596046448
+      }
+    ],
+    "h1Pass": true,
+    "h2Pass": true,
+    "h3Pass": true,
+    "h3Skipped": false,
+    "h4Pass": false,
+    "h4Skipped": false
+  }
+}

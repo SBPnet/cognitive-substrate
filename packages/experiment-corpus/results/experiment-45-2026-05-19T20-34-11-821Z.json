@@ -1,0 +1,89 @@
+{
+  "experiment": "experiment-45",
+  "runAt": "2026-05-19T20:34:11.821Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 pipeline integrity: FAIL (totalDocs=19, eventTypes=4)\nH2 importance ordering: FAIL (article_complete=-1.0000 page_view=0.1000)\nH3 kNN recall: PASS (2/2 slugs)\nH4 multi-session salience: PASS (1 multi-session articles)",
+  "data": {
+    "totalDocs": 19,
+    "byEventType": [
+      {
+        "eventType": "scroll_depth",
+        "count": 11
+      },
+      {
+        "eventType": "page_view",
+        "count": 4
+      },
+      {
+        "eventType": "time_on_page",
+        "count": 3
+      },
+      {
+        "eventType": "copy_code",
+        "count": 1
+      }
+    ],
+    "importanceDist": [
+      {
+        "eventType": "scroll_depth",
+        "meanImportance": 0.2888888981607225,
+        "count": 11
+      },
+      {
+        "eventType": "page_view",
+        "meanImportance": 0.10000000149011612,
+        "count": 4
+      },
+      {
+        "eventType": "time_on_page",
+        "meanImportance": 0,
+        "count": 3
+      },
+      {
+        "eventType": "copy_code",
+        "meanImportance": 0,
+        "count": 1
+      }
+    ],
+    "knnResults": [
+      {
+        "slug": "ai-as-search",
+        "pass": true,
+        "topTags": [
+          "blog",
+          "event:page_view",
+          "article:ai-as-search",
+          "event:scroll_depth",
+          "engagement:shallow"
+        ]
+      },
+      {
+        "slug": "experience-ingestion",
+        "pass": true,
+        "topTags": [
+          "blog",
+          "event:page_view",
+          "article:experience-ingestion",
+          "event:scroll_depth",
+          "engagement:shallow",
+          "article:ai-as-search"
+        ]
+      }
+    ],
+    "multiSessionCount": 1,
+    "singleSessionCount": 1,
+    "multiSessionArticles": [
+      {
+        "articleTag": "article:ai-as-search",
+        "sessionCount": 2,
+        "medianImportance": 0.30000001192092896
+      }
+    ],
+    "h1Pass": false,
+    "h2Pass": false,
+    "h3Pass": true,
+    "h3Skipped": false,
+    "h4Pass": true,
+    "h4Skipped": false
+  }
+}

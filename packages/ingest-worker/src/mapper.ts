@@ -47,7 +47,12 @@ interface ArticleCompleteEvent extends TelemetryEventBase {
 
 interface ScrollDepthEvent extends TelemetryEventBase {
   type: "scroll_depth";
-  payload: { depth: 25 | 50 | 75 | 100 };
+  payload: { depth: 25 | 50 | 75 | 90 };
+}
+
+interface CopyCodeEvent extends TelemetryEventBase {
+  type: "copy_code";
+  payload: { path: string; title: string; language: string; snippet: string };
 }
 
 interface SnippetCopyEvent extends TelemetryEventBase {
@@ -84,6 +89,7 @@ export type TelemetryEvent =
   | PageViewEvent
   | ArticleCompleteEvent
   | ScrollDepthEvent
+  | CopyCodeEvent
   | SnippetCopyEvent
   | RepoClickEvent
   | SearchQueryEvent
@@ -102,7 +108,10 @@ function importanceScore(event: TelemetryEvent): number {
       return Math.min(0.85 + (event.payload.readingTimeMs / 600_000) * 0.15, 1.0);
 
     case "scroll_depth":
-      return { 100: 0.75, 75: 0.55, 50: 0.30, 25: 0.15 }[event.payload.depth];
+      return { 90: 0.75, 75: 0.55, 50: 0.30, 25: 0.15 }[event.payload.depth];
+
+    case "copy_code":
+      return 0.65;
 
     case "snippet_copy":
       return 0.65;
@@ -144,6 +153,9 @@ function buildSummary(event: TelemetryEvent): string {
     case "scroll_depth":
       return `scroll depth ${event.payload.depth}% on ${slug}`;
 
+    case "copy_code":
+      return `code copied: ${event.payload.language} snippet on ${slug} — "${event.payload.snippet.slice(0, 60)}"`;
+
     case "snippet_copy":
       return `code snippet copied: ${event.payload.file} (${event.payload.lang}) on ${slug}`;
 
@@ -181,6 +193,7 @@ function buildTags(event: TelemetryEvent): string[] {
     case "scroll_depth":
       tags.push(event.payload.depth >= 75 ? "engagement:deep" : "engagement:shallow");
       break;
+    case "copy_code":
     case "snippet_copy":
     case "repo_click":
       tags.push("engagement:conversion");
