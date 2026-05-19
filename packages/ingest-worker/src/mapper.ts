@@ -33,6 +33,9 @@ interface TelemetryEventBase {
   referrer?: string;
   userAgent?: string;
   semanticTopicTags?: string[];
+  readerId?: string;
+  sessionCount?: number;
+  firstSeen?: string;
 }
 
 interface PageViewEvent extends TelemetryEventBase {
