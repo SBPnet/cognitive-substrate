@@ -472,10 +472,14 @@ async function main(): Promise<void> {
   console.log(`H4 — compress fires (≥1) and cluster forms: compress=${compressCount} clusters=${clusterCount}: ${h4Pass ? "✓ PASS" : "✗ FAIL"}`);
 
   // ── Cleanup ──────────────────────────────────────────────────────────────
-  console.log("\nCleaning up...");
-  await client.indices.delete({ index: EXP_INDEX });
-  await client.ingest.deletePipeline({ id: PIPELINE_ID });
-  console.log("  Done.");
+  if (process.env["EXP29_KEEP_INDEX"] === "1") {
+    console.log("\nSkipping cleanup (EXP29_KEEP_INDEX=1) — index retained for downstream experiments.");
+  } else {
+    console.log("\nCleaning up...");
+    await client.indices.delete({ index: EXP_INDEX });
+    await client.ingest.deletePipeline({ id: PIPELINE_ID });
+    console.log("  Done.");
+  }
 
   // ── Summary ──────────────────────────────────────────────────────────────
   const allPass = h1Pass && h2Pass && h3Pass && h4Pass;

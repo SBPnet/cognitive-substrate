@@ -1,0 +1,21 @@
+{
+  "experiment": "exp43",
+  "runAt": "2026-05-18T19:49:21.687Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 count≥20: PASS (20); H2 usedFwa>0: PASS (0.1000); H3 unusedFwa≤0: PASS (0.0000); H4 outageHelp≥normalHelp: PASS (0.000 vs 0.000)",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": true,
+      "h4": true
+    },
+    "writtenCount": 20,
+    "indexedCount": 20,
+    "meanUsedFwa": 0.10000000000000002,
+    "meanUnusedFwa": 0,
+    "meanOutageHelpfulness": 0,
+    "meanNormalHelpfulness": 0,
+    "hasReranker": false
+  }
+}

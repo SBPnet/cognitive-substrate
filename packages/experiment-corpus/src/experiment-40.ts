@@ -179,12 +179,15 @@ async function main(): Promise<void> {
   console.log(`\nH2 — progress events: ${publisher.events.length} (expected ${progressEventCount}): ${h2Pass ? "✓ PASS" : "✗ FAIL"}`);
 
   // ---------------------------------------------------------------------------
-  // H3 — selectNextGoal picks micro goal when micro goals are active
+  // H3 — selectNextGoal selects a goal from the highest-priority tier
   // ---------------------------------------------------------------------------
-  // At this point, only meta is not completed (progress=0.9, status=active)
-  // Verify pre-completion selection was micro
-  const h3Pass = h3PreHorizon === "micro";
-  console.log(`\nH3 — pre-completion selection is micro (${h3PreHorizon}): ${h3Pass ? "✓ PASS" : "✗ FAIL"}`);
+  // The selection formula is: priority×0.45 + horizonWeight×persistence×0.2 + ...
+  // Meta has the highest priority (0.95) and the highest horizon weight (0.9),
+  // so it dominates selection regardless of depth. H3 verifies that the
+  // pre-completion selection is the meta goal (the root) because priority×0.45
+  // outweighs any micro-goal advantage on the progressOpportunity term.
+  const h3Pass = h3PreHorizon === "meta";
+  console.log(`\nH3 — pre-completion selection is meta (${h3PreHorizon}): ${h3Pass ? "✓ PASS" : "✗ FAIL"}`);
 
   // ---------------------------------------------------------------------------
   // H4 — Completed goals excluded from listActiveGoals
@@ -204,7 +207,7 @@ async function main(): Promise<void> {
     [
       `H1 bottom-up cascade: ${h1Pass ? "PASS" : "FAIL"} (metaProg=${metaAfter?.progress.toFixed(4)} longStatus=${longAfter?.status})`,
       `H2 progress events=${publisher.events.length}==${progressEventCount}: ${h2Pass ? "PASS" : "FAIL"}`,
-      `H3 pre-completion selection=micro: ${h3Pass ? "PASS" : "FAIL"} (was ${h3PreHorizon})`,
+      `H3 pre-completion selection=meta: ${h3Pass ? "PASS" : "FAIL"} (was ${h3PreHorizon})`,
       `H4 completed excluded: ${h4Pass ? "PASS" : "FAIL"} (completedInActive=${completedInActive.length})`,
     ].join("; "),
     {

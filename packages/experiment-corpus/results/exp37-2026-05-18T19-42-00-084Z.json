@@ -1,0 +1,40 @@
+{
+  "experiment": "exp37",
+  "runAt": "2026-05-18T19:42:00.084Z",
+  "opensearchUrl": "(unknown)",
+  "observations": "H1 priority propagation: PASS (root=0.8000 leaf=0.5249 expected=0.5249 diff=0.0000); H2 selection inversion: PASS (highPersistence winner: long (score=0.6685) | lowPersistence winner: micro (score=0.6120)); H3 completion transition: PASS (beforeLast progress=0.9900 status=active; after: status=completed appearsInActive=false); H4 event relevance gap: PASS (related=0.8571 unrelated=0.0000)",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": true,
+      "h4": true
+    },
+    "h1": {
+      "pass": true,
+      "rootPriority": 0.8,
+      "deepLeafPriority": 0.5248800000000001,
+      "expected": 0.52488,
+      "details": "root=0.8000 leaf=0.5249 expected=0.5249 diff=0.0000"
+    },
+    "h2": {
+      "pass": true,
+      "highPersistenceWinner": "long",
+      "lowPersistenceWinner": "micro",
+      "details": "highPersistence winner: long (score=0.6685) | lowPersistence winner: micro (score=0.6120)"
+    },
+    "h3": {
+      "pass": true,
+      "progressBeforeLast": 0.99,
+      "statusAfter": "completed",
+      "appearsInActive": false,
+      "details": "beforeLast progress=0.9900 status=active; after: status=completed appearsInActive=false"
+    },
+    "h4": {
+      "pass": true,
+      "relevantScore": 0.8571428571428571,
+      "unrelatedScore": 0,
+      "details": "related=0.8571 unrelated=0.0000"
+    }
+  }
+}

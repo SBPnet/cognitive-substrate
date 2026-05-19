@@ -68,6 +68,7 @@ export class CognitiveLoop {
       session.sessionId,
       retrieval.memories,
     );
+    const updatedSession = { ...session, workingMemory: retrieval.memories };
 
     const context: AgentContext = {
       sessionId: session.sessionId,
@@ -111,7 +112,7 @@ export class CognitiveLoop {
     await this.config.policyEvaluationPublisher.publish(policyEvaluation);
 
     return {
-      session,
+      session: updatedSession,
       context,
       agentResult,
       actionResult,

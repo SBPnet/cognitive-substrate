@@ -1,0 +1,33 @@
+{
+  "experiment": "exp41",
+  "runAt": "2026-05-18T19:42:02.713Z",
+  "opensearchUrl": "(unknown)",
+  "observations": "H1 ef drops in outage: PASS (0.4023<0.8551); H2 ef recovers: FAIL (0.0000>0.4023); H3 drift≤0.01: FAIL (max=0.045390); H4 rt higher in recovery: FAIL (1.0000>1.0000)",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": false,
+      "h3": false,
+      "h4": false
+    },
+    "phaseBoundarySnapshots": {
+      "normal": {
+        "ef": 0.8046197652360207,
+        "rt": 0.4930810788182085
+      },
+      "degraded": {
+        "ef": 0.8551295176218705,
+        "rt": 0.85360882672917
+      },
+      "outage": {
+        "ef": 0.40230638764287135,
+        "rt": 1
+      },
+      "recovery": {
+        "ef": 0,
+        "rt": 1
+      }
+    },
+    "maxObservedDrift": 0.045389970338930996
+  }
+}

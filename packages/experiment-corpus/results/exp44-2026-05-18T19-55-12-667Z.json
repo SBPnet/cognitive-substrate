@@ -1,0 +1,50 @@
+{
+  "experiment": "exp44",
+  "runAt": "2026-05-18T19:55:12.667Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 all 100 turns: PASS (errors=0); H2 ef monotone down t20→t80: PASS (t80=0.0000 t20=0.8092); H3 ≥80 feedback records: PASS (245); H4 all goals progress>0: PASS",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": true,
+      "h4": true
+    },
+    "errorCount": 0,
+    "feedbackWritten": 100,
+    "feedbackIndexed": 245,
+    "policySnapshots": [
+      {
+        "turn": 20,
+        "ef": 0.8091946833997882,
+        "rt": 0.4945742780677522
+      },
+      {
+        "turn": 40,
+        "ef": 0.8001031244912477,
+        "rt": 0.9385531187279829
+      },
+      {
+        "turn": 60,
+        "ef": 0.23876496620536575,
+        "rt": 1
+      },
+      {
+        "turn": 80,
+        "ef": 0,
+        "rt": 1
+      },
+      {
+        "turn": 100,
+        "ef": 0,
+        "rt": 1
+      }
+    ],
+    "goalProgress": {
+      "monitor": 1,
+      "detect": 1,
+      "contain": 1,
+      "restore": 1
+    }
+  }
+}

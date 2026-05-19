@@ -1,0 +1,20 @@
+{
+  "experiment": "exp39",
+  "runAt": "2026-05-18T19:47:11.226Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 count≥40: PASS (40); H2 helpfulness range query exact: PASS (11=11); H3 highHelp meanFWA>0: PASS (0.0930); H4 hallucination FWA<0: PASS (n=8 allNeg=true)",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": true,
+      "h4": true
+    },
+    "totalWritten": 40,
+    "totalIndexed": 40,
+    "highHelpCount": 7,
+    "meanHighFutureWeight": 0.09296719680274554,
+    "hallucinationCount": 8,
+    "allHallucinationNegativeFwa": true
+  }
+}

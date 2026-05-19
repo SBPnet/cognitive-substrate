@@ -1,0 +1,40 @@
+{
+  "experiment": "exp44",
+  "runAt": "2026-05-18T19:51:08.039Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 all 100 turns: PASS (errors=0); H2 ef t80>t60: FAIL (0.0000 vs 0.2388); H3 ≥80 feedback records: FAIL (0); H4 all goals progress>0: PASS",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": false,
+      "h3": false,
+      "h4": true
+    },
+    "errorCount": 0,
+    "feedbackWritten": 100,
+    "feedbackIndexed": 0,
+    "policySnapshots": [
+      {
+        "turn": 60,
+        "ef": 0.23876496620536575,
+        "rt": 1
+      },
+      {
+        "turn": 80,
+        "ef": 0,
+        "rt": 1
+      },
+      {
+        "turn": 100,
+        "ef": 0,
+        "rt": 1
+      }
+    ],
+    "goalProgress": {
+      "monitor": 1,
+      "detect": 1,
+      "contain": 1,
+      "restore": 1
+    }
+  }
+}

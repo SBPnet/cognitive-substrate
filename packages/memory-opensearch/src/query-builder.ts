@@ -76,6 +76,13 @@ export interface HybridQueryOptions {
    */
   readonly retrievalMode?: RetrievalMode;
 
+  /**
+   * Explicit knn_vector field name. When set, overrides retrievalMode field
+   * selection. Use for experimental indices that don't follow the standard
+   * retrieval mode mapping (e.g. embedding_minilm).
+   */
+  readonly knnField?: string;
+
   /** Relative BM25 and k-NN weights used by bool-query score fusion. */
   readonly fusion?: RetrievalFusionOptions;
 }
@@ -101,7 +108,7 @@ export function buildHybridQuery(options: HybridQueryOptions): Record<string, un
 
   const retrievalBias = policy?.retrievalBias ?? 0.5;
   const memoryTrust = policy?.memoryTrust ?? 0.5;
-  const vectorField = RETRIEVAL_MODE_VECTOR_FIELD[retrievalMode];
+  const vectorField = options.knnField ?? RETRIEVAL_MODE_VECTOR_FIELD[retrievalMode];
   const lexicalWeight = fusion?.lexicalWeight ?? 1;
   const vectorWeight = fusion?.vectorWeight ?? Math.max(0.1, retrievalBias * memoryTrust * 2);
 

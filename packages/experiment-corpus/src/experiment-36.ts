@@ -85,7 +85,7 @@ interface ModelInfo {
   dim?: number;
 }
 
-async function discoverModels(client: OSClient): Promise<{
+async function discoverModels(client: OSClient, preferName?: string): Promise<{
   embedder: ModelInfo;
   reranker: ModelInfo | undefined;
 }> {
@@ -115,10 +115,14 @@ async function discoverModels(client: OSClient): Promise<{
     const name = hit._source.name ?? "";
     const dim  = hit._source.model_config?.embedding_dimension;
 
-    if (name.includes("all-mpnet") && dim) {
-      embedder = { id: hit._id, name, type: "embedding", dim };
-    } else if (name.includes("all-MiniLM") && !embedder && dim) {
-      embedder = { id: hit._id, name, type: "embedding", dim };
+    if (preferName) {
+      if (name.includes(preferName) && dim) embedder = { id: hit._id, name, type: "embedding", dim };
+    } else {
+      if (name.includes("all-mpnet") && dim) {
+        embedder = { id: hit._id, name, type: "embedding", dim };
+      } else if (name.includes("all-MiniLM") && !embedder && dim) {
+        embedder = { id: hit._id, name, type: "embedding", dim };
+      }
     }
 
     if (name.includes("ms-marco") || name.includes("cross-encoder") || name.includes("reranker")) {
@@ -214,14 +218,23 @@ async function main(): Promise<void> {
     console.log("No reranker deployed — H2/H3 will test kNN-only vs itself (trivially pass)");
   }
 
-  // Determine which index + vector field to use
+  // Determine which index + vector field to use. When falling back to exp29_events
+  // (which only has embedding_minilm at 384-dim), also switch the embedder to
+  // MiniLM so the query vector dimension matches the indexed field.
   const mpnetCount = await client.count({ index: PREFERRED_INDEX }).catch(() => null);
-  const useIndex = mpnetCount && (mpnetCount.body as { count: number }).count > 500
-    ? PREFERRED_INDEX
-    : FALLBACK_INDEX;
-  const vectorField = useIndex === PREFERRED_INDEX ? "embedding_mpnet" : FALLBACK_FIELD;
-  const embedDim    = embedder.dim!;
-  console.log(`Index: ${useIndex} (field: ${vectorField})\n`);
+  const useMpnetIndex = mpnetCount && (mpnetCount.body as { count: number }).count > 500;
+  const useIndex = useMpnetIndex ? PREFERRED_INDEX : FALLBACK_INDEX;
+
+  // When falling back to exp29_events (384-dim MiniLM field), switch the
+  // embedder to MiniLM if the discovered embedder is 768-dim.
+  const vectorField = useMpnetIndex ? "embedding_mpnet" : FALLBACK_FIELD;
+  let activeEmbedder = embedder;
+  if (!useMpnetIndex && embedder.dim !== 384) {
+    const { embedder: miniLM } = await discoverModels(client, "all-MiniLM");
+    activeEmbedder = miniLM;
+  }
+  const embedDim = activeEmbedder.dim!;
+  console.log(`Index: ${useIndex} (field: ${vectorField}, embedder: ${activeEmbedder.name} ${embedDim}-dim)\n`);
 
   interface WindowResult {
     window: WindowName;
@@ -237,7 +250,7 @@ async function main(): Promise<void> {
 
   for (const window of WINDOWS) {
     process.stdout.write(`  Probing window: ${window}...`);
-    const vec = await embedText(client, embedder.id, PROBE_QUERIES[window], embedDim);
+    const vec = await embedText(client, activeEmbedder.id, PROBE_QUERIES[window], embedDim);
 
     // Condition A: kNN only
     const knnHits = await knnFetch(client, useIndex, vectorField, vec, KNN_FETCH);

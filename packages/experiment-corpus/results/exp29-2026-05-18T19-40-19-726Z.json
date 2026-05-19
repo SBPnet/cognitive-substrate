@@ -1,8 +1,8 @@
 {
   "experiment": "exp29",
-  "runAt": "2026-05-18T19:41:55.677Z",
+  "runAt": "2026-05-18T19:40:19.726Z",
   "opensearchUrl": "http://thor:9200",
-  "observations": "H1 bulk ingest ≥50 docs/s: 220.3 docs/s over 10,000 docs: PASS; H2 knn recall at scale all windows ≥6/10: normal=10,degraded=10,outage=10,recovery=10 : PASS; H3 outage retain ≥2× normal at ageDays=0: outage=100.0% normal=39.2% ratio=2.55: PASS; H4 compress fires on mid-importance age45 candidates: compress=218/500 clusters=1: PASS",
+  "observations": "H1 bulk ingest ≥50 docs/s: 218.3 docs/s over 10,000 docs: PASS; H2 knn recall at scale all windows ≥6/10: normal=10,degraded=10,outage=10,recovery=10 : PASS; H3 outage retain ≥2× normal at ageDays=0: outage=100.0% normal=37.6% ratio=2.66: PASS; H4 compress fires on mid-importance age45 candidates: compress=219/500 clusters=1: PASS",
   "data": {
     "hypotheses": {
       "h1": true,
@@ -26,9 +26,9 @@
       "ingestErrors": 0
     },
     "throughput": {
-      "totalMs": 45399,
-      "docsPerSecond": 220.26916892442563,
-      "msPerDoc": 4.5399
+      "totalMs": 45799,
+      "docsPerSecond": 218.3453787200594,
+      "msPerDoc": 4.5799
     },
     "recall": {
       "k": 10,
@@ -100,22 +100,22 @@
       "sampleSize": 500,
       "age0": {
         "outageRetainCount": 125,
-        "normalRetainCount": 49,
+        "normalRetainCount": 47,
         "outageRetainRate": 1,
-        "normalRetainRate": 0.392,
-        "retainRatio": 2.5510204081632653
+        "normalRetainRate": 0.376,
+        "retainRatio": 2.6595744680851063
       },
       "age45": {
         "syntheticCandidates": 500,
-        "compressCount": 218,
+        "compressCount": 219,
         "retainCount": 125,
-        "pruneCount": 157,
+        "pruneCount": 156,
         "clusterCount": 1,
         "clusters": [
           {
             "clusterId": "compression-candidate-cluster",
-            "memoryCount": 218,
-            "priority": 0.436
+            "memoryCount": 219,
+            "priority": 0.438
           }
         ]
       }

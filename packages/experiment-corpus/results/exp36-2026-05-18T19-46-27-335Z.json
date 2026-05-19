@@ -1,0 +1,61 @@
+{
+  "experiment": "exp36",
+  "runAt": "2026-05-18T19:46:27.335Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 P@1 kNN≥0.75: PASS (1.000); H2 reranked P@1≥kNN: PASS (1.000 vs 1.000); H3 reranked P@5≥kNN: PASS (1.000 vs 1.000); H4 outage P@1=1.0 both: PASS",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": true,
+      "h4": true
+    },
+    "hasReranker": false,
+    "index": "exp29_events",
+    "vectorField": "embedding_minilm",
+    "windowResults": [
+      {
+        "window": "normal",
+        "p1KnnOnly": 1,
+        "p5KnnOnly": 1,
+        "p1Reranked": 1,
+        "p5Reranked": 1,
+        "topKnnScore": 1.7889762,
+        "topRerankerScore": 1.7889762
+      },
+      {
+        "window": "degraded",
+        "p1KnnOnly": 1,
+        "p5KnnOnly": 1,
+        "p1Reranked": 1,
+        "p5Reranked": 1,
+        "topKnnScore": 1.7675211,
+        "topRerankerScore": 1.7675211
+      },
+      {
+        "window": "outage",
+        "p1KnnOnly": 1,
+        "p5KnnOnly": 1,
+        "p1Reranked": 1,
+        "p5Reranked": 1,
+        "topKnnScore": 1.876085,
+        "topRerankerScore": 1.876085
+      },
+      {
+        "window": "recovery",
+        "p1KnnOnly": 1,
+        "p5KnnOnly": 1,
+        "p1Reranked": 1,
+        "p5Reranked": 1,
+        "topKnnScore": 1.7043042,
+        "topRerankerScore": 1.7043042
+      }
+    ],
+    "summary": {
+      "meanP1Knn": 1,
+      "meanP1Reranked": 1,
+      "meanP5Knn": 1,
+      "meanP5Reranked": 1
+    }
+  }
+}

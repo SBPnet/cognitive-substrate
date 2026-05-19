@@ -1,0 +1,72 @@
+{
+  "experiment": "exp42",
+  "runAt": "2026-05-18T19:47:14.512Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 best α=0.7: PASS (best=0.1); H2 outage P5≥0.8 all α: FAIL; H3 monotone score: PASS (4/4); H4 α=0.5 within 5% of best: PASS (0.000)",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": false,
+      "h3": true,
+      "h4": true
+    },
+    "bestAlpha": 0.1,
+    "alphaResults": [
+      {
+        "alpha": 0.1,
+        "windowP5": {
+          "normal": 0,
+          "degraded": 0,
+          "outage": 0,
+          "recovery": 0
+        },
+        "meanP5": 0,
+        "meanTop1Score": 0
+      },
+      {
+        "alpha": 0.3,
+        "windowP5": {
+          "normal": 0,
+          "degraded": 0,
+          "outage": 0,
+          "recovery": 0
+        },
+        "meanP5": 0,
+        "meanTop1Score": 0
+      },
+      {
+        "alpha": 0.5,
+        "windowP5": {
+          "normal": 0,
+          "degraded": 0,
+          "outage": 0,
+          "recovery": 0
+        },
+        "meanP5": 0,
+        "meanTop1Score": 0
+      },
+      {
+        "alpha": 0.7,
+        "windowP5": {
+          "normal": 0,
+          "degraded": 0,
+          "outage": 0,
+          "recovery": 0
+        },
+        "meanP5": 0,
+        "meanTop1Score": 0
+      },
+      {
+        "alpha": 0.9,
+        "windowP5": {
+          "normal": 0,
+          "degraded": 0,
+          "outage": 0,
+          "recovery": 0
+        },
+        "meanP5": 0,
+        "meanTop1Score": 0
+      }
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "experiment": "exp38",
+  "runAt": "2026-05-18T19:42:01.164Z",
+  "opensearchUrl": "(unknown)",
+  "observations": "H1 all 50 turns: PASS (errors=0); H2 winner planner/executor: PASS (dist={\"executor\":50}); H3 working memory=3: FAIL (wrongCounts=1); H4 reward>0 when conf>0.6: PASS (50/50)",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": false,
+      "h4": true
+    },
+    "completedTurns": 50,
+    "errorCount": 0,
+    "winnerDistribution": {
+      "executor": 50
+    },
+    "meanConfidence": 0.75,
+    "meanReward": 0.75,
+    "badWinners": []
+  }
+}

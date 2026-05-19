@@ -1,0 +1,346 @@
+{
+  "experiment": "exp35",
+  "runAt": "2026-05-18T19:44:48.454Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 condA breadth≥0.60: PASS (0.9819); H2 condB>condA breadth: FAIL (0.8423 vs 0.9819); H3 outage highest phase breadth: PASS (outage=1.000); H4 condB unique≥20: PASS (55)",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": false,
+      "h3": true,
+      "h4": true
+    },
+    "conditionA": {
+      "breadth": {
+        "entropy": 4.243856189774722,
+        "breadth": 0.981935862097059,
+        "totalReferences": 500,
+        "uniqueMemoryIds": 20,
+        "distribution": [
+          {
+            "memoryId": "op-normal-608-7651f5bb",
+            "count": 40
+          },
+          {
+            "memoryId": "op-normal-668-c563eb0e",
+            "count": 40
+          },
+          {
+            "memoryId": "op-normal-671-e4a1f331",
+            "count": 40
+          },
+          {
+            "memoryId": "op-normal-716-c2e9c9af",
+            "count": 40
+          },
+          {
+            "memoryId": "op-normal-725-cfb32f91",
+            "count": 40
+          },
+          {
+            "memoryId": "op-degraded-516-4fdc4e4f",
+            "count": 20
+          },
+          {
+            "memoryId": "op-degraded-543-0b8a9e65",
+            "count": 20
+          },
+          {
+            "memoryId": "op-degraded-618-9062bf26",
+            "count": 20
+          },
+          {
+            "memoryId": "op-degraded-636-f48055d9",
+            "count": 20
+          },
+          {
+            "memoryId": "op-degraded-732-a16baff3",
+            "count": 20
+          },
+          {
+            "memoryId": "op-outage-26-8a111ef6",
+            "count": 20
+          },
+          {
+            "memoryId": "op-outage-86-e6e9942e",
+            "count": 20
+          },
+          {
+            "memoryId": "op-outage-95-3874384d",
+            "count": 20
+          },
+          {
+            "memoryId": "op-outage-125-41b04ad6",
+            "count": 20
+          },
+          {
+            "memoryId": "op-outage-146-4dfe5cb3",
+            "count": 20
+          },
+          {
+            "memoryId": "op-recovery-39-4dafe497",
+            "count": 20
+          },
+          {
+            "memoryId": "op-recovery-180-af5b476e",
+            "count": 20
+          },
+          {
+            "memoryId": "op-recovery-285-e232cb33",
+            "count": 20
+          },
+          {
+            "memoryId": "op-recovery-303-c6efa37a",
+            "count": 20
+          },
+          {
+            "memoryId": "op-recovery-324-d3ee007e",
+            "count": 20
+          }
+        ]
+      },
+      "phaseBreadth": {
+        "normal": 1,
+        "degraded": 1,
+        "outage": 1,
+        "recovery": 1
+      }
+    },
+    "conditionB": {
+      "breadth": {
+        "entropy": 4.869646846785216,
+        "breadth": 0.8423013076652845,
+        "totalReferences": 500,
+        "uniqueMemoryIds": 55,
+        "distribution": [
+          {
+            "memoryId": "op-normal-512-c2049015",
+            "count": 40
+          },
+          {
+            "memoryId": "op-normal-608-7651f5bb",
+            "count": 40
+          },
+          {
+            "memoryId": "op-normal-668-c563eb0e",
+            "count": 40
+          },
+          {
+            "memoryId": "op-normal-671-e4a1f331",
+            "count": 40
+          },
+          {
+            "memoryId": "op-degraded-507-c535fd91",
+            "count": 20
+          },
+          {
+            "memoryId": "op-degraded-510-93a6c44f",
+            "count": 20
+          },
+          {
+            "memoryId": "op-degraded-516-4fdc4e4f",
+            "count": 20
+          },
+          {
+            "memoryId": "op-degraded-525-5b8e8f9b",
+            "count": 20
+          },
+          {
+            "memoryId": "op-outage-2-0bd4b8d0",
+            "count": 20
+          },
+          {
+            "memoryId": "op-outage-14-fe50ab5d",
+            "count": 20
+          },
+          {
+            "memoryId": "op-outage-26-8a111ef6",
+            "count": 20
+          },
+          {
+            "memoryId": "op-outage-29-45f0a7c9",
+            "count": 20
+          },
+          {
+            "memoryId": "op-recovery-39-4dafe497",
+            "count": 20
+          },
+          {
+            "memoryId": "op-recovery-51-615ce232",
+            "count": 20
+          },
+          {
+            "memoryId": "op-recovery-120-afe438e7",
+            "count": 20
+          },
+          {
+            "memoryId": "op-recovery-141-da7f9478",
+            "count": 20
+          },
+          {
+            "memoryId": "op-normal-1004-6b658784",
+            "count": 9
+          },
+          {
+            "memoryId": "op-normal-1913-8b1ccd14",
+            "count": 5
+          },
+          {
+            "memoryId": "op-recovery-816-699d3faf",
+            "count": 5
+          },
+          {
+            "memoryId": "op-normal-1964-49e96d37",
+            "count": 4
+          },
+          {
+            "memoryId": "op-normal-1976-8e095949",
+            "count": 4
+          },
+          {
+            "memoryId": "op-normal-1007-80f98be7",
+            "count": 4
+          },
+          {
+            "memoryId": "op-degraded-12-30187654",
+            "count": 4
+          },
+          {
+            "memoryId": "op-recovery-936-856eb80a",
+            "count": 4
+          },
+          {
+            "memoryId": "op-normal-1043-6e44643b",
+            "count": 3
+          },
+          {
+            "memoryId": "op-normal-1832-9aa903ee",
+            "count": 3
+          },
+          {
+            "memoryId": "op-normal-1850-790c962c",
+            "count": 3
+          },
+          {
+            "memoryId": "op-normal-1889-1804a79a",
+            "count": 3
+          },
+          {
+            "memoryId": "op-degraded-54-b6e1a6cc",
+            "count": 3
+          },
+          {
+            "memoryId": "op-degraded-924-970176d4",
+            "count": 3
+          },
+          {
+            "memoryId": "op-outage-245-f47cedbe",
+            "count": 3
+          },
+          {
+            "memoryId": "op-outage-197-c5966599",
+            "count": 3
+          },
+          {
+            "memoryId": "op-outage-203-07b690f1",
+            "count": 3
+          },
+          {
+            "memoryId": "op-recovery-924-9cf072a9",
+            "count": 3
+          },
+          {
+            "memoryId": "op-degraded-969-47856d29",
+            "count": 2
+          },
+          {
+            "memoryId": "op-degraded-48-faac7145",
+            "count": 2
+          },
+          {
+            "memoryId": "op-degraded-930-ef1c6884",
+            "count": 2
+          },
+          {
+            "memoryId": "op-outage-254-f48e63e8",
+            "count": 2
+          },
+          {
+            "memoryId": "op-outage-215-4415a89e",
+            "count": 2
+          },
+          {
+            "memoryId": "op-outage-200-8570ac1b",
+            "count": 2
+          },
+          {
+            "memoryId": "op-outage-209-1e11beae",
+            "count": 2
+          },
+          {
+            "memoryId": "op-recovery-903-08b22d99",
+            "count": 2
+          },
+          {
+            "memoryId": "op-recovery-999-f35d2293",
+            "count": 2
+          },
+          {
+            "memoryId": "op-normal-1055-c3f4eb5b",
+            "count": 2
+          },
+          {
+            "memoryId": "op-degraded-15-5c37a55e",
+            "count": 1
+          },
+          {
+            "memoryId": "op-degraded-903-bfb976db",
+            "count": 1
+          },
+          {
+            "memoryId": "op-degraded-906-c803b51c",
+            "count": 1
+          },
+          {
+            "memoryId": "op-degraded-51-30f892cb",
+            "count": 1
+          },
+          {
+            "memoryId": "op-outage-230-2657da22",
+            "count": 1
+          },
+          {
+            "memoryId": "op-outage-251-c3be46ac",
+            "count": 1
+          },
+          {
+            "memoryId": "op-outage-212-f1f53a53",
+            "count": 1
+          },
+          {
+            "memoryId": "op-recovery-807-25084921",
+            "count": 1
+          },
+          {
+            "memoryId": "op-recovery-870-3749bb38",
+            "count": 1
+          },
+          {
+            "memoryId": "op-recovery-993-840f3214",
+            "count": 1
+          },
+          {
+            "memoryId": "op-recovery-927-1ba76f28",
+            "count": 1
+          }
+        ]
+      },
+      "phaseBreadth": {
+        "normal": 0.7775794999391666,
+        "degraded": 0.7751355006920769,
+        "outage": 0.7784057828783346,
+        "recovery": 0.7844117605453064
+      }
+    }
+  }
+}

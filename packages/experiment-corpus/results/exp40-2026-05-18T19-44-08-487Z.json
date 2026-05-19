@@ -1,0 +1,21 @@
+{
+  "experiment": "exp40",
+  "runAt": "2026-05-18T19:44:08.487Z",
+  "opensearchUrl": "(unknown)",
+  "observations": "H1 bottom-up cascade: PASS (metaProg=0.9000 longStatus=completed); H2 progress events=16==16: PASS; H3 pre-completion selection=meta: PASS (was meta); H4 completed excluded: PASS (completedInActive=0)",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": true,
+      "h4": true
+    },
+    "metaProgress": 0.9,
+    "longStatus": "completed",
+    "midCompletedCount": 2,
+    "microCompletedCount": 8,
+    "progressEventCount": 16,
+    "preCompletionSelectionHorizon": "meta",
+    "activeGoalsRemaining": 1
+  }
+}
