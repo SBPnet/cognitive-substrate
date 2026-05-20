@@ -1,0 +1,17 @@
+[Unit]
+Description=Cognitive Substrate Pattern Worker
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/steve/Workspace/cognitive-substrate/apps/workers/pattern
+ExecStart=/home/steve/.nvm/versions/node/v22.22.0/bin/node dist/main.js
+Restart=always
+RestartSec=10
+Environment=KAFKA_BROKERS=100.113.192.75:9092
+Environment=KAFKA_CLIENT_ID=pattern-worker
+Environment=OPENSEARCH_URL=http://localhost:9200
+Environment=CLICKHOUSE_URL=http://localhost:8123
+
+[Install]
+WantedBy=multi-user.target

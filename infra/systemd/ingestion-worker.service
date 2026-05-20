@@ -1,0 +1,27 @@
+[Unit]
+Description=Cognitive Substrate Ingestion Worker (experience.raw pipeline)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/steve/Workspace/cognitive-substrate/apps/workers/ingestion
+ExecStart=/home/steve/.nvm/versions/node/v22.22.0/bin/node dist/main.js
+Restart=always
+RestartSec=10
+Environment=KAFKA_BROKERS=100.113.192.75:9092
+Environment=KAFKA_CLIENT_ID=ingestion-worker-full
+Environment=OPENSEARCH_URL=http://localhost:9200
+# Use OpenSearch ML node for embeddings — all-mpnet-base-v2 (768-dim, mpnet preferred)
+Environment=EMBEDDING_PROVIDER=opensearch
+Environment=OPENSEARCH_MODEL_ID=YYGXOJ4BgYB_vs2klaSo
+Environment=EMBEDDING_DIMENSION=768
+# Object store — MinIO running locally
+Environment=S3_BUCKET=cognitive-substrate
+Environment=S3_REGION=us-east-1
+Environment=S3_ENDPOINT=http://localhost:9000
+Environment=S3_ACCESS_KEY_ID=minioadmin
+Environment=S3_SECRET_ACCESS_KEY=minioadmin
+Environment=S3_FORCE_PATH_STYLE=true
+
+[Install]
+WantedBy=multi-user.target

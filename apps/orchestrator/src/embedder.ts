@@ -160,12 +160,70 @@ export class VertexQueryEmbeddingClient implements QueryEmbeddingClient {
   }
 }
 
+/**
+ * Calls the OpenSearch ML Commons _predict endpoint directly.
+ * Works with any deployed sentence-transformer model (MiniLM, mpnet, distilbert).
+ *
+ * Required env vars:
+ *   OPENSEARCH_URL       — e.g. http://localhost:9200
+ *   OPENSEARCH_MODEL_ID  — ML Commons model ID of the deployed model
+ *   EMBEDDING_DIMENSION  — must match the model (384 for MiniLM, 768 for mpnet)
+ */
+export class OpenSearchMLEmbeddingClient implements QueryEmbeddingClient {
+  private readonly opensearchUrl: string;
+  private readonly modelId: string;
+
+  constructor(config: { readonly opensearchUrl: string; readonly modelId: string }) {
+    this.opensearchUrl = config.opensearchUrl.replace(/\/$/, "");
+    this.modelId = config.modelId;
+  }
+
+  async embed(text: string): Promise<ReadonlyArray<number>> {
+    const response = await fetch(
+      `${this.opensearchUrl}/_plugins/_ml/models/${this.modelId}/_predict`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text_docs: [text],
+          return_number: true,
+          target_response: ["sentence_embedding"],
+        }),
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `OpenSearch ML predict failed: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    const data = (await response.json()) as {
+      inference_results: Array<{
+        output: Array<{ name: string; data: number[] }>;
+      }>;
+    };
+    const embedding = data.inference_results[0]?.output.find(
+      (o) => o.name === "sentence_embedding",
+    )?.data;
+    if (!embedding) throw new Error("OpenSearch ML predict returned no sentence_embedding");
+    return embedding;
+  }
+}
+
 export function queryEmbedderFromEnv(): QueryEmbeddingClient {
   const provider = process.env["EMBEDDING_PROVIDER"] ?? "stub";
   const dimension = embeddingDimensionFromEnv();
 
   if (provider === "stub" || provider === "zero") {
     return new ZeroEmbeddingClient(dimension);
+  }
+
+  if (provider === "opensearch") {
+    const opensearchUrl = process.env["OPENSEARCH_URL"] ?? "http://localhost:9200";
+    const modelId = process.env["OPENSEARCH_MODEL_ID"];
+    if (!modelId) throw new Error("OPENSEARCH_MODEL_ID is required when EMBEDDING_PROVIDER=opensearch");
+    return new OpenSearchMLEmbeddingClient({ opensearchUrl, modelId });
   }
 
   if (provider === "openai" || provider === "openai_compat") {
