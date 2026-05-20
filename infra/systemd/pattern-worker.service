@@ -12,6 +12,7 @@ Environment=KAFKA_BROKERS=100.113.192.75:9092
 Environment=KAFKA_CLIENT_ID=pattern-worker
 Environment=OPENSEARCH_URL=http://localhost:9200
 Environment=CLICKHOUSE_URL=http://localhost:8123
+Environment=HEALTH_PORT=3003
 
 [Install]
 WantedBy=multi-user.target

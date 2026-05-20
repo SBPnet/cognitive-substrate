@@ -15,6 +15,7 @@ Environment=OPENSEARCH_URL=http://localhost:9200
 Environment=EMBEDDING_PROVIDER=opensearch
 Environment=OPENSEARCH_MODEL_ID=YYGXOJ4BgYB_vs2klaSo
 Environment=EMBEDDING_DIMENSION=768
+Environment=HEALTH_PORT=3006
 
 [Install]
 WantedBy=multi-user.target

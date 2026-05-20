@@ -22,6 +22,7 @@ Environment=S3_ENDPOINT=http://localhost:9000
 Environment=S3_ACCESS_KEY_ID=minioadmin
 Environment=S3_SECRET_ACCESS_KEY=minioadmin
 Environment=S3_FORCE_PATH_STYLE=true
+Environment=HEALTH_PORT=3005
 
 [Install]
 WantedBy=multi-user.target

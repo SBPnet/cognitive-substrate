@@ -11,6 +11,7 @@ RestartSec=10
 Environment=KAFKA_BROKERS=100.113.192.75:9092
 Environment=KAFKA_CLIENT_ID=consolidation-worker
 Environment=OPENSEARCH_URL=http://localhost:9200
+Environment=HEALTH_PORT=3001
 
 [Install]
 WantedBy=multi-user.target
