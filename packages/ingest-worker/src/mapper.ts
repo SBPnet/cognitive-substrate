@@ -90,7 +90,22 @@ interface RelatedArticleClickEvent extends TelemetryEventBase {
 
 interface OutboundLinkEvent extends TelemetryEventBase {
   type: "outbound_link";
-  payload: { url: string; label?: string };
+  payload: { path: string; title: string; href: string };
+}
+
+interface NavClickEvent extends TelemetryEventBase {
+  type: "nav_click";
+  payload: { label: string; href: string };
+}
+
+interface TagClickEvent extends TelemetryEventBase {
+  type: "tag_click";
+  payload: { tag: string; context: "article" | "index" | "tags_page" };
+}
+
+interface SeriesNavClickEvent extends TelemetryEventBase {
+  type: "series_nav_click";
+  payload: { fromSlug: string; toSlug: string; direction: "prev" | "next" };
 }
 
 export type TelemetryEvent =
@@ -104,7 +119,10 @@ export type TelemetryEvent =
   | FocusGainEvent
   | FocusLossEvent
   | RelatedArticleClickEvent
-  | OutboundLinkEvent;
+  | OutboundLinkEvent
+  | NavClickEvent
+  | TagClickEvent
+  | SeriesNavClickEvent;
 
 // ---------------------------------------------------------------------------
 // Importance scoring
@@ -142,6 +160,17 @@ function importanceScore(event: TelemetryEvent): number {
 
     case "outbound_link":
       return 0.55;
+
+    case "nav_click":
+      return 0.05;
+
+    case "tag_click":
+      // Article context = stronger interest signal than browsing the index
+      return event.payload.context === "article" ? 0.20 : 0.15;
+
+    case "series_nav_click":
+      // Progressing through a series is a strong deep-engagement signal
+      return 0.45;
 
     case "page_view":
     case "focus_gain":
@@ -187,7 +216,16 @@ function buildSummary(event: TelemetryEvent): string {
       return `related article click: ${event.payload.fromSlug} → ${event.payload.toSlug} (position ${event.payload.position})`;
 
     case "outbound_link":
-      return `outbound link clicked: ${event.payload.label ?? event.payload.url} on ${slug}`;
+      return `outbound link clicked: ${event.payload.href} on ${slug}`;
+
+    case "nav_click":
+      return `nav click: ${event.payload.label} → ${event.payload.href}`;
+
+    case "tag_click":
+      return `tag click: "${event.payload.tag}" (${event.payload.context})`;
+
+    case "series_nav_click":
+      return `series nav: ${event.payload.direction} from ${event.payload.fromSlug} → ${event.payload.toSlug}`;
   }
 }
 
@@ -221,6 +259,15 @@ function buildTags(event: TelemetryEvent): string[] {
       break;
     case "focus_loss":
       tags.push("engagement:exit");
+      break;
+    case "nav_click":
+      tags.push("engagement:navigation");
+      break;
+    case "tag_click":
+      tags.push("engagement:curiosity", `tag:${event.payload.tag}`);
+      break;
+    case "series_nav_click":
+      tags.push("engagement:deep");
       break;
   }
 
