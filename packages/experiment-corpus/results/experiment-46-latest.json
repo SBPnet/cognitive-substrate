@@ -1,0 +1,142 @@
+{
+  "experiment": "experiment-46",
+  "runAt": "2026-05-20T19:05:45.162Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 rp written: PASS (anyRpPositive=true)\nH2 multi-session rp > single: PASS (multi=0.5281 single=0.4998)\nH3 Pearson r: PASS (r=0.8999, n=17)\nH4 importance intact: PASS (maxDelta=0.000000)",
+  "data": {
+    "totalSeededDocs": 101,
+    "multiSessionCount": 3,
+    "singleSessionCount": 14,
+    "multiMedianRp": 0.5280628610569029,
+    "singleMedianRp": 0.4998249889323283,
+    "pearsonR": 0.8998851694631693,
+    "maxImportanceDelta": 0,
+    "perArticle": [
+      {
+        "articleTag": "article:cognitive-loop",
+        "sessionCount": 2,
+        "medianRetrievalPriority": 0.5280628610569029,
+        "medianImportanceDelta": 0,
+        "docCount": 13
+      },
+      {
+        "articleTag": "article:memory-retrieval",
+        "sessionCount": 2,
+        "medianRetrievalPriority": 0.5380218009320976,
+        "medianImportanceDelta": 0,
+        "docCount": 10
+      },
+      {
+        "articleTag": "article:multi-agent",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.509783928807523,
+        "medianImportanceDelta": 0,
+        "docCount": 5
+      },
+      {
+        "articleTag": "article:opensearch-ml-inference",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.4998249889323283,
+        "medianImportanceDelta": 0,
+        "docCount": 6
+      },
+      {
+        "articleTag": "article:reinforcement",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.4998249889323283,
+        "medianImportanceDelta": 0,
+        "docCount": 6
+      },
+      {
+        "articleTag": "article:policy-engine",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.4898660490571336,
+        "medianImportanceDelta": 0,
+        "docCount": 7
+      },
+      {
+        "articleTag": "article:arbitration",
+        "sessionCount": 2,
+        "medianRetrievalPriority": 0.5280628610569029,
+        "medianImportanceDelta": 0,
+        "docCount": 9
+      },
+      {
+        "articleTag": "article:consolidation",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.4998249889323283,
+        "medianImportanceDelta": 0,
+        "docCount": 6
+      },
+      {
+        "articleTag": "article:attention",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.4998249889323283,
+        "medianImportanceDelta": 0,
+        "docCount": 6
+      },
+      {
+        "articleTag": "article:temporal",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.4998249889323283,
+        "medianImportanceDelta": 0,
+        "docCount": 6
+      },
+      {
+        "articleTag": "article:goals",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.4998249889323283,
+        "medianImportanceDelta": 0,
+        "docCount": 6
+      },
+      {
+        "articleTag": "article:world-model",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.4998249889323283,
+        "medianImportanceDelta": 0,
+        "docCount": 6
+      },
+      {
+        "articleTag": "article:identity",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.4998249889323283,
+        "medianImportanceDelta": 0,
+        "docCount": 6
+      },
+      {
+        "articleTag": "article:agent-society",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.4865464024320687,
+        "medianImportanceDelta": 0,
+        "docCount": 2
+      },
+      {
+        "articleTag": "article:economics",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.4865464024320687,
+        "medianImportanceDelta": 0,
+        "docCount": 2
+      },
+      {
+        "articleTag": "article:experience-ingestion",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.4898660490571336,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:reflection",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.4865464024320687,
+        "medianImportanceDelta": 0,
+        "docCount": 2
+      }
+    ],
+    "h1Pass": true,
+    "h2Pass": true,
+    "h2Skipped": false,
+    "h3Pass": true,
+    "h3Skipped": false,
+    "h4Pass": true
+  }
+}

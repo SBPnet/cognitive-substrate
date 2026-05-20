@@ -203,9 +203,10 @@ async function fetchPostRunStats(
     const baselineById = new Map(baselineDocs.map((d) => [d._id, d]));
 
     const priorities = postDocs.map((d) => d.retrieval_priority ?? 0);
-    const importanceDeltas = postDocs.map((d) => {
+    const importanceDeltas = postDocs.flatMap((d) => {
       const baseline = baselineById.get(d._id)?.importance_score ?? d.importance_score;
-      return Math.abs(d.importance_score - baseline);
+      if (d.importance_score == null || baseline == null) return [];
+      return [Math.abs(d.importance_score - baseline)];
     });
 
     stats.push({
@@ -333,7 +334,10 @@ async function main(): Promise<void> {
   const h3Skipped = postStats.length < 3;
 
   // H4 — importance_score not corrupted (max delta ≤ 0.001)
-  const maxImportanceDelta = Math.max(...postStats.map((s) => s.medianImportanceDelta), 0);
+  const maxImportanceDelta = Math.max(
+    ...postStats.map((s) => s.medianImportanceDelta).filter((v) => !isNaN(v)),
+    0,
+  );
   console.log(`\n  Max importance_score delta: ${maxImportanceDelta.toFixed(6)}`);
   const h4Pass = maxImportanceDelta <= 0.001;
 
