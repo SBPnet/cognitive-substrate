@@ -10,8 +10,10 @@ Restart=always
 RestartSec=10
 Environment=KAFKA_BROKERS=100.113.192.75:9092
 Environment=KAFKA_CLIENT_ID=reinforcement-worker
+Environment=KAFKA_TOPIC_REPLICATION_FACTOR=1
 Environment=OPENSEARCH_URL=http://localhost:9200
 Environment=CLICKHOUSE_URL=http://localhost:8123
+Environment=CLICKHOUSE_PASSWORD=substrate
 Environment=HEALTH_PORT=3004
 
 [Install]
