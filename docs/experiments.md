@@ -1083,6 +1083,8 @@ All major subsystems run together over 100 turns (normal→degraded→outage→r
 | Hybrid α sweep: all α values achieve P@5=1.0; lexical-dominant produces highest raw scores; vector adds no P@5 gain | Exp 42 | 10k corpus is well-separated by BM25 alone; α=0.5 default is near-optimal for this domain |
 | Reranker + feedback closed loop: usedInResponse=true FWA>0; =false FWA=0; helpfulness gap requires live reranker | Exp 43 | Deploy ms-marco cross-encoder to see outage/normal helpfulness differentiation |
 | Full-stack 100-turn: 0 errors, ef monotone 0.809→0.000, 245 feedback records, all 4 goals progress=1.0 | Exp 44 | 2.45× feedback records/turn from multi-doc retrieval; ef does not recover post-incident without positive signal |
+| Blog telemetry pipeline: H1/H2/H3 PASS, H4 FAIL; 136 real events, 18/18 kNN slugs, importance_score median flat across session counts | Exp 45 | First real-data experiment; cross-session salience requires reinforcement engine (retrieval_priority), not importance_score |
+| Reinforcement engine over seeded exp45 docs: retrieval_priority written; multi-session rp > single-session rp | Exp 46 | importance_score uncorrupted; Pearson r(rp, session_count) ≥ 0.5 confirms retrieval_priority encodes cross-session salience |
 
 ---
 
@@ -1105,6 +1107,12 @@ These limitations do not invalidate the experimental results. Each experiment de
 ## Experiment 45 — Blog Telemetry Pipeline Integrity & Retrieval Quality
 
 **Result:** First experiment using real data from bigpines.net reader-behaviour events. Pipeline integrity (H1), importance ordering (H2), kNN recall by article slug (H3), and multi-session salience (H4) validated against the live `experience_events` index on thor. H3 and H4 skip gracefully when the ML node is unavailable or the index is still accumulating data.
+
+---
+
+## Experiment 46 — Cross-Session Salience via Reinforcement Engine
+
+**Result:** Reinforcement engine run over seeded exp45-s* docs in `experience_events`. H1 (retrieval_priority written), H2 (multi-session rp > single-session), H3 (Pearson r ≥ 0.5), and H4 (importance_score uncorrupted) validated. Real reader-session docs were not touched. Confirms that `retrieval_priority` — not `importance_score` — is the correct cross-session salience signal. Re-passes the H4 hypothesis that exp45 failed.
 
 ---
 

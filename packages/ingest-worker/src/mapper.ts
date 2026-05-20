@@ -88,6 +88,11 @@ interface RelatedArticleClickEvent extends TelemetryEventBase {
   payload: { fromSlug: string; toSlug: string; position: number };
 }
 
+interface OutboundLinkEvent extends TelemetryEventBase {
+  type: "outbound_link";
+  payload: { url: string; label?: string };
+}
+
 export type TelemetryEvent =
   | PageViewEvent
   | ArticleCompleteEvent
@@ -98,7 +103,8 @@ export type TelemetryEvent =
   | SearchQueryEvent
   | FocusGainEvent
   | FocusLossEvent
-  | RelatedArticleClickEvent;
+  | RelatedArticleClickEvent
+  | OutboundLinkEvent;
 
 // ---------------------------------------------------------------------------
 // Importance scoring
@@ -133,6 +139,9 @@ function importanceScore(event: TelemetryEvent): number {
     case "focus_loss":
       // Long dwell before loss = more meaningful engagement
       return Math.min(0.10 + (event.payload.durationMs / 120_000) * 0.20, 0.30);
+
+    case "outbound_link":
+      return 0.55;
 
     case "page_view":
     case "focus_gain":
@@ -176,6 +185,9 @@ function buildSummary(event: TelemetryEvent): string {
 
     case "related_article_click":
       return `related article click: ${event.payload.fromSlug} → ${event.payload.toSlug} (position ${event.payload.position})`;
+
+    case "outbound_link":
+      return `outbound link clicked: ${event.payload.label ?? event.payload.url} on ${slug}`;
   }
 }
 
@@ -203,6 +215,9 @@ function buildTags(event: TelemetryEvent): string[] {
       break;
     case "search_query":
       tags.push("engagement:curiosity");
+      break;
+    case "outbound_link":
+      tags.push("engagement:conversion");
       break;
     case "focus_loss":
       tags.push("engagement:exit");

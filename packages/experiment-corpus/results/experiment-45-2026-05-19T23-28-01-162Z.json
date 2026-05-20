@@ -1,22 +1,18 @@
 {
   "experiment": "experiment-45",
-  "runAt": "2026-05-20T14:44:31.038Z",
+  "runAt": "2026-05-19T23:28:01.162Z",
   "opensearchUrl": "http://thor:9200",
-  "observations": "H1 pipeline integrity: PASS (totalDocs=157, eventTypes=9)\nH2 importance ordering: PASS (article_complete=0.9357 page_view=0.1000)\nH3 kNN recall: PASS (19/19 slugs)\nH4 multi-session salience: FAIL (5 multi-session articles)",
+  "observations": "H1 pipeline integrity: PASS (totalDocs=136, eventTypes=8)\nH2 importance ordering: PASS (article_complete=0.9357 page_view=0.1000)\nH3 kNN recall: PASS (18/18 slugs)\nH4 multi-session salience: FAIL (5 multi-session articles)",
   "data": {
-    "totalDocs": 157,
+    "totalDocs": 136,
     "byEventType": [
       {
         "eventType": "scroll_depth",
-        "count": 83
+        "count": 77
       },
       {
         "eventType": "page_view",
-        "count": 30
-      },
-      {
-        "eventType": "time_on_page",
-        "count": 17
+        "count": 25
       },
       {
         "eventType": "article_complete",
@@ -27,15 +23,15 @@
         "count": 8
       },
       {
+        "eventType": "time_on_page",
+        "count": 8
+      },
+      {
         "eventType": "search_query",
         "count": 2
       },
       {
         "eventType": "focus_loss",
-        "count": 1
-      },
-      {
-        "eventType": "outbound_link",
         "count": 1
       },
       {
@@ -66,8 +62,8 @@
       },
       {
         "eventType": "scroll_depth",
-        "meanImportance": 0.31985295038012895,
-        "count": 83
+        "meanImportance": 0.3153225899704041,
+        "count": 77
       },
       {
         "eventType": "focus_loss",
@@ -77,17 +73,12 @@
       {
         "eventType": "page_view",
         "meanImportance": 0.10000000149011612,
-        "count": 30
+        "count": 25
       },
       {
         "eventType": "time_on_page",
         "meanImportance": 0,
-        "count": 17
-      },
-      {
-        "eventType": "outbound_link",
-        "meanImportance": 0,
-        "count": 1
+        "count": 8
       }
     ],
     "knnResults": [
@@ -97,7 +88,9 @@
         "topTags": [
           "blog",
           "event:page_view",
-          "article:ai-as-search"
+          "article:ai-as-search",
+          "event:scroll_depth",
+          "engagement:shallow"
         ]
       },
       {
@@ -292,18 +285,6 @@
         ]
       },
       {
-        "slug": "glossary",
-        "pass": true,
-        "topTags": [
-          "blog",
-          "event:page_view",
-          "article:glossary",
-          "event:article_complete",
-          "article:policy-engine",
-          "engagement:deep"
-        ]
-      },
-      {
         "slug": "reflection",
         "pass": true,
         "topTags": [
@@ -317,11 +298,11 @@
       }
     ],
     "multiSessionCount": 5,
-    "singleSessionCount": 14,
+    "singleSessionCount": 13,
     "multiSessionArticles": [
       {
         "articleTag": "article:ai-as-search",
-        "sessionCount": 7,
+        "sessionCount": 3,
         "medianImportance": 0.30000001192092896
       },
       {
