@@ -77,6 +77,18 @@ function outageReadings(): SensorReading[] {
   ];
 }
 
+const healthyPolicy: PolicyState = {
+  version: "v1",
+  timestamp: NOW,
+  retrievalBias: 0.5,
+  toolBias: 0.5,
+  riskTolerance: 0.3,
+  memoryTrust: 0.7,
+  explorationFactor: 0.4,
+  goalPersistence: 0.6,
+  workingMemoryDecayRate: 0.1,
+};
+
 const safeAction: WorldModelSimulationInput = {
   currentStateSummary: "System is running normally, all services healthy.",
   actionSummary: "Explain the runbook procedure to the on-call engineer.",
@@ -94,6 +106,15 @@ const supportedAction: WorldModelSimulationInput = {
   context: {
     sessionId: "s1",
     traceId: randomUUID(),
+    input: {
+      eventId: randomUUID(),
+      timestamp: NOW,
+      type: "system_event" as const,
+      context: { sessionId: "s1" },
+      importanceScore: 0.8,
+      input: { text: "Explain the runbook procedure to the on-call engineer.", embedding: [] },
+      tags: [],
+    },
     memories: Array.from({ length: 5 }, (_, i) => ({
       memoryId: `mem-${i}`,
       index: "memory_semantic" as const,
@@ -106,16 +127,15 @@ const supportedAction: WorldModelSimulationInput = {
       description: `Restore service tier ${i}`,
       horizon: "short" as const,
       priority: 0.9,
+      progress: 0,
+      status: "active" as const,
+      associatedMemoryIds: [],
+      subgoals: [],
       createdAt: NOW,
     })),
-    agentType: "executor" as const,
+    policy: healthyPolicy,
+    capabilities: [],
   },
-};
-
-const healthyPolicy: PolicyState = {
-  explorationFactor: 0.4,
-  riskTolerance: 0.3,
-  attentionWeights: { novelty: 0.3, importance: 0.4, recency: 0.3 },
 };
 
 const healthyIdentity: IdentityState = {
@@ -216,9 +236,11 @@ async function main(): Promise<void> {
     policy: healthyPolicy,
     identity: healthyIdentity,
     reinforcement: {
-      signalId: randomUUID(),
-      timestamp: NOW,
       importance: 0.9,
+      usageFrequency: 0.5,
+      goalRelevance: 0.5,
+      novelty: 0.5,
+      predictionAccuracy: 0.5,
       policyAlignment: 0.1,
       contradictionRisk: 0.8,
       emotionalWeight: 0.8,

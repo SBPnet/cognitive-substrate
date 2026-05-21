@@ -1,5 +1,6 @@
 export * from "./experience.js";
 export * from "./memory.js";
+export * from "./memory-critique.js";
 export * from "./policy.js";
 export * from "./goal.js";
 export * from "./agent.js";

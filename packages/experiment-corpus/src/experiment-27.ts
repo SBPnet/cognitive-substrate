@@ -55,7 +55,7 @@ import { CalibrationMonitor, ReflectionEngine } from "@cognitive-substrate/metac
 import { SocialEngine } from "@cognitive-substrate/social-engine";
 import { saveResults } from "./results.js";
 import type { CapabilityMetric, CurriculumItem } from "@cognitive-substrate/development-engine";
-import type { SemanticMemory } from "@cognitive-substrate/core-types";
+import type { ExperienceEvent, PolicyState, SemanticMemory } from "@cognitive-substrate/core-types";
 import type { CognitiveOperationTrace } from "@cognitive-substrate/metacog-engine";
 
 const NOW = new Date().toISOString();
@@ -72,30 +72,28 @@ function makeMemory(
 ): SemanticMemory {
   return {
     memoryId: id,
-    index: "memory_semantic",
     generalization: summary,
     summary,
     importanceScore: 0.7,
     contradictionScore,
     stabilityScore,
-    retrievalCount: 2,
+    usageFrequency: 2,
     embedding: [],
-    sources: [],
+    sourceEventIds: [],
     createdAt: NOW,
-    updatedAt: NOW,
   };
 }
 
-function makeExperienceEvent(text: string, success?: boolean) {
+function makeExperienceEvent(text: string, success?: boolean): ExperienceEvent {
   return {
     eventId: randomUUID(),
     timestamp: NOW,
-    type: "operational_signal" as const,
+    type: "environmental_observation",
+    context: { sessionId: "s-27" },
     importanceScore: 0.7,
     input: { text, embedding: [] },
-    payload: { affectedServices: ["api"], severity: "low" as const, metrics: {} },
     tags: ["social-test"],
-    ...(success !== undefined ? { result: { success, latencyMs: 100 } } : {}),
+    ...(success !== undefined ? { result: { output: text, success, latencyMs: 100 } } : {}),
   };
 }
 
@@ -247,17 +245,46 @@ async function main(): Promise<void> {
   }
 
   // Reflection over a failed high-risk action
+  const sessionId = "s1";
+  const traceId = randomUUID();
+  const stubPolicy: PolicyState = {
+    version: "v1", timestamp: NOW,
+    retrievalBias: 0.5, toolBias: 0.5, riskTolerance: 0.3,
+    memoryTrust: 0.7, explorationFactor: 0.4,
+    goalPersistence: 0.6, workingMemoryDecayRate: 0.1,
+  };
   const reflectionInput = {
     loopResult: {
-      actionResult: { success: false, latencyMs: 300 },
-      agentResult: { confidence: 0.9, riskScore: 0.8 },
+      session: {
+        sessionId,
+        traceId,
+        activeGoals: [],
+        policyState: stubPolicy,
+        workingMemory: [],
+        participatingAgents: ["executor" as const],
+        createdAt: Date.now(),
+      },
       context: {
-        sessionId: "s1",
-        traceId: randomUUID(),
+        sessionId,
+        traceId,
+        input: makeExperienceEvent("stub"),
         memories: [],
         goals: [],
-        agentType: "executor" as const,
+        policy: stubPolicy,
+        capabilities: [],
       },
+      agentResult: {
+        agentId: "agent-1",
+        agentType: "executor" as const,
+        traceId,
+        timestamp: NOW,
+        proposal: "retry",
+        confidence: 0.9,
+        riskScore: 0.8,
+        retrievedMemories: [],
+      },
+      actionResult: { output: "", success: false, latencyMs: 300 },
+      policyEvaluation: { sourceExperienceId: "exp-1", rewardDelta: -0.5 },
     },
     priorReflectionsInSession: 0,
   };

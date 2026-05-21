@@ -18,6 +18,7 @@ import {
 } from "@cognitive-substrate/telemetry-otel";
 import { queryEmbedderFromEnv } from "./embedder.js";
 import { createSocietyLoop } from "./society.js";
+import { AgentActionPublisher } from "./publishers.js";
 
 export async function startOrchestrator(): Promise<void> {
   const shutdown = await initTelemetry(telemetryConfigFromEnv("orchestrator"));
@@ -40,11 +41,12 @@ export async function startOrchestrator(): Promise<void> {
   const producer = new CognitiveProducer({ kafka, enableAuditMirror: true });
   await producer.connect();
 
-  const loop = createSocietyLoop({
+  const loop = await createSocietyLoop({
     openSearchClient,
     producer,
     embedder,
   });
+  const agentActionPublisher = new AgentActionPublisher(producer);
 
   const consumer = new CognitiveConsumer({
     kafka,
@@ -64,6 +66,10 @@ export async function startOrchestrator(): Promise<void> {
         log(
           `Processed event ${event.eventId}; action success=${result.actionResult.success}`,
         );
+
+        // Publish agent_action ExperienceEvent so LLM decisions feed back into
+        // the reinforcement and consolidation pipeline (Gap 2).
+        await agentActionPublisher.publish(event, result);
 
         const response: InteractionResponseEvent = {
           eventId: event.eventId,

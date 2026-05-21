@@ -191,7 +191,8 @@ async function main(): Promise<void> {
     recentEvents: Array.from({ length: 10 }, (_, i) => ({
       eventId: `evt-${i}`,
       timestamp: new Date(Date.now() - i * 30_000).toISOString(),
-      type: "operational_signal" as const,
+      type: "environmental_observation" as const,
+      context: { sessionId: "s-25" },
       importanceScore: 0.9,
       input: { text: "outage latency critical", embedding: [] },
       payload: { affectedServices: ["api"], severity: "critical" as const, metrics: {} },
@@ -218,7 +219,8 @@ async function main(): Promise<void> {
   const sequence = temporalEngine.sequenceEpisodes(outagePlan.urgencySignals.map((_, i) => ({
     eventId: `evt-${i}`,
     timestamp: new Date(Date.now() - i * 30_000).toISOString(),
-    type: "operational_signal" as const,
+    type: "environmental_observation" as const,
+    context: { sessionId: "s-25" },
     importanceScore: 0.9,
     input: { text: "outage", embedding: [] },
     payload: { affectedServices: ["api"], severity: "critical" as const, metrics: {} },

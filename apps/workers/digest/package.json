@@ -1,0 +1,25 @@
+{
+  "name": "@cognitive-substrate/digest-worker",
+  "version": "0.1.0",
+  "description": "Weekly Memory Digest worker — extractive aggregation over bigpines.net reader telemetry events, producing a structured Markdown report each Sunday",
+  "license": "PolyForm-Noncommercial-1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/main.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "start": "node dist/main.js",
+    "dev": "node --watch dist/main.js",
+    "clean": "rm -rf dist *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@cognitive-substrate/memory-opensearch": "workspace:*",
+    "@cognitive-substrate/telemetry-otel": "workspace:*",
+    "@opensearch-project/opensearch": "^2.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.5.0"
+  }
+}

@@ -58,6 +58,9 @@ export const Topics = {
   /** Consolidated semantic memories written back to OpenSearch. */
   MEMORY_SEMANTIC_UPDATED: "memory.semantic.updated",
 
+  /** Structured agent critiques of retrieved memories (Memory Critique Events). */
+  MEMORY_FEEDBACK: "memory.feedback",
+
   /** Identity drift updates from the identity formation engine. */
   IDENTITY_UPDATED: "identity.updated",
 
@@ -163,6 +166,7 @@ export const TOPIC_CONFIGS: ReadonlyArray<TopicConfig> = [
   { name: Topics.GOAL_PROGRESS, partitions: 3, retentionMs: 90 * 86_400_000, replicationFactor: 3 },
   { name: Topics.CONSOLIDATION_REQUEST, partitions: 6, retentionMs: 7 * 86_400_000, replicationFactor: 3 },
   { name: Topics.MEMORY_SEMANTIC_UPDATED, partitions: 6, retentionMs: 90 * 86_400_000, replicationFactor: 3 },
+  { name: Topics.MEMORY_FEEDBACK, partitions: 6, retentionMs: 30 * 86_400_000, replicationFactor: 3 },
   { name: Topics.IDENTITY_UPDATED, partitions: 3, retentionMs: -1, replicationFactor: 3 },
   { name: Topics.SELFMOD_PROPOSED, partitions: 3, retentionMs: -1, replicationFactor: 3 },
   { name: Topics.SELFMOD_VALIDATED, partitions: 3, retentionMs: -1, replicationFactor: 3 },

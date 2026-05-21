@@ -208,11 +208,11 @@ async function main(): Promise<void> {
   console.log("\n--- Phase 4: graph pruning ---");
 
   const links: MemoryLink[] = [
-    { linkId: "l1", sourceId: "a", targetId: "b", strength: 0.05, relationshipType: "causal" },
-    { linkId: "l2", sourceId: "b", targetId: "c", strength: 0.10, relationshipType: "temporal" },
-    { linkId: "l3", sourceId: "c", targetId: "d", strength: 0.15, relationshipType: "semantic" },
-    { linkId: "l4", sourceId: "d", targetId: "e", strength: 0.40, relationshipType: "causal" },
-    { linkId: "l5", sourceId: "e", targetId: "f", strength: 0.80, relationshipType: "generalizes" },
+    { linkId: "l1", sourceMemoryId: "a", targetMemoryId: "b", strength: 0.05, relationshipType: "causal", createdAt: new Date().toISOString() },
+    { linkId: "l2", sourceMemoryId: "b", targetMemoryId: "c", strength: 0.10, relationshipType: "temporal", createdAt: new Date().toISOString() },
+    { linkId: "l3", sourceMemoryId: "c", targetMemoryId: "d", strength: 0.15, relationshipType: "semantic", createdAt: new Date().toISOString() },
+    { linkId: "l4", sourceMemoryId: "d", targetMemoryId: "e", strength: 0.40, relationshipType: "causal", createdAt: new Date().toISOString() },
+    { linkId: "l5", sourceMemoryId: "e", targetMemoryId: "f", strength: 0.80, relationshipType: "generalizes", createdAt: new Date().toISOString() },
   ];
 
   const pruneResult = engine.pruneGraph(links);

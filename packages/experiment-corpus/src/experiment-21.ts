@@ -80,6 +80,8 @@ function outageSignal(): AffectSignal {
 /** A high-risk candidate to probe coupleAttention */
 const highRiskCandidate: AttentionCandidate = {
   candidateId: "candidate-incident-alert",
+  summary: "Incident alert — high risk",
+  source: "experience",
   importance: 0.5,
   novelty: 0.8,
   urgency: 0.9,
