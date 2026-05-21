@@ -212,7 +212,9 @@ services:
     container_name: cs-web
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      # 3000 is claimed by the old system-level telemetry-worker.service;
+      # using 3007 until those units are disabled with sudo.
+      - "3007:3000"
     networks:
       - infra
       - kafka-net
