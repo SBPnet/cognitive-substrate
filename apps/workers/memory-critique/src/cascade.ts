@@ -70,7 +70,7 @@ async function cascadeToDescendants(
 ): Promise<number> {
   // Find memories whose source_ids include the critiqued memory.
   const hits = await search<SemanticMemoryDoc>(client, "memory_semantic", {
-    query: { term: { source_ids: parentId } },
+    query: { term: { "source_ids.keyword": parentId } },
     size: 50,
   });
 

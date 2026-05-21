@@ -69,7 +69,7 @@ async function applyCritiqueAndCascade(
   let updated = 0;
   if (critique.memoryId) { await applyTrustDelta(client, critique.memoryId, trustDelta); updated++; }
   if (!critique.memoryId || !CASCADE_LEVELS.includes(critique.abstractionLevel ?? "")) return { updated };
-  const hits = await search<SemanticMemoryDoc>(client, INDEX, { query: { term: { source_ids: critique.memoryId } }, size: 50 });
+  const hits = await search<SemanticMemoryDoc>(client, INDEX, { query: { term: { "source_ids.keyword": critique.memoryId } }, size: 50 });
   const attenuated = trustDelta * CASCADE_ATTENUATION;
   for (const hit of hits) {
     const current = hit._source.retrieval_priority ?? 0.5;
