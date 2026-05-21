@@ -54,6 +54,12 @@ export interface PipelineConfig {
   readonly objectStore: Pick<EpisodicObjectStore, "put">;
   readonly producer: CognitiveProducer;
   readonly indexDocument?: typeof openSearchIndexDocument;
+  /**
+   * When set, indexing calls include `?pipeline=<name>` so OpenSearch ML
+   * handles embedding at index time. The worker skips client-side embedding
+   * and passes an empty vector placeholder; the pipeline overwrites it.
+   */
+  readonly ingestPipeline?: string;
 }
 
 /** Enriched event payload emitted to `experience.enriched`. */
@@ -93,12 +99,17 @@ export async function processEvent(
       [CogAttributes.SESSION_ID]: rawEvent.context.sessionId,
     },
     async (span) => {
-      // Step 1: Generate embeddings (multi-profile or legacy single).
+      // Step 1: Generate embeddings.
+      // When ingestPipeline is set, OpenSearch ML handles embedding at index
+      // time — skip client-side embedding and use an empty placeholder vector.
       const { primaryEmbedding, profileVectors, profileMetadata } = await withSpan(
         tracer,
         "experience.embed",
         { [CogAttributes.EVENT_ID]: rawEvent.eventId },
         async () => {
+          if (config.ingestPipeline) {
+            return { primaryEmbedding: [] as number[], profileVectors: {}, profileMetadata: [] };
+          }
           if (config.profiledEmbedders && config.profiledEmbedders.length > 0) {
             return embedAllProfiles(rawEvent.input.text, config.profiledEmbedders, span);
           }
@@ -107,7 +118,7 @@ export async function processEvent(
             span.setAttribute(CogAttributes.EMBEDDING_DIM, vec.length);
             return { primaryEmbedding: vec, profileVectors: {}, profileMetadata: [] };
           }
-          throw new Error("PipelineConfig requires either embedder or profiledEmbedders");
+          throw new Error("PipelineConfig requires embedder, profiledEmbedders, or ingestPipeline");
         },
       );
       const embedding = primaryEmbedding;
@@ -178,7 +189,7 @@ export async function processEvent(
             decay_factor: 1.0,
             object_storage_key: objectStorageKey,
             tags: rawEvent.tags,
-          });
+          }, config.ingestPipeline ? { pipeline: config.ingestPipeline } : undefined);
         },
       );
 

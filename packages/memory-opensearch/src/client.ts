@@ -75,8 +75,15 @@ export async function indexDocument(
   index: CognitiveIndex,
   id: string,
   document: Record<string, unknown>,
+  options?: { readonly pipeline?: string },
 ): Promise<void> {
-  await client.index({ index, id, body: document, refresh: "wait_for" });
+  await client.index({
+    index,
+    id,
+    body: document,
+    refresh: "wait_for",
+    ...(options?.pipeline ? { pipeline: options.pipeline } : {}),
+  });
 }
 
 /** Updates specific fields on an existing document without replacing it. */

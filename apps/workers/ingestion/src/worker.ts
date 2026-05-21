@@ -66,10 +66,14 @@ export async function startWorker(): Promise<void> {
   const useLanes = process.env["EMBEDDING_LANES"] !== undefined;
   const profiledEmbedders = useLanes ? buildEmbeddersFromProfiles(embeddingProfilesFromEnv()) : undefined;
 
-  // Legacy single-embedder path (used when EMBEDDING_LANES is not set).
+  // When INGEST_PIPELINE is set, OpenSearch ML handles embedding at index time.
+  // The worker skips client-side embedding entirely in this mode.
+  const ingestPipeline = process.env["INGEST_PIPELINE"] ?? undefined;
+
+  // Legacy single-embedder path (used when EMBEDDING_LANES is not set and no ingest pipeline).
   const embeddingConfig = openAIEmbeddingConfigFromEnv();
   const provider = process.env["EMBEDDING_PROVIDER"] ?? "openai";
-  const legacyEmbedder = useLanes ? undefined
+  const legacyEmbedder = (useLanes || ingestPipeline) ? undefined
     : provider === "stub"
       ? new StubEmbeddingClient(embeddingConfig.dimension)
       : provider === "vertex"
@@ -103,7 +107,11 @@ export async function startWorker(): Promise<void> {
       log(`Processing event ${event.eventId} (type=${event.type})`);
 
       const enriched = await processEvent(event, {
-        ...(profiledEmbedders ? { profiledEmbedders } : { embedder: legacyEmbedder! }),
+        ...(ingestPipeline
+          ? { ingestPipeline }
+          : profiledEmbedders
+            ? { profiledEmbedders }
+            : { embedder: legacyEmbedder! }),
         openSearch: openSearchClient,
         objectStore,
         producer,
