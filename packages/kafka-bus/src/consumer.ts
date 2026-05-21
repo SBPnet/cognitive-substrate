@@ -34,8 +34,10 @@ export class CognitiveConsumer {
   constructor(config: CognitiveConsumerConfig) {
     this.consumer = config.kafka.consumer({
       groupId: config.groupId,
-      sessionTimeout: 30_000,
-      heartbeatInterval: 3_000,
+      // 5-minute session timeout accommodates slow local LLM inference (qwen, ollama).
+      // heartbeatInterval must be < sessionTimeout/3 per KafkaJS docs.
+      sessionTimeout: 300_000,
+      heartbeatInterval: 10_000,
     });
   }
 
