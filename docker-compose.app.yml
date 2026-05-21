@@ -36,6 +36,9 @@ x-worker-common: &worker-common
     KAFKA_BROKERS: kafka:29092
     KAFKA_TOPIC_REPLICATION_FACTOR: "1"
     OPENSEARCH_URL: http://opensearch-node1:9200
+    EMBEDDING_PROVIDER: opensearch
+    OPENSEARCH_MODEL_ID: ${OPENSEARCH_MODEL_ID:-YYGXOJ4BgYB_vs2klaSo}
+    EMBEDDING_DIMENSION: "768"
 
 services:
   # ---------------------------------------------------------------------------
@@ -82,7 +85,11 @@ services:
       KAFKA_TOPIC_REPLICATION_FACTOR: "1"
       OPENSEARCH_URL: http://opensearch-node1:9200
       OPENSEARCH_MODEL_ID: ${OPENSEARCH_MODEL_ID:-YYGXOJ4BgYB_vs2klaSo}
+      EMBEDDING_PROVIDER: opensearch
+      EMBEDDING_DIMENSION: "768"
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434/v1}
+      OPENAI_MODEL: ${OPENAI_MODEL:-qwen2.5:7b}
       OTEL_SDK_DISABLED: "true"
 
   # ---------------------------------------------------------------------------
@@ -99,7 +106,7 @@ services:
     environment:
       <<: *worker-env
       KAFKA_CLIENT_ID: ingestion-worker-full
-      OPENSEARCH_MODEL_ID: ${OPENSEARCH_MODEL_ID:-YYGXOJ4BgYB_vs2klaSo}
+      INGEST_PIPELINE: experience-events-embed
       S3_ENDPOINT: http://minio:9000
       S3_BUCKET: cognitive-substrate
       S3_REGION: us-east-1
