@@ -76,6 +76,10 @@ services:
       dockerfile: deploy/orchestrator/Dockerfile
     container_name: cs-orchestrator
     restart: unless-stopped
+    extra_hosts:
+      # Allows containers to reach host services (Ollama) on Linux where
+      # host.docker.internal is not automatically injected.
+      - "host.docker.internal:172.19.0.1"
     networks:
       - infra
       - kafka-net
