@@ -205,7 +205,10 @@ services:
       context: .
       dockerfile: deploy/web/Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://thor:4000}
+        # Server-side (Next.js SSR proxy): use container name so web→api works
+        # inside Docker. The browser always uses relative /api paths so this
+        # only affects server-side rewrites, not client-side fetches.
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://cs-api:4000}
     container_name: cs-web
     restart: unless-stopped
     ports:
