@@ -31,6 +31,7 @@ x-worker-common: &worker-common
   restart: unless-stopped
   networks:
     - infra
+    - kafka-net
   environment: &worker-env
     NODE_ENV: production
     KAFKA_BROKERS: kafka:29092
@@ -55,6 +56,7 @@ services:
       - "4000:4000"
     networks:
       - infra
+      - kafka-net
     environment:
       NODE_ENV: production
       PORT: "4000"
@@ -76,6 +78,7 @@ services:
     restart: unless-stopped
     networks:
       - infra
+      - kafka-net
     depends_on:
       - api
     environment:
@@ -205,10 +208,16 @@ services:
       - "3000:3000"
     networks:
       - infra
+      - kafka-net
     depends_on:
       - api
 
 networks:
+  # OpenSearch, ClickHouse, MinIO: started via `docker compose` (project: docker)
   infra:
+    external: true
+    name: docker_default
+  # Kafka: started via `docker compose -f docker-compose.thor.yml` (project: cognitive-substrate)
+  kafka-net:
     external: true
     name: cognitive-substrate_default
