@@ -1,0 +1,207 @@
+# Application stack for thor — API, orchestrator, all workers, web UI.
+#
+# Requires the infra stack to be running first:
+#   docker compose -f docker-compose.thor.yml up -d
+#
+# This file joins the infra stack's default network so services can reach
+# kafka, opensearch-node1, clickhouse, and minio by container name.
+#
+# Build all images (run from repo root):
+#   docker compose -f docker-compose.app.yml build
+#
+# Start everything:
+#   docker compose -f docker-compose.app.yml up -d
+#
+# Tail logs:
+#   docker compose -f docker-compose.app.yml logs -f
+#
+# Stop (keep images):
+#   docker compose -f docker-compose.app.yml down
+#
+# Rebuild a single service after code changes:
+#   docker compose -f docker-compose.app.yml build api && docker compose -f docker-compose.app.yml up -d api
+#
+# Web UI build arg — baked into the Next.js bundle at build time.
+# Override for a different host:
+#   NEXT_PUBLIC_API_URL=http://myhost:4000 docker compose -f docker-compose.app.yml build web
+
+x-worker-common: &worker-common
+  build:
+    context: .
+  restart: unless-stopped
+  networks:
+    - infra
+  environment: &worker-env
+    NODE_ENV: production
+    KAFKA_BROKERS: kafka:29092
+    KAFKA_TOPIC_REPLICATION_FACTOR: "1"
+    OPENSEARCH_URL: http://opensearch-node1:9200
+
+services:
+  # ---------------------------------------------------------------------------
+  # API — REST + SSE gateway
+  # http://thor:4000
+  # ---------------------------------------------------------------------------
+  api:
+    build:
+      context: .
+      dockerfile: deploy/api/Dockerfile
+    container_name: cs-api
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    networks:
+      - infra
+    environment:
+      NODE_ENV: production
+      PORT: "4000"
+      KAFKA_BROKERS: kafka:29092
+      KAFKA_CLIENT_ID: api
+      KAFKA_TOPIC_REPLICATION_FACTOR: "1"
+      OPENSEARCH_URL: http://opensearch-node1:9200
+      OTEL_SDK_DISABLED: "true"
+      API_CORS_ORIGIN: "*"
+
+  # ---------------------------------------------------------------------------
+  # Orchestrator — CognitiveLoop consumer
+  # ---------------------------------------------------------------------------
+  orchestrator:
+    build:
+      context: .
+      dockerfile: deploy/orchestrator/Dockerfile
+    container_name: cs-orchestrator
+    restart: unless-stopped
+    networks:
+      - infra
+    depends_on:
+      - api
+    environment:
+      NODE_ENV: production
+      KAFKA_BROKERS: kafka:29092
+      KAFKA_CLIENT_ID: orchestrator
+      KAFKA_TOPIC_REPLICATION_FACTOR: "1"
+      OPENSEARCH_URL: http://opensearch-node1:9200
+      OPENSEARCH_MODEL_ID: ${OPENSEARCH_MODEL_ID:-YYGXOJ4BgYB_vs2klaSo}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OTEL_SDK_DISABLED: "true"
+
+  # ---------------------------------------------------------------------------
+  # Workers
+  # ---------------------------------------------------------------------------
+  worker-ingestion:
+    <<: *worker-common
+    build:
+      context: .
+      dockerfile: deploy/ingestion/Dockerfile
+    container_name: cs-worker-ingestion
+    depends_on:
+      - api
+    environment:
+      <<: *worker-env
+      KAFKA_CLIENT_ID: ingestion-worker-full
+      OPENSEARCH_MODEL_ID: ${OPENSEARCH_MODEL_ID:-YYGXOJ4BgYB_vs2klaSo}
+      S3_ENDPOINT: http://minio:9000
+      S3_BUCKET: cognitive-substrate
+      S3_REGION: us-east-1
+      S3_ACCESS_KEY_ID: minioadmin
+      S3_SECRET_ACCESS_KEY: minioadmin
+      S3_FORCE_PATH_STYLE: "true"
+
+  worker-consolidation:
+    <<: *worker-common
+    build:
+      context: .
+      dockerfile: deploy/consolidation/Dockerfile
+    container_name: cs-worker-consolidation
+    depends_on:
+      - api
+    environment:
+      <<: *worker-env
+      KAFKA_CLIENT_ID: consolidation-worker
+
+  worker-reinforcement:
+    <<: *worker-common
+    build:
+      context: .
+      dockerfile: deploy/reinforcement/Dockerfile
+    container_name: cs-worker-reinforcement
+    depends_on:
+      - api
+    environment:
+      <<: *worker-env
+      KAFKA_CLIENT_ID: reinforcement-worker
+      CLICKHOUSE_URL: http://clickhouse:8123
+      CLICKHOUSE_PASSWORD: substrate
+
+  worker-pattern:
+    <<: *worker-common
+    build:
+      context: .
+      dockerfile: deploy/pattern/Dockerfile
+    container_name: cs-worker-pattern
+    depends_on:
+      - api
+    environment:
+      <<: *worker-env
+      KAFKA_CLIENT_ID: pattern-worker
+      CLICKHOUSE_URL: http://clickhouse:8123
+      CLICKHOUSE_PASSWORD: substrate
+
+  worker-telemetry:
+    <<: *worker-common
+    build:
+      context: .
+      dockerfile: deploy/telemetry/Dockerfile
+    container_name: cs-worker-telemetry
+    depends_on:
+      - api
+    environment:
+      <<: *worker-env
+      KAFKA_CLIENT_ID: telemetry-worker
+      KAFKA_GROUP_ID: telemetry-workers
+      KAFKA_SSL: "false"
+      CLICKHOUSE_URL: http://clickhouse:8123
+      CLICKHOUSE_DATABASE: cognitive_substrate_telemetry
+      CLICKHOUSE_USERNAME: default
+      CLICKHOUSE_PASSWORD: substrate
+      OTEL_SDK_DISABLED: "true"
+
+  worker-memory-critique:
+    <<: *worker-common
+    build:
+      context: .
+      dockerfile: deploy/memory-critique/Dockerfile
+    container_name: cs-worker-memory-critique
+    depends_on:
+      - api
+    environment:
+      <<: *worker-env
+      KAFKA_CLIENT_ID: memory-critique-worker
+
+  # ---------------------------------------------------------------------------
+  # Web UI
+  # http://thor:3000
+  #
+  # NEXT_PUBLIC_API_URL is baked into the bundle at build time. The default
+  # assumes the browser reaches the API via thor's LAN address. Override with:
+  #   NEXT_PUBLIC_API_URL=http://yourhost:4000 docker compose ... build web
+  # ---------------------------------------------------------------------------
+  web:
+    build:
+      context: .
+      dockerfile: deploy/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://thor:4000}
+    container_name: cs-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    networks:
+      - infra
+    depends_on:
+      - api
+
+networks:
+  infra:
+    external: true
+    name: cognitive-substrate_default
