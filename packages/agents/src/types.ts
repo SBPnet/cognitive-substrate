@@ -60,6 +60,7 @@ export interface MemoryRetrieverPort {
     readonly queryEmbedding?: ReadonlyArray<number>;
     readonly size?: number;
     readonly policy?: Partial<PolicyState>;
+    readonly retrievalMode?: "legacy" | "efficient" | "quality" | "hybrid";
   }): Promise<{ readonly memories: ReadonlyArray<MemoryReference> }>;
 }
 

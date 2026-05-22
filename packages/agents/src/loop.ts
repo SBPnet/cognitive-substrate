@@ -59,6 +59,7 @@ export class CognitiveLoop {
       queryText: event.input.text,
       size: 8,
       policy,
+      retrievalMode: "efficient",
       ...(event.input.embedding.length > 0
         ? { queryEmbedding: event.input.embedding }
         : {}),
