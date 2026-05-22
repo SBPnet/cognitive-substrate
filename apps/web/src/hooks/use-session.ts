@@ -8,11 +8,17 @@ import {
   getSessionTrace,
   getAgentActivity,
   searchMemories,
+  getSessionPolicy,
   type SessionDto,
   type MemoryDto,
   type TraceEventDto,
   type AgentActivityDto,
+  type PolicySnapshotDto,
+  type KafkaEventDto,
 } from "@/lib/api-client";
+
+const KAFKA_EVENT_CAP = 200;
+const SESSION_TIMEOUT_MS = 10_000;
 
 export interface ConversationTurn {
   id: string;
@@ -31,10 +37,13 @@ export interface UseSessionResult {
   memories: MemoryDto[];
   traceEvents: TraceEventDto[];
   agentActivities: AgentActivityDto[];
+  policy: PolicySnapshotDto | null;
+  kafkaEvents: KafkaEventDto[];
   isInitialising: boolean;
   isSending: boolean;
   error: string | null;
   startSession: () => Promise<SessionDto | null>;
+  loadSession: (sessionId: string) => Promise<void>;
   submit: (text: string, currentSessionId?: string) => Promise<void>;
   addAssistantTurn: (
     eventId: string,
@@ -47,6 +56,8 @@ export interface UseSessionResult {
   queryMemories: (sid: string, query: string) => Promise<void>;
   refreshTrace: (sid: string) => Promise<void>;
   refreshAgentActivity: (sid: string) => Promise<void>;
+  refreshPolicy: (sid: string) => Promise<void>;
+  appendKafkaEvent: (event: KafkaEventDto) => void;
 }
 
 export function useSession(): UseSessionResult {
@@ -55,6 +66,8 @@ export function useSession(): UseSessionResult {
   const [memories, setMemories] = useState<MemoryDto[]>([]);
   const [traceEvents, setTraceEvents] = useState<TraceEventDto[]>([]);
   const [agentActivities, setAgentActivities] = useState<AgentActivityDto[]>([]);
+  const [policy, setPolicy] = useState<PolicySnapshotDto | null>(null);
+  const [kafkaEvents, setKafkaEvents] = useState<KafkaEventDto[]>([]);
   const [isInitialising, setIsInitialising] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -62,14 +75,42 @@ export function useSession(): UseSessionResult {
   const startSession = useCallback(async () => {
     setIsInitialising(true);
     setError(null);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), SESSION_TIMEOUT_MS);
     try {
       const s = await createSession();
       setSession(s);
       return s;
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to start session";
+      const isTimeout = err instanceof Error && err.name === "AbortError";
+      const msg = isTimeout
+        ? "API server unreachable. Check that apps/api is running."
+        : err instanceof Error
+          ? err.message
+          : "Failed to start session";
       setError(msg);
       return null;
+    } finally {
+      clearTimeout(timeout);
+      setIsInitialising(false);
+    }
+  }, []);
+
+  const loadSession = useCallback(async (sessionId: string) => {
+    setIsInitialising(true);
+    setError(null);
+    try {
+      setSession({ sessionId, createdAt: "", messageCount: 0, status: "active" });
+      setTurns([]);
+      await Promise.all([
+        getSessionMemories(sessionId).then((r) => setMemories(r.memories as MemoryDto[])),
+        getSessionTrace(sessionId).then((r) => setTraceEvents(r.events as TraceEventDto[])),
+        getAgentActivity(sessionId).then((r) => setAgentActivities(r.activities as AgentActivityDto[])),
+        getSessionPolicy(sessionId).then(setPolicy),
+      ]);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Failed to load session";
+      setError(msg);
     } finally {
       setIsInitialising(false);
     }
@@ -144,7 +185,7 @@ export function useSession(): UseSessionResult {
   const refreshMemories = useCallback(async (sid: string) => {
     try {
       const result = await getSessionMemories(sid);
-      setMemories(result.memories);
+      setMemories(result.memories as MemoryDto[]);
     } catch {
       // non-fatal
     }
@@ -153,7 +194,7 @@ export function useSession(): UseSessionResult {
   const queryMemories = useCallback(async (sid: string, query: string) => {
     try {
       const result = await searchMemories(sid, query);
-      setMemories(result.memories);
+      setMemories(result.memories as MemoryDto[]);
     } catch {
       // non-fatal
     }
@@ -162,7 +203,7 @@ export function useSession(): UseSessionResult {
   const refreshTrace = useCallback(async (sid: string) => {
     try {
       const result = await getSessionTrace(sid);
-      setTraceEvents(result.events);
+      setTraceEvents(result.events as TraceEventDto[]);
     } catch {
       // non-fatal
     }
@@ -171,10 +212,26 @@ export function useSession(): UseSessionResult {
   const refreshAgentActivity = useCallback(async (sid: string) => {
     try {
       const result = await getAgentActivity(sid);
-      setAgentActivities(result.activities);
+      setAgentActivities(result.activities as AgentActivityDto[]);
     } catch {
       // non-fatal
     }
+  }, []);
+
+  const refreshPolicy = useCallback(async (sid: string) => {
+    try {
+      const snapshot = await getSessionPolicy(sid);
+      setPolicy(snapshot);
+    } catch {
+      // non-fatal
+    }
+  }, []);
+
+  const appendKafkaEvent = useCallback((event: KafkaEventDto) => {
+    setKafkaEvents((prev) => {
+      const next = [...prev, event];
+      return next.length > KAFKA_EVENT_CAP ? next.slice(next.length - KAFKA_EVENT_CAP) : next;
+    });
   }, []);
 
   return {
@@ -183,10 +240,13 @@ export function useSession(): UseSessionResult {
     memories,
     traceEvents,
     agentActivities,
+    policy,
+    kafkaEvents,
     isInitialising,
     isSending,
     error,
     startSession,
+    loadSession,
     submit,
     addAssistantTurn,
     markTurnFailed,
@@ -194,5 +254,7 @@ export function useSession(): UseSessionResult {
     queryMemories,
     refreshTrace,
     refreshAgentActivity,
+    refreshPolicy,
+    appendKafkaEvent,
   };
 }

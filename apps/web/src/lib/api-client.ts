@@ -12,9 +12,25 @@ const API_BASE = "/api";
 export interface SessionDto {
   sessionId: string;
   userId?: string | undefined;
+  name?: string | undefined;
   createdAt: string;
   messageCount: number;
   status: "active" | "idle";
+}
+
+export interface KafkaEventDto {
+  topic: string;
+  key: string;
+  timestamp: string;
+  payload: unknown;
+}
+
+export interface PolicySnapshotDto {
+  version: string;
+  timestamp: string;
+  retrievalBias: number;
+  riskTolerance: number;
+  explorationFactor: number;
 }
 
 export interface SendMessageResponse {
@@ -89,8 +105,10 @@ export interface CollectorConfigDto {
   buildStatus?: string | undefined;
 }
 
+export type SseEventType = "interaction_response" | "kafka_event" | "ping" | "connected" | "error";
+
 export interface SseEnvelope<T = unknown> {
-  type: string;
+  type: SseEventType;
   payload: T;
 }
 
@@ -238,4 +256,36 @@ export async function updateCollectorServices(
   });
   if (!res.ok) throw new Error(`Failed to update collector services: ${res.status}`);
   return res.json() as Promise<CollectorConfigDto>;
+}
+
+// ---------------------------------------------------------------------------
+// Sessions list + rename
+// ---------------------------------------------------------------------------
+
+export async function listSessions(limit = 50): Promise<{ sessions: SessionDto[]; total: number }> {
+  const res = await fetch(`${API_BASE}/sessions?limit=${limit}`);
+  if (!res.ok) return { sessions: [], total: 0 };
+  return res.json() as Promise<{ sessions: SessionDto[]; total: number }>;
+}
+
+export async function renameSession(sessionId: string, name: string): Promise<SessionDto> {
+  const res = await fetch(`${API_BASE}/sessions/${sessionId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name }),
+  });
+  if (!res.ok) throw new Error(`Failed to rename session: ${res.status}`);
+  return res.json() as Promise<SessionDto>;
+}
+
+// ---------------------------------------------------------------------------
+// Policy
+// ---------------------------------------------------------------------------
+
+export async function getSessionPolicy(sessionId: string): Promise<PolicySnapshotDto> {
+  const res = await fetch(`${API_BASE}/sessions/${sessionId}/policy`);
+  if (!res.ok) {
+    return { version: "default", timestamp: new Date().toISOString(), retrievalBias: 0.5, riskTolerance: 0.5, explorationFactor: 0.5 };
+  }
+  return res.json() as Promise<PolicySnapshotDto>;
 }

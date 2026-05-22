@@ -84,13 +84,14 @@ export function ConversationPane({ turns, isSending, sessionId, onSend }: Props)
 
   return (
     <div className="flex flex-col h-full">
-      <header className="px-4 py-3 border-b border-zinc-700 bg-zinc-900">
-        <h2 className="text-sm font-semibold text-zinc-300 uppercase tracking-widest">
-          Conversation
-        </h2>
-        {sessionId && (
-          <p className="text-xs text-zinc-500 font-mono mt-0.5 truncate">{sessionId}</p>
-        )}
+      <header className="px-4 py-2.5 border-b border-zinc-700/50 bg-zinc-900/60 backdrop-blur-sm flex items-center gap-2.5">
+        <div className="w-0.5 h-4 rounded-full bg-zinc-500" />
+        <div>
+          <h2 className="text-xs font-semibold text-zinc-200">Conversation</h2>
+          {sessionId && (
+            <p className="text-[10px] text-zinc-600 font-mono mt-0.5 truncate">{sessionId}</p>
+          )}
+        </div>
       </header>
 
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
@@ -112,7 +113,7 @@ export function ConversationPane({ turns, isSending, sessionId, onSend }: Props)
 
       {/* File chips row */}
       {pendingFiles.length > 0 && (
-        <div className="px-4 py-2 border-t border-zinc-700 bg-zinc-900 flex flex-wrap gap-1.5">
+        <div className="px-4 py-2 border-t border-zinc-700/50 bg-zinc-900/60 flex flex-wrap gap-1.5">
           {pendingFiles.map((file) => (
             <span
               key={file.name}
@@ -150,7 +151,7 @@ export function ConversationPane({ turns, isSending, sessionId, onSend }: Props)
 
         <form
           onSubmit={handleSubmit}
-          className="flex gap-2 px-4 py-3 border-t border-zinc-700 bg-zinc-900"
+          className="flex gap-2 px-4 py-3 border-t border-zinc-700/50 bg-zinc-900/60 backdrop-blur-sm"
         >
           {/* Hidden file input */}
           <input
@@ -214,14 +215,17 @@ function MessageBubble({ turn }: { turn: ConversationTurn }) {
   const isFailed = turn.status === "failed";
 
   return (
-    <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
+    <div className={`flex gap-2.5 ${isUser ? "justify-end" : "justify-start"}`}>
+      {!isUser && (
+        <div className={`w-0.5 rounded-full flex-shrink-0 mt-1 self-stretch ${isFailed ? "bg-red-500/60" : "bg-indigo-500/50"}`} />
+      )}
       <div
-        className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+        className={`max-w-[80%] rounded-xl px-3.5 py-2.5 text-sm leading-relaxed ${
           isUser
-            ? "bg-indigo-600 text-white rounded-br-sm"
+            ? "bg-indigo-600/90 text-white"
             : isFailed
-              ? "bg-red-900/60 text-red-200 border border-red-700 rounded-bl-sm"
-              : "bg-zinc-700 text-zinc-100 rounded-bl-sm"
+              ? "bg-red-950/50 text-red-200 border border-red-800/50"
+              : "bg-zinc-800/60 text-zinc-100 border border-zinc-700/40"
         }`}
       >
         <p className="whitespace-pre-wrap">{turn.text}</p>

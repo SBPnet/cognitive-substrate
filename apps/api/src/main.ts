@@ -16,6 +16,7 @@ import {
 } from "@cognitive-substrate/telemetry-otel";
 import { ensureKafkaTopics, kafkaConfigFromEnv } from "@cognitive-substrate/kafka-bus";
 import { startResponseConsumer } from "./kafka/response-consumer.js";
+import { startCognitiveConsumer } from "./kafka/cognitive-consumer.js";
 import { startExperienceProducer } from "./kafka/experience-producer.js";
 import { startAuditConsumer } from "./kafka/audit-consumer.js";
 import { startMetadataProducer, getMetadataProducer } from "./kafka/metadata-producer.js";
@@ -34,6 +35,7 @@ async function main(): Promise<void> {
   let stopProducer: () => Promise<void> = async () => {};
   let stopConsumer: () => Promise<void> = async () => {};
   let stopAuditConsumer: () => Promise<void> = async () => {};
+  let stopCognitiveConsumer: () => Promise<void> = async () => {};
   let stopMetadataProducer: () => Promise<void> = async () => {};
 
   const server = serve({ fetch: app.fetch, hostname: "0.0.0.0", port }, () => {
@@ -51,6 +53,7 @@ async function main(): Promise<void> {
 
       stopProducer = await startExperienceProducer(kafkaConfig);
       stopConsumer = await startResponseConsumer(kafkaConfig);
+      stopCognitiveConsumer = await startCognitiveConsumer(kafkaConfig);
       stopAuditConsumer = await startAuditConsumer(kafkaConfig, openSearchClient);
       stopMetadataProducer = await startMetadataProducer(kafkaConfig);
       log("Kafka producer and consumer connected.");
@@ -64,6 +67,7 @@ async function main(): Promise<void> {
     server.close();
     await stopMetadataProducer();
     await stopAuditConsumer();
+    await stopCognitiveConsumer();
     await stopConsumer();
     await stopProducer();
     await shutdownTelemetry();

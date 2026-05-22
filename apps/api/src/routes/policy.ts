@@ -31,6 +31,7 @@ const DEFAULT_POLICY: PolicySnapshotDto = {
 };
 
 export function createPolicyRouter(openSearchClient: Client): Hono {
+  const client = openSearchClient;
   const router = new Hono();
 
   router.get("/", async (c) => {
@@ -67,7 +68,6 @@ export function createPolicyRouter(openSearchClient: Client): Hono {
     }
   });
 
-  const client = openSearchClient;
   return router;
 }
 

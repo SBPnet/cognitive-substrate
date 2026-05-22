@@ -3,8 +3,10 @@
  *
  * GET /api/sessions/:sessionId/stream
  *
- * Subscribes to the SessionEventBus for the given sessionId and emits
- * SSE messages as the orchestrator publishes InteractionResponseEvents.
+ * Emits two event types:
+ *   interaction_response  — orchestrator responses (from SessionEventBus)
+ *   kafka_event           — cognitive pipeline events (from KafkaEventBus)
+ *
  * A keepalive ping is sent every 15 seconds to prevent proxy timeouts.
  */
 
@@ -12,7 +14,8 @@ import { Hono } from "hono";
 import { streamSSE } from "hono/streaming";
 import type { InteractionResponseEvent } from "@cognitive-substrate/core-types";
 import { sessionEventBus } from "../kafka/session-bus.js";
-import type { SseEnvelope, InteractionResponseDto } from "../types.js";
+import { kafkaEventBus } from "../kafka/kafka-event-bus.js";
+import type { SseEnvelope, InteractionResponseDto, KafkaEventDto } from "../types.js";
 
 export const streamRouter = new Hono();
 
@@ -28,7 +31,7 @@ streamRouter.get("/", (c) => {
       });
     }, 15_000);
 
-    const unsubscribe = sessionEventBus.subscribe(
+    const unsubscribeResponse = sessionEventBus.subscribe(
       sessionId,
       (event: InteractionResponseEvent) => {
         const dto: InteractionResponseDto = {
@@ -56,9 +59,24 @@ streamRouter.get("/", (c) => {
       },
     );
 
+    const unsubscribeKafka = kafkaEventBus.subscribe(
+      sessionId,
+      (event: KafkaEventDto) => {
+        const envelope: SseEnvelope<KafkaEventDto> = {
+          type: "kafka_event",
+          payload: event,
+        };
+        void stream.writeSSE({
+          event: "kafka_event",
+          data: JSON.stringify(envelope),
+        });
+      },
+    );
+
     stream.onAbort(() => {
       clearInterval(pingInterval);
-      unsubscribe();
+      unsubscribeResponse();
+      unsubscribeKafka();
     });
 
     await stream.writeSSE({
@@ -71,6 +89,7 @@ streamRouter.get("/", (c) => {
     });
 
     clearInterval(pingInterval);
-    unsubscribe();
+    unsubscribeResponse();
+    unsubscribeKafka();
   });
 });

@@ -8,8 +8,8 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import type { Client } from "@opensearch-project/opensearch";
 import type { CognitiveProducer } from "@cognitive-substrate/kafka-bus";
-import { sessionsRouter } from "./routes/sessions.js";
-import { messagesRouter } from "./routes/messages.js";
+import { createSessionsRouter } from "./routes/sessions.js";
+import { createMessagesRouter } from "./routes/messages.js";
 import { streamRouter } from "./routes/stream.js";
 import { createMemoriesRouter } from "./routes/memories.js";
 import { createCollectorRouter } from "./routes/collector.js";
@@ -31,16 +31,16 @@ export function createApp(
 
   const corsOrigin = process.env["API_CORS_ORIGIN"] ?? "http://localhost:3000";
 
-  app.use("*", cors({ origin: corsOrigin, allowMethods: ["GET", "POST", "OPTIONS"] }));
+  app.use("*", cors({ origin: corsOrigin, allowMethods: ["GET", "POST", "PATCH", "OPTIONS"] }));
   app.use("*", logger());
 
   app.get("/health", (c) =>
     c.json({ status: "ok", timestamp: new Date().toISOString() }),
   );
 
-  app.route("/api/sessions", sessionsRouter);
+  app.route("/api/sessions", createSessionsRouter(openSearchClient));
 
-  app.route("/api/sessions/:sessionId/messages", messagesRouter);
+  app.route("/api/sessions/:sessionId/messages", createMessagesRouter(openSearchClient));
   app.route("/api/sessions/:sessionId/documents", createDocumentsRouter());
   app.route("/api/sessions/:sessionId/stream", streamRouter);
 

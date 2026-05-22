@@ -18,6 +18,7 @@ export interface CreateSessionRequest {
 export interface SessionDto {
   readonly sessionId: string;
   readonly userId?: string | undefined;
+  readonly name?: string | undefined;
   readonly createdAt: string;
   readonly messageCount: number;
   readonly status: "active" | "idle";
@@ -138,8 +139,16 @@ export type PolicySnapshotDto = Pick<
 // SSE envelope
 // ---------------------------------------------------------------------------
 
+export interface KafkaEventDto {
+  readonly topic: string;
+  readonly key: string;
+  readonly timestamp: string;
+  readonly payload: unknown;
+}
+
 export type SseEventType =
   | "interaction_response"
+  | "kafka_event"
   | "trace"
   | "memory_update"
   | "policy_update"

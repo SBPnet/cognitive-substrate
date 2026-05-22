@@ -355,6 +355,19 @@ export const modelRegistrySchema = {
   },
 } as const;
 
+const sessionsSchema = {
+  mappings: {
+    properties: {
+      session_id: { type: "keyword" },
+      user_id: { type: "keyword" },
+      name: { type: "text" },
+      created_at: { type: "date" },
+      message_count: { type: "integer" },
+      status: { type: "keyword" },
+    },
+  },
+} as const;
+
 export const INDEX_SCHEMAS = {
   experience_events: experienceEventsSchema,
   memory_semantic: memorySemanticSchema,
@@ -369,6 +382,7 @@ export const INDEX_SCHEMAS = {
   operational_patterns: operationalPatternsSchema,
   audit_events: auditEventsSchema,
   model_registry: modelRegistrySchema,
+  sessions: sessionsSchema,
 } as const;
 
 export type CognitiveIndex = keyof typeof INDEX_SCHEMAS;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { InteractionResponseDto, SseEnvelope } from "@/lib/api-client";
+import type { InteractionResponseDto, KafkaEventDto, SseEnvelope } from "@/lib/api-client";
 
 // SSE connections bypass the Next.js rewrite proxy (which buffers responses
 // and breaks long-lived streams). Connect directly to the API using the
@@ -12,6 +12,7 @@ const API_ORIGIN = process.env["NEXT_PUBLIC_SSE_URL"] ?? "";
 
 export interface SseCallbacks {
   onResponse: (response: InteractionResponseDto) => void;
+  onKafkaEvent?: (event: KafkaEventDto) => void;
   onError?: (error: Event) => void;
 }
 
@@ -32,6 +33,15 @@ export function useSessionSSE(
       try {
         const envelope = JSON.parse(ev.data) as SseEnvelope<InteractionResponseDto>;
         callbacksRef.current.onResponse(envelope.payload);
+      } catch {
+        // malformed message — ignore
+      }
+    });
+
+    es.addEventListener("kafka_event", (ev: MessageEvent<string>) => {
+      try {
+        const envelope = JSON.parse(ev.data) as SseEnvelope<KafkaEventDto>;
+        callbacksRef.current.onKafkaEvent?.(envelope.payload);
       } catch {
         // malformed message — ignore
       }

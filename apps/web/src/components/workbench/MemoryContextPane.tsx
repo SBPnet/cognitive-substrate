@@ -25,23 +25,25 @@ export function MemoryContextPane({ memories, sessionId, onSearch, onRefresh }: 
 
   return (
     <div className="flex flex-col h-full">
-      <header className="px-4 py-3 border-b border-zinc-700 bg-zinc-900 flex items-center justify-between">
-        <div>
-          <h2 className="text-sm font-semibold text-zinc-300 uppercase tracking-widest">
-            Memory Context
-          </h2>
-          <p className="text-xs text-zinc-500 mt-0.5">{memories.length} memories</p>
+      <header className="px-4 py-2.5 border-b border-zinc-700/50 bg-zinc-900/60 backdrop-blur-sm flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="w-0.5 h-4 rounded-full bg-teal-500" />
+          <div>
+            <h2 className="text-xs font-semibold text-zinc-200">Memory Context</h2>
+            <p className="text-[10px] text-zinc-500 mt-0.5">{memories.length} memories</p>
+          </div>
         </div>
         <button
           onClick={onRefresh}
           disabled={!sessionId}
-          className="text-xs text-zinc-400 hover:text-zinc-200 disabled:opacity-40 transition-colors"
+          className="p-1.5 rounded-md text-zinc-500 hover:text-zinc-200 hover:bg-zinc-700/50 disabled:opacity-40 transition-colors"
+          title="Refresh memories"
         >
-          Refresh
+          <RefreshIcon />
         </button>
       </header>
 
-      <form onSubmit={handleSearch} className="flex gap-2 px-4 py-2.5 border-b border-zinc-700">
+      <form onSubmit={handleSearch} className="flex gap-2 px-4 py-2.5 border-b border-zinc-700/50">
         <input
           type="text"
           value={query}
@@ -78,33 +80,32 @@ function MemoryCard({ memory }: { memory: MemoryDto }) {
   const scorePct = Math.round(memory.score * 100);
 
   return (
-    <div className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-xs hover:border-zinc-500 transition-colors">
+    <div className="bg-zinc-800/40 border border-zinc-700/50 rounded-lg px-3 py-2.5 text-xs hover:border-zinc-600/60 transition-colors">
       <p className="text-zinc-200 leading-relaxed line-clamp-3">{memory.summary}</p>
-      <div className="flex items-center gap-3 mt-2 text-zinc-500">
-        <span className="font-mono">{memory.index}</span>
-        <span>
-          imp{" "}
-          <span
-            className={importancePct >= 70 ? "text-green-400" : "text-zinc-400"}
-          >
-            {importancePct}%
-          </span>
-        </span>
-        <span>
-          score <span className="text-zinc-400">{scorePct}%</span>
+      <div className="flex items-center gap-2 mt-2 text-zinc-500">
+        <span className="font-mono text-[10px]">{memory.index}</span>
+        <span className={`text-[10px] ${importancePct >= 70 ? "text-green-400" : "text-zinc-500"}`}>
+          imp {importancePct}%
         </span>
         {memory.lastRetrieved && (
-          <span className="ml-auto">
+          <span className="ml-auto text-[10px]">
             {new Date(memory.lastRetrieved).toLocaleDateString()}
           </span>
         )}
+      </div>
+      {/* Score bar */}
+      <div className="mt-2 h-0.5 rounded-full bg-zinc-700">
+        <div
+          className="h-full rounded-full bg-indigo-500/60 transition-all duration-500"
+          style={{ width: `${scorePct}%` }}
+        />
       </div>
       {memory.tags && memory.tags.length > 0 && (
         <div className="flex flex-wrap gap-1 mt-2">
           {memory.tags.map((tag) => (
             <span
               key={tag}
-              className="bg-zinc-700 text-zinc-400 px-1.5 py-0.5 rounded text-[10px]"
+              className="bg-zinc-700/60 text-zinc-400 px-1.5 py-0.5 rounded-full text-[10px]"
             >
               {tag}
             </span>
@@ -112,5 +113,16 @@ function MemoryCard({ memory }: { memory: MemoryDto }) {
         </div>
       )}
     </div>
+  );
+}
+
+function RefreshIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+      <path d="M21 3v5h-5" />
+      <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+      <path d="M8 16H3v5" />
+    </svg>
   );
 }

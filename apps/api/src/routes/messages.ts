@@ -10,14 +10,17 @@
 
 import { Hono } from "hono";
 import { v4 as uuidv4 } from "uuid";
+import type { Client } from "@opensearch-project/opensearch";
 import type { ExperienceEvent, EventContext } from "@cognitive-substrate/core-types";
 import type { SendMessageRequest, SendMessageResponse } from "../types.js";
 import { publishExperienceEvent } from "../kafka/experience-producer.js";
-import { getOrCreateSession, incrementSessionMessages } from "./sessions.js";
+import { getOrCreateSession, incrementSessionMessages, autoNameSession } from "./sessions.js";
 
-export const messagesRouter = new Hono();
+export function createMessagesRouter(openSearchClient: Client): Hono {
+  const client = openSearchClient;
+  const router = new Hono();
 
-messagesRouter.post("/", async (c) => {
+  router.post("/", async (c) => {
   const sessionId = c.req.param("sessionId");
   if (!sessionId) return c.json({ error: "sessionId is required" }, 400);
 
@@ -65,7 +68,8 @@ messagesRouter.post("/", async (c) => {
     return c.json({ error: `Failed to queue message: ${message}` }, 503);
   }
 
-  incrementSessionMessages(sessionId);
+  incrementSessionMessages(sessionId, client);
+  autoNameSession(sessionId, body.text.trim(), client);
 
   const response: SendMessageResponse = {
     eventId,
@@ -75,4 +79,7 @@ messagesRouter.post("/", async (c) => {
   };
 
   return c.json(response, 202);
-});
+  });
+
+  return router;
+}
