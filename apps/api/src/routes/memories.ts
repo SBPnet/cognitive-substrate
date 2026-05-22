@@ -30,6 +30,7 @@ export function createMemoriesRouter(openSearchClient: Client): Hono {
   });
 
   router.get("/search", async (c) => {
+    const sessionId = c.req.param("sessionId");
     const q = c.req.query("q") ?? "";
     const limit = Math.max(1, Number(c.req.query("limit") ?? "10"));
     const retrievalMode = parseRetrievalMode(c.req.query("mode"));
@@ -38,7 +39,7 @@ export function createMemoriesRouter(openSearchClient: Client): Hono {
       return c.json({ memories: [], total: 0 } as MemoriesResponse);
     }
 
-    const memories = await searchSemanticMemories(openSearchClient, q, limit, retrievalMode);
+    const memories = await searchSemanticMemories(openSearchClient, q, limit, retrievalMode, sessionId);
     const response: MemoriesResponse = { memories, total: memories.length };
     return c.json(response);
   });

@@ -54,6 +54,7 @@ export class MultiAgentRuntime {
       results.map((result) =>
         this.activityStore.record({
           traceId: `${context.traceId}:${result.agentId}`,
+          sessionId: context.sessionId,
           timestamp: result.timestamp,
           agentType: result.agentType,
           inputSummary: context.input.input.text.slice(0, 500),

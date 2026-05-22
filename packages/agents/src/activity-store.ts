@@ -36,6 +36,7 @@ export class OpenSearchAgentActivityStore implements AgentActivityStore {
   async record(trace: AgentActivityTrace): Promise<void> {
     await this.indexTrace(this.openSearch, "agent_activity", trace.traceId, {
       trace_id: trace.traceId,
+      session_id: trace.sessionId,
       timestamp: trace.timestamp,
       agent_type: trace.agentType,
       input_summary: trace.inputSummary,

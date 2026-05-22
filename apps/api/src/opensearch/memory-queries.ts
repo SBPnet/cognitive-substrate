@@ -32,28 +32,41 @@ export async function getSessionMemories(
   sessionId: string,
   limit = 20,
 ): Promise<MemoryDto[]> {
-  const experienceQuery = {
-    query: { term: { session_id: sessionId } },
-    sort: [{ importance_score: { order: "desc" } }, { timestamp: { order: "desc" } }],
+  // Return consolidated semantic memories -- the same index the LLM retrieves
+  // from during a cognitive loop turn. Filtered to memories that have been
+  // accessed in this session via the session_tags field written by the
+  // reinforcement engine, falling back to top-importance memories globally.
+  const sessionTag = `session:${sessionId}`;
+  const sessionQuery = {
+    query: {
+      bool: {
+        should: [
+          { term: { tags: sessionTag } },
+          { term: { "tags.keyword": sessionTag } },
+        ],
+        minimum_should_match: 1,
+      },
+    },
+    sort: [{ importance_score: { order: "desc" } }, { last_retrieved: { order: "desc" } }],
     size: limit,
-    _source: ["event_id", "timestamp", "summary", "importance_score", "tags"],
+    _source: {
+      includes: ["memory_id", "summary", "generalization", "importance_score", "last_retrieved", "tags"],
+      excludes: Object.values(RETRIEVAL_MODE_VECTOR_FIELD),
+    },
   };
 
-  const hits = await search<ExperienceHit>(client, "experience_events", experienceQuery);
+  const hits = await search<SemanticHit>(client, "memory_semantic", sessionQuery);
 
   return hits.map((h): MemoryDto => {
     const base: MemoryDto = {
-      memoryId: h._source.event_id ?? h._id,
-      index: "experience_events",
-      summary: h._source.summary ?? "",
+      memoryId: h._source.memory_id ?? h._id,
+      index: "memory_semantic",
+      summary: h._source.summary ?? h._source.generalization ?? "",
       importanceScore: h._source.importance_score ?? 0,
       score: h._score,
     };
-    const tags = h._source.tags;
-    if (tags !== undefined && tags.length > 0) {
-      return { ...base, tags };
-    }
-    return base;
+    const lastRetrieved = h._source.last_retrieved;
+    return lastRetrieved !== undefined ? { ...base, lastRetrieved } : base;
   });
 }
 
@@ -62,15 +75,32 @@ export async function searchSemanticMemories(
   queryText: string,
   limit = 10,
   retrievalMode: RetrievalMode = "legacy",
+  sessionId?: string,
 ): Promise<MemoryDto[]> {
   const selectedVectorField = RETRIEVAL_MODE_VECTOR_FIELD[retrievalMode];
-  const semanticQuery = {
-    query: {
-      multi_match: {
-        query: queryText,
-        fields: ["summary^2", "generalization"],
-      },
+  const textClause = {
+    multi_match: {
+      query: queryText,
+      fields: ["summary^2", "generalization"],
     },
+  };
+  const semanticQuery = {
+    query: sessionId
+      ? {
+          bool: {
+            must: textClause,
+            filter: {
+              bool: {
+                should: [
+                  { term: { tags: `session:${sessionId}` } },
+                  { term: { "tags.keyword": `session:${sessionId}` } },
+                ],
+                minimum_should_match: 1,
+              },
+            },
+          },
+        }
+      : textClause,
     sort: [{ importance_score: { order: "desc" } }],
     size: limit,
     _source: {

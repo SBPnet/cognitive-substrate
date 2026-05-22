@@ -108,6 +108,7 @@ export interface ArbitrationDecision {
 /** Activity trace written to the `agent_activity` OpenSearch index. */
 export interface AgentActivityTrace {
   readonly traceId: string;
+  readonly sessionId: string;
   readonly timestamp: string;
   readonly agentType: AgentType;
   readonly inputSummary: string;

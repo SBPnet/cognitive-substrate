@@ -78,6 +78,7 @@ export function createPolicyRouter(openSearchClient: Client): Hono {
 
 interface AgentActivityDoc extends Record<string, unknown> {
   readonly trace_id?: string;
+  readonly session_id?: string;
   readonly timestamp?: string;
   readonly agent_type?: string;
   readonly input_summary?: string;
@@ -91,13 +92,17 @@ interface AgentActivityDoc extends Record<string, unknown> {
 export function createAgentActivityRouter(client: Client): Hono {
   const router = new Hono();
   router.get("/", async (c) => {
+    const sessionId = c.req.param("sessionId");
     const limit = Math.max(1, Number(c.req.query("limit") ?? "30"));
     const hits = await search<AgentActivityDoc>(client, "agent_activity", {
-      query: { match_all: {} },
+      query: sessionId
+        ? { term: { session_id: sessionId } }
+        : { match_all: {} },
       sort: [{ timestamp: { order: "desc" } }],
       size: limit,
       _source: [
         "trace_id",
+        "session_id",
         "timestamp",
         "agent_type",
         "input_summary",
