@@ -13,4 +13,4 @@ Thor app stack: `docker compose -f docker-compose.app.yml build` (from repo root
 
 ## OpenSearch Dashboards
 
-`opensearch-dashboards/` holds index-pattern manifests and bootstrap notes for the thor dashboards profile. See [opensearch-dashboards/README.md](./opensearch-dashboards/README.md).
+`opensearch-dashboards/` holds index-pattern manifests, blog reader analytics dashboard objects, and bootstrap notes. See [opensearch-dashboards/README.md](./opensearch-dashboards/README.md).

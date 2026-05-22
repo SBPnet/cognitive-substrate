@@ -11,5 +11,10 @@
   { "id": "retrieval-feedback", "title": "retrieval_feedback", "timeFieldName": "timestamp" },
   { "id": "operational-patterns", "title": "operational_patterns", "timeFieldName": "updated_at" },
   { "id": "audit-events", "title": "audit_events", "timeFieldName": "timestamp" },
-  { "id": "model-registry", "title": "model_registry", "timeFieldName": "registered_at" }
+  { "id": "model-registry", "title": "model_registry", "timeFieldName": "registered_at" },
+  {
+    "id": "blog-posts-search",
+    "title": "blog_posts_search",
+    "description": "bigpines.net hybrid search index (blog-bigpinesdotnet); no time field — disable time filter in Discover"
+  }
 ]

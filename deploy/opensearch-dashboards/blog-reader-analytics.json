@@ -1,0 +1,111 @@
+{
+  "indexPatternId": "experience-events",
+  "baseQuery": "tags: blog",
+  "visualizations": [
+    {
+      "id": "blog-unique-sessions",
+      "attributes": {
+        "title": "Unique sessions",
+        "visState": "{\"title\":\"Unique sessions\",\"type\":\"metric\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"session_id\"}}],\"params\":{\"type\":\"metric\",\"metric\":{\"style\":{\"fontSize\":44},\"labels\":{\"show\":true}}}}",
+        "uiStateJSON": "{}",
+        "description": "Distinct readers (session_id) in selected time range",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"experience-events\",\"query\":{\"language\":\"kuery\",\"query\":\"tags: blog\"},\"filter\":[]}"
+        }
+      }
+    },
+    {
+      "id": "blog-page-views",
+      "attributes": {
+        "title": "Page views",
+        "visState": "{\"title\":\"Page views\",\"type\":\"metric\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}}],\"params\":{\"type\":\"metric\",\"metric\":{\"style\":{\"fontSize\":44},\"labels\":{\"show\":true}}}}",
+        "uiStateJSON": "{}",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"experience-events\",\"query\":{\"language\":\"kuery\",\"query\":\"tags: blog and tags: event:page_view\"},\"filter\":[]}"
+        }
+      }
+    },
+    {
+      "id": "blog-clicks",
+      "attributes": {
+        "title": "Engagement clicks",
+        "visState": "{\"title\":\"Engagement clicks\",\"type\":\"metric\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}}],\"params\":{\"type\":\"metric\",\"metric\":{\"style\":{\"fontSize\":44},\"labels\":{\"show\":true}}}}",
+        "uiStateJSON": "{}",
+        "description": "nav, tag, repo, related article, search result, outbound, series nav",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"experience-events\",\"query\":{\"language\":\"kuery\",\"query\":\"tags: blog and (tags: event:nav_click or tags: event:tag_click or tags: event:repo_click or tags: event:related_article_click or tags: event:search_result_click or tags: event:outbound_link or tags: event:series_nav_click)\"},\"filter\":[]}"
+        }
+      }
+    },
+    {
+      "id": "blog-completions",
+      "attributes": {
+        "title": "Article completes",
+        "visState": "{\"title\":\"Article completes\",\"type\":\"metric\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}}],\"params\":{\"type\":\"metric\",\"metric\":{\"style\":{\"fontSize\":44},\"labels\":{\"show\":true}}}}",
+        "uiStateJSON": "{}",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"experience-events\",\"query\":{\"language\":\"kuery\",\"query\":\"tags: blog and tags: event:article_complete\"},\"filter\":[]}"
+        }
+      }
+    },
+    {
+      "id": "blog-events-timeline",
+      "attributes": {
+        "title": "Activity over time",
+        "visState": "{\"title\":\"Activity over time\",\"type\":\"histogram\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"timestamp\",\"interval\":\"auto\",\"min_doc_count\":0}}],\"params\":{\"type\":\"histogram\",\"grid\":{\"categoryLines\":false},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"labels\":{\"show\":true}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"title\":{\"text\":\"Events\"}}],\"seriesParams\":[{\"show\":true,\"type\":\"histogram\",\"mode\":\"stacked\",\"data\":{\"label\":\"Count\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\"}],\"addTooltip\":true,\"addLegend\":false}}",
+        "uiStateJSON": "{}",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"experience-events\",\"query\":{\"language\":\"kuery\",\"query\":\"tags: blog\"},\"filter\":[]}"
+        }
+      }
+    },
+    {
+      "id": "blog-events-pie",
+      "attributes": {
+        "title": "Events by type",
+        "visState": "{\"title\":\"Events by type\",\"type\":\"pie\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"tags\",\"size\":15,\"orderBy\":\"1\",\"order\":\"desc\",\"include\":\"event:.*\"}}],\"params\":{\"type\":\"pie\",\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":true}}",
+        "uiStateJSON": "{}",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"experience-events\",\"query\":{\"language\":\"kuery\",\"query\":\"tags: blog\"},\"filter\":[]}"
+        }
+      }
+    },
+    {
+      "id": "blog-top-articles",
+      "attributes": {
+        "title": "Top articles (signals)",
+        "visState": "{\"title\":\"Top articles (signals)\",\"type\":\"histogram\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"tags\",\"size\":12,\"orderBy\":\"1\",\"order\":\"desc\",\"include\":\"article:.*\"}}],\"params\":{\"type\":\"histogram\",\"grid\":{\"categoryLines\":false},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"left\",\"show\":true,\"labels\":{\"show\":true}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"bottom\",\"show\":true}],\"seriesParams\":[{\"show\":true,\"type\":\"histogram\",\"mode\":\"normal\",\"data\":{\"label\":\"Count\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\"}],\"addTooltip\":true,\"addLegend\":false,\"orientation\":\"horizontal\"}}",
+        "uiStateJSON": "{}",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"experience-events\",\"query\":{\"language\":\"kuery\",\"query\":\"tags: blog\"},\"filter\":[]}"
+        }
+      }
+    }
+  ],
+  "dashboard": {
+    "id": "blog-reader-analytics",
+    "attributes": {
+      "title": "Blog reader analytics (bigpines.net)",
+      "description": "Reader telemetry from experience_events (tags:blog). Not post search metadata.",
+      "panelsJSON": "[{\"version\":\"3.0.0\",\"type\":\"visualization\",\"gridData\":{\"x\":0,\"y\":0,\"w\":12,\"h\":8,\"i\":\"1\"},\"panelIndex\":\"1\",\"embeddableConfig\":{},\"panelRefName\":\"panel_1\"},{\"version\":\"3.0.0\",\"type\":\"visualization\",\"gridData\":{\"x\":12,\"y\":0,\"w\":12,\"h\":8,\"i\":\"2\"},\"panelIndex\":\"2\",\"embeddableConfig\":{},\"panelRefName\":\"panel_2\"},{\"version\":\"3.0.0\",\"type\":\"visualization\",\"gridData\":{\"x\":24,\"y\":0,\"w\":12,\"h\":8,\"i\":\"3\"},\"panelIndex\":\"3\",\"embeddableConfig\":{},\"panelRefName\":\"panel_3\"},{\"version\":\"3.0.0\",\"type\":\"visualization\",\"gridData\":{\"x\":36,\"y\":0,\"w\":12,\"h\":8,\"i\":\"4\"},\"panelIndex\":\"4\",\"embeddableConfig\":{},\"panelRefName\":\"panel_4\"},{\"version\":\"3.0.0\",\"type\":\"visualization\",\"gridData\":{\"x\":0,\"y\":8,\"w\":48,\"h\":12,\"i\":\"5\"},\"panelIndex\":\"5\",\"embeddableConfig\":{},\"panelRefName\":\"panel_5\"},{\"version\":\"3.0.0\",\"type\":\"visualization\",\"gridData\":{\"x\":0,\"y\":20,\"w\":24,\"h\":14,\"i\":\"6\"},\"panelIndex\":\"6\",\"embeddableConfig\":{},\"panelRefName\":\"panel_6\"},{\"version\":\"3.0.0\",\"type\":\"visualization\",\"gridData\":{\"x\":24,\"y\":20,\"w\":24,\"h\":14,\"i\":\"7\"},\"panelIndex\":\"7\",\"embeddableConfig\":{},\"panelRefName\":\"panel_7\"}]",
+      "optionsJSON": "{\"useMargins\":true,\"syncColors\":false,\"syncCursor\":true,\"syncTooltips\":true,\"hidePanelTitles\":false}",
+      "version": 1,
+      "timeRestore": true,
+      "timeTo": "now",
+      "timeFrom": "now-30d",
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"query\":{\"language\":\"kuery\",\"query\":\"tags: blog\"},\"filter\":[]}"
+      }
+    },
+    "references": [
+      { "name": "panel_1", "type": "visualization", "id": "blog-unique-sessions" },
+      { "name": "panel_2", "type": "visualization", "id": "blog-page-views" },
+      { "name": "panel_3", "type": "visualization", "id": "blog-clicks" },
+      { "name": "panel_4", "type": "visualization", "id": "blog-completions" },
+      { "name": "panel_5", "type": "visualization", "id": "blog-events-timeline" },
+      { "name": "panel_6", "type": "visualization", "id": "blog-events-pie" },
+      { "name": "panel_7", "type": "visualization", "id": "blog-top-articles" }
+    ]
+  },
+  "deprecatedSavedObjectIds": ["blog-posts-overview", "blog-posts-all"]
+}
