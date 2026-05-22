@@ -18,8 +18,8 @@ interface KnnVectorField {
   readonly dimension: number;
   readonly method: {
     readonly name: "hnsw";
-    readonly engine: "faiss";
-    readonly space_type: "l2";
+    readonly engine: "faiss" | "lucene";
+    readonly space_type: "l2" | "cosinesimil";
     readonly parameters: {
       readonly m: number;
       readonly ef_construction: number;
@@ -27,13 +27,16 @@ interface KnnVectorField {
   };
 }
 
+// lucene engine is used for indices that mix knn with bool/filter queries.
+// faiss is faster for pure knn but crashes with ConjunctionDISI in OpenSearch 3.0
+// when combined with any other query clause.
 const knnVectorField = (dimension: number = EMBEDDING_DIM): KnnVectorField => ({
   type: "knn_vector",
   dimension,
   method: {
     name: "hnsw",
-    engine: "faiss",
-    space_type: "l2",
+    engine: "lucene",
+    space_type: "cosinesimil",
     parameters: { m: 16, ef_construction: 128 },
   },
 });

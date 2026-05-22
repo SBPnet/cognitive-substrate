@@ -85,19 +85,14 @@ export interface HybridQueryOptions {
 
   /** Relative BM25 and k-NN weights used by bool-query score fusion. */
   readonly fusion?: RetrievalFusionOptions;
-
-  /**
-   * When true, skip BM25 and use a pure knn query (required for faiss-backed
-   * indices where the hybrid query type triggers a ConjunctionDISI bug).
-   */
-  readonly knnOnly?: boolean;
 }
 
 /**
  * Builds a hybrid OpenSearch request body combining BM25 + kNN using the
- * native `hybrid` query type (OpenSearch 2.10+). This avoids the
- * ConjunctionDISI segment-alignment bug that occurs when knn is mixed into a
- * bool query alongside standard Lucene queries.
+ * native `hybrid` query type (OpenSearch 2.10+).
+ *
+ * Requires the lucene knn engine (not faiss) — all indices use lucene so
+ * that hybrid queries work without the ConjunctionDISI bug in OpenSearch 3.0.
  *
  * Filters are applied inside each sub-query so they are respected by both
  * the lexical and vector passes.
@@ -115,7 +110,6 @@ export function buildHybridQuery(options: HybridQueryOptions): Record<string, un
     includeTagFilter = true,
     retrievalMode = "legacy",
     fusion,
-    knnOnly = false,
   } = options;
 
   const retrievalBias = policy?.retrievalBias ?? 0.5;
@@ -134,30 +128,6 @@ export function buildHybridQuery(options: HybridQueryOptions): Record<string, un
 
   if (includeTagFilter && requiredTags && requiredTags.length > 0) {
     filterClauses.push({ terms: { tags: requiredTags } });
-  }
-
-  // faiss-backed indices crash with both the hybrid query type and knn filter
-  // clauses (ConjunctionDISI bug in OpenSearch 3.0 with faiss engine). Use a
-  // bool query with the knn in must and filters at the bool level, which avoids
-  // passing a filter into the faiss knn scorer.
-  if (knnOnly) {
-    const knnClause = {
-      knn: {
-        [vectorField]: {
-          vector: Array.from(options.queryEmbedding),
-          k: options.k ?? size,
-        },
-      },
-    };
-    return {
-      size,
-      query: filterClauses.length > 0
-        ? { bool: { must: knnClause, filter: filterClauses } }
-        : knnClause,
-      _source: {
-        excludes: ["embedding", "embedding_qwen", "embedding_nomic", "embedding_bge_m3"],
-      },
-    };
   }
 
   const lexicalQuery: Record<string, unknown> =
