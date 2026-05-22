@@ -58,7 +58,7 @@ OPENSEARCH_URL=http://localhost:9200 pnpm --filter @cognitive-substrate/experime
 
 ## Documentation
 
-Architecture specs, articles, research paper, and whitepaper: [SBPnet/cognitive-substrate-docs](https://github.com/SBPnet/cognitive-substrate-docs)
+See https://bigpines.net for my blog about this project. More detailed internal documentation to come.
 
 ## License
 
