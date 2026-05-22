@@ -224,5 +224,6 @@ function queryOptionsForIndex(index: RetrievalSearchIndex): {
     textFields: ["summary", "generalization"],
     timestampField: "created_at",
     includeTagFilter: false,
+    knnOnly: true,
   };
 }

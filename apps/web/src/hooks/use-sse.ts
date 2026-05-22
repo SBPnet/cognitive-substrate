@@ -3,7 +3,11 @@
 import { useEffect, useRef } from "react";
 import type { InteractionResponseDto, SseEnvelope } from "@/lib/api-client";
 
-const API_ORIGIN = process.env["NEXT_PUBLIC_API_URL"] ?? "";
+// SSE connections always use a relative path so the browser routes through
+// the Next.js rewrite proxy (which handles the internal container URL).
+// Never use NEXT_PUBLIC_API_URL here — that bakes in the internal Docker
+// hostname (e.g. http://cs-api:4000) which is unreachable from the browser.
+const API_ORIGIN = "";
 
 export interface SseCallbacks {
   onResponse: (response: InteractionResponseDto) => void;
