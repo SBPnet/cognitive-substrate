@@ -136,30 +136,24 @@ export function buildHybridQuery(options: HybridQueryOptions): Record<string, un
     filterClauses.push({ terms: { tags: requiredTags } });
   }
 
-  // faiss-backed indices crash with the hybrid query type (ConjunctionDISI bug
-  // in OpenSearch 3.0). Use a plain knn query with filters pushed into the
-  // knn filter clause instead.
+  // faiss-backed indices crash with both the hybrid query type and knn filter
+  // clauses (ConjunctionDISI bug in OpenSearch 3.0 with faiss engine). Use a
+  // bool query with the knn in must and filters at the bool level, which avoids
+  // passing a filter into the faiss knn scorer.
   if (knnOnly) {
+    const knnClause = {
+      knn: {
+        [vectorField]: {
+          vector: Array.from(options.queryEmbedding),
+          k: options.k ?? size,
+        },
+      },
+    };
     return {
       size,
       query: filterClauses.length > 0
-        ? {
-            knn: {
-              [vectorField]: {
-                vector: Array.from(options.queryEmbedding),
-                k: options.k ?? size,
-                filter: { bool: { filter: filterClauses } },
-              },
-            },
-          }
-        : {
-            knn: {
-              [vectorField]: {
-                vector: Array.from(options.queryEmbedding),
-                k: options.k ?? size,
-              },
-            },
-          },
+        ? { bool: { must: knnClause, filter: filterClauses } }
+        : knnClause,
       _source: {
         excludes: ["embedding", "embedding_qwen", "embedding_nomic", "embedding_bge_m3"],
       },
