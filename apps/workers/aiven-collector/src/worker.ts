@@ -8,6 +8,7 @@ import {
 import {
   initTelemetry,
   telemetryConfigFromEnv,
+  AivenCollectorMetrics,
 } from "@cognitive-substrate/telemetry-otel";
 import { AivenClient, type AivenService } from "./aiven-client.js";
 import { collectorConfigFromEnv, type AivenCollectorConfig } from "./config.js";
@@ -38,6 +39,7 @@ export async function startWorker(): Promise<void> {
   const producer = new CognitiveProducer({ kafka, enableAuditMirror: false });
   await producer.connect();
 
+  const workerMetrics = new AivenCollectorMetrics();
   const client = new AivenClient(config.apiBaseUrl, config.token, config.project);
   let shuttingDown = false;
 
@@ -53,6 +55,7 @@ export async function startWorker(): Promise<void> {
     },
     producer,
     log,
+    workerMetrics,
   );
 
   // Kafka log consumer: reads from aiven.logs.* topics populated by the
@@ -81,7 +84,7 @@ export async function startWorker(): Promise<void> {
     }
   };
 
-  const metadataPoll = (): Promise<void> => collectMetadata(config, client, producer, log);
+  const metadataPoll = (): Promise<void> => collectMetadata(config, client, producer, log, workerMetrics);
 
   await runSafe("metadata", metadataPoll);
 
@@ -121,11 +124,13 @@ async function collectMetadata(
   client: AivenClient,
   producer: CognitiveProducer,
   log: (message: string) => void,
+  workerMetrics?: AivenCollectorMetrics,
 ): Promise<void> {
   const services = await resolveServices(config, client);
   const observedAt = new Date().toISOString();
 
   for (const service of services) {
+    workerMetrics?.metadataPublished.add(1);
     const message: RawMetadataMessage = {
       project: config.project,
       serviceId: service.service_name,

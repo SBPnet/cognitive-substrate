@@ -18,6 +18,7 @@ import {
 import {
   initTelemetry,
   telemetryConfigFromEnv,
+  ConsolidationMetrics,
 } from "@cognitive-substrate/telemetry-otel";
 
 export async function startWorker(): Promise<void> {
@@ -35,6 +36,7 @@ export async function startWorker(): Promise<void> {
 
   const kafka = createKafkaClient(kafkaConfig);
   const openSearchClient = createOpenSearchClient(opensearchConfigFromEnv());
+  const workerMetrics = new ConsolidationMetrics();
   const engine = new ConsolidationEngine({ openSearch: openSearchClient });
 
   log("Ensuring OpenSearch indexes exist...");
@@ -55,19 +57,25 @@ export async function startWorker(): Promise<void> {
     [Topics.CONSOLIDATION_REQUEST],
     async (message) => {
       const request = message.value;
+      const done = workerMetrics.startMessage();
       log(`Processing consolidation request ${request.requestId}`);
 
       let result;
       try {
         result = await engine.consolidate(request);
       } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : String(error);
-        if (message.includes("at least one replay candidate")) {
+        const errMsg = error instanceof Error ? error.message : String(error);
+        if (errMsg.includes("at least one replay candidate")) {
+          done();
           log(`Skipping consolidation request ${request.requestId}: no replay candidates available yet`);
           return;
         }
+        done(error);
         throw error;
       }
+
+      workerMetrics.sourceEvents.record(result.sourceEventIds.length);
+      done();
 
       await producer.publish(Topics.MEMORY_SEMANTIC_UPDATED, result, {
         key: result.semanticMemory.memoryId,

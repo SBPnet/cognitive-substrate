@@ -13,6 +13,7 @@ import {
 import {
   initTelemetry,
   telemetryConfigFromEnv,
+  TelemetryWorkerMetrics,
 } from "@cognitive-substrate/telemetry-otel";
 import {
   telemetryExperienceBridgeFromEnv,
@@ -46,6 +47,7 @@ export async function startWorker(): Promise<void> {
 
   // High-volume metric tier: audit mirroring would re-publish every raw metric
   // message onto the audit topic, doubling bus throughput for no diagnostic gain.
+  const workerMetrics = new TelemetryWorkerMetrics();
   const producer = new CognitiveProducer({ kafka, enableAuditMirror: false });
   await producer.connect();
   const experienceBridge = telemetryExperienceBridgeFromEnv(producer);
@@ -85,7 +87,10 @@ export async function startWorker(): Promise<void> {
     }
     if (currentMetrics.length > 0) {
       log(`Flushing batch of ${currentMetrics.length} metric messages`);
+      workerMetrics.batchSize.record(currentMetrics.length);
+      const writeStart = performance.now();
       await processTelemetryBatch(currentMetrics, { producer, clickhouse });
+      workerMetrics.clickhouseWriteDurationMs.record(performance.now() - writeStart);
     }
     if (currentLogs.length > 0) {
       log(`Flushing batch of ${currentLogs.length} log messages`);
@@ -112,6 +117,7 @@ export async function startWorker(): Promise<void> {
       if (message.topic === Topics.TELEMETRY_METRICS_RAW) {
         const metric = message.value as RawMetricMessage;
         experienceBridge?.observeMetric(metric);
+        workerMetrics.messagesProcessed.add(1, { topic: "metrics" });
         batch.push(metric);
         if (batch.length >= BATCH_MAX_SIZE) {
           await flush();
@@ -121,6 +127,7 @@ export async function startWorker(): Promise<void> {
       } else if (message.topic === Topics.TELEMETRY_LOGS_RAW) {
         const logMessage = message.value as RawLogMessage;
         experienceBridge?.observeLog(logMessage);
+        workerMetrics.messagesProcessed.add(1, { topic: "logs" });
         logBatch.push(logMessage);
         if (logBatch.length >= BATCH_MAX_SIZE) {
           await flush();
@@ -129,6 +136,7 @@ export async function startWorker(): Promise<void> {
         }
       } else if (message.topic === Topics.TELEMETRY_METADATA_RAW) {
         experienceBridge?.observeMetadata(message.value as RawMetadataMessage);
+        workerMetrics.messagesProcessed.add(1, { topic: "metadata" });
       }
 
       if (experienceBridge?.shouldFlush()) {

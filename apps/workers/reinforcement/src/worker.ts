@@ -15,6 +15,7 @@ import {
 import {
   initTelemetry,
   telemetryConfigFromEnv,
+  ReinforcementMetrics,
 } from "@cognitive-substrate/telemetry-otel";
 import {
   trackRecommendation,
@@ -34,6 +35,7 @@ export async function startWorker(): Promise<void> {
     process.stdout.write(`[reinforcement-worker] ${new Date().toISOString()} ${msg}\n`);
   };
 
+  const workerMetrics = new ReinforcementMetrics();
   const kafka = createKafkaClient(kafkaConfigFromEnv());
   const openSearch = createOpenSearchClient(opensearchConfigFromEnv());
   const clickhouse = createTelemetryClientFromEnv();
@@ -56,8 +58,16 @@ export async function startWorker(): Promise<void> {
     [Topics.COGNITION_RECOMMENDATIONS],
     async (message) => {
       const rec = message.value;
+      const done = workerMetrics.startMessage();
       log(`Tracking recommendation ${rec.recommendationId} for pattern ${rec.patternId}`);
-      await trackRecommendation(rec, inserter, ENVIRONMENT);
+      try {
+        await trackRecommendation(rec, inserter, ENVIRONMENT);
+        workerMetrics.recommendationsTracked.add(1);
+        done();
+      } catch (err) {
+        done(err);
+        throw err;
+      }
     },
   );
 
@@ -75,8 +85,6 @@ export async function startWorker(): Promise<void> {
     [Topics.POLICY_EVALUATION],
     async (message) => {
       const evaluation = message.value;
-      // Policy evaluations that reference a recommendation_id are treated as
-      // outcome feedback for the referenced recommendation.
       const recommendationId = evaluation["recommendationId"] as string | undefined;
       const patternId = evaluation["patternId"] as string | undefined;
       if (!recommendationId || !patternId) return;
@@ -97,10 +105,19 @@ export async function startWorker(): Promise<void> {
         confidenceBefore: rewardScore,
       };
 
+      const done = workerMetrics.startMessage({ outcome });
       log(
         `Recording outcome for recommendation ${recommendationId}: ${outcome} (reward=${rewardScore.toFixed(3)})`,
       );
-      await recordOutcome(feedback, inserter, openSearch, ENVIRONMENT);
+      try {
+        await recordOutcome(feedback, inserter, openSearch, ENVIRONMENT);
+        workerMetrics.outcomesRecorded.add(1, { outcome });
+        workerMetrics.rewardScore.record(rewardScore, { outcome });
+        done();
+      } catch (err) {
+        done(err);
+        throw err;
+      }
     },
   );
 

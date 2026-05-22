@@ -19,6 +19,7 @@ import {
 import {
   initTelemetry,
   telemetryConfigFromEnv,
+  PatternMetrics,
 } from "@cognitive-substrate/telemetry-otel";
 import type { OperationalPrimitiveEvent } from "@cognitive-substrate/abstraction-engine";
 import {
@@ -73,6 +74,7 @@ export async function startWorker(): Promise<void> {
     log(`Reloaded ${patterns.length} patterns.`);
   }, PATTERN_RELOAD_INTERVAL_MS);
 
+  const workerMetrics = new PatternMetrics();
   const window = new PrimitiveWindow();
   const inserter = new TelemetryInserter(clickhouse);
 
@@ -82,10 +84,12 @@ export async function startWorker(): Promise<void> {
     [Topics.COGNITION_PRIMITIVES],
     async (message) => {
       const event = message.value;
+      const done = workerMetrics.startMessage({ "primitive.id": event.primitiveId });
       window.push({
         ...event,
         timestamp: new Date(event.timestamp),
       });
+      workerMetrics.windowSize.add(1);
 
       // Write to ClickHouse cognitive_events
       const cogRow: CognitiveEventRow = {
@@ -105,45 +109,56 @@ export async function startWorker(): Promise<void> {
 
       // Match against pattern library
       const matches = matchPatterns(window, patterns);
+      let processingError: unknown;
 
-      for (const match of matches) {
-        const { pattern, matchScore } = match;
+      try {
+        for (const match of matches) {
+          const { pattern, matchScore } = match;
 
-        if (matchScore < CONFIDENCE_THRESHOLD) continue;
+          if (matchScore < CONFIDENCE_THRESHOLD) continue;
 
-        const recommendationId = randomUUID();
-        const anomalyPayload = {
-          anomalyId: randomUUID(),
-          patternId: pattern.patternId,
-          matchScore,
-          outcome: pattern.outcome,
-          activePrimitives: Array.from(window.activePrimitives),
-          timestamp: new Date().toISOString(),
-        };
+          workerMetrics.patternMatches.add(1, { "pattern.id": pattern.patternId });
+          workerMetrics.matchScore.record(matchScore, { "pattern.id": pattern.patternId });
 
-        const recommendationPayload = {
-          recommendationId,
-          patternId: pattern.patternId,
-          matchScore,
-          interventions: pattern.interventions,
-          outcome: pattern.outcome,
-          timestamp: new Date().toISOString(),
-        };
+          const recommendationId = randomUUID();
+          const anomalyPayload = {
+            anomalyId: randomUUID(),
+            patternId: pattern.patternId,
+            matchScore,
+            outcome: pattern.outcome,
+            activePrimitives: Array.from(window.activePrimitives),
+            timestamp: new Date().toISOString(),
+          };
 
-        await producer.publish(Topics.COGNITION_ANOMALIES, anomalyPayload);
-        await producer.publish(Topics.COGNITION_RECOMMENDATIONS, recommendationPayload);
+          const recommendationPayload = {
+            recommendationId,
+            patternId: pattern.patternId,
+            matchScore,
+            interventions: pattern.interventions,
+            outcome: pattern.outcome,
+            timestamp: new Date().toISOString(),
+          };
 
-        log(
-          `Pattern matched: ${pattern.patternId} (score=${matchScore.toFixed(3)})`,
-        );
+          await producer.publish(Topics.COGNITION_ANOMALIES, anomalyPayload);
+          await producer.publish(Topics.COGNITION_RECOMMENDATIONS, recommendationPayload);
 
-        // Update observation count on the matched pattern
-        await upsertPattern(openSearch, {
-          ...pattern,
-          observationCount: pattern.observationCount + 1,
-          updatedAt: new Date(),
-        });
+          log(
+            `Pattern matched: ${pattern.patternId} (score=${matchScore.toFixed(3)})`,
+          );
+
+          await upsertPattern(openSearch, {
+            ...pattern,
+            observationCount: pattern.observationCount + 1,
+            updatedAt: new Date(),
+          });
+        }
+      } catch (err) {
+        processingError = err;
       }
+
+      workerMetrics.windowSize.add(-1);
+      done(processingError);
+      if (processingError !== undefined) throw processingError;
     },
   );
 

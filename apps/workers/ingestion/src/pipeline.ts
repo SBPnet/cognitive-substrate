@@ -60,6 +60,10 @@ export interface PipelineConfig {
    * and passes an empty vector placeholder; the pipeline overwrites it.
    */
   readonly ingestPipeline?: string;
+  /** Called with embedding wall-clock time in ms after each embed step. */
+  readonly onEmbeddingDuration?: (ms: number) => void;
+  /** Called with OpenSearch write wall-clock time in ms after each index step. */
+  readonly onWriteDuration?: (ms: number) => void;
 }
 
 /** Enriched event payload emitted to `experience.enriched`. */
@@ -102,6 +106,7 @@ export async function processEvent(
       // Step 1: Generate embeddings.
       // When ingestPipeline is set, OpenSearch ML handles embedding at index
       // time — skip client-side embedding and use an empty placeholder vector.
+      const embedStart = performance.now();
       const { primaryEmbedding, profileVectors, profileMetadata } = await withSpan(
         tracer,
         "experience.embed",
@@ -121,6 +126,7 @@ export async function processEvent(
           throw new Error("PipelineConfig requires embedder, profiledEmbedders, or ingestPipeline");
         },
       );
+      config.onEmbeddingDuration?.(performance.now() - embedStart);
       const embedding = primaryEmbedding;
 
       // Step 2: Compute importance score.
@@ -149,6 +155,7 @@ export async function processEvent(
       );
 
       // Step 6: Index metadata + embeddings in OpenSearch.
+      const writeStart = performance.now();
       await withSpan(
         tracer,
         "experience.opensearch.index",
@@ -192,6 +199,7 @@ export async function processEvent(
           }, config.ingestPipeline ? { pipeline: config.ingestPipeline } : undefined);
         },
       );
+      config.onWriteDuration?.(performance.now() - writeStart);
 
       const enrichedPayload: EnrichedEventPayload = {
         eventId: rawEvent.eventId,

@@ -32,6 +32,7 @@ import {
 import {
   initTelemetry,
   telemetryConfigFromEnv,
+  IngestionMetrics,
 } from "@cognitive-substrate/telemetry-otel";
 
 import {
@@ -89,6 +90,8 @@ export async function startWorker(): Promise<void> {
   log("Ensuring OpenSearch indexes exist...");
   await ensureIndexes(openSearchClient);
 
+  const workerMetrics = new IngestionMetrics();
+
   const producer = new CognitiveProducer({ kafka, enableAuditMirror: true });
   await producer.connect();
 
@@ -104,22 +107,33 @@ export async function startWorker(): Promise<void> {
     [Topics.EXPERIENCE_RAW],
     async (message) => {
       const event = message.value;
+      const attrs = { "event.type": event.type };
+      const done = workerMetrics.startMessage(attrs);
       log(`Processing event ${event.eventId} (type=${event.type})`);
 
-      const enriched = await processEvent(event, {
-        ...(ingestPipeline
-          ? { ingestPipeline }
-          : profiledEmbedders
-            ? { profiledEmbedders }
-            : { embedder: legacyEmbedder! }),
-        openSearch: openSearchClient,
-        objectStore,
-        producer,
-      });
+      try {
+        const enriched = await processEvent(event, {
+          ...(ingestPipeline
+            ? { ingestPipeline }
+            : profiledEmbedders
+              ? { profiledEmbedders }
+              : { embedder: legacyEmbedder! }),
+          openSearch: openSearchClient,
+          objectStore,
+          producer,
+          onEmbeddingDuration: (ms) => workerMetrics.embeddingDurationMs.record(ms, attrs),
+          onWriteDuration: (ms) => workerMetrics.opensearchWriteDurationMs.record(ms, attrs),
+        });
 
-      log(
-        `Indexed event ${enriched.eventId} with importance=${enriched.importanceScore.toFixed(3)}`,
-      );
+        workerMetrics.importanceScore.record(enriched.importanceScore, attrs);
+        done();
+        log(
+          `Indexed event ${enriched.eventId} with importance=${enriched.importanceScore.toFixed(3)}`,
+        );
+      } catch (err) {
+        done(err);
+        throw err;
+      }
     },
   );
 

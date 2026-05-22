@@ -19,6 +19,7 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { decompress } from "snappyjs";
 import { Topics, type CognitiveProducer } from "@cognitive-substrate/kafka-bus";
+import type { AivenCollectorMetrics } from "@cognitive-substrate/telemetry-otel";
 import type { RawMetricMessage } from "./messages.js";
 
 export interface PrometheusReceiverConfig {
@@ -32,9 +33,10 @@ export function startPrometheusReceiver(
   config: PrometheusReceiverConfig,
   producer: CognitiveProducer,
   log: (message: string) => void,
+  workerMetrics?: AivenCollectorMetrics,
 ): () => void {
   const server = createServer((req, res) => {
-    void handleRequest(req, res, config, producer, log);
+    void handleRequest(req, res, config, producer, log, workerMetrics);
   });
 
   server.listen(config.port, () => {
@@ -50,6 +52,7 @@ async function handleRequest(
   config: PrometheusReceiverConfig,
   producer: CognitiveProducer,
   log: (message: string) => void,
+  workerMetrics?: AivenCollectorMetrics,
 ): Promise<void> {
   if (req.method !== "POST" || req.url !== "/metrics/write") {
     res.writeHead(404).end();
@@ -74,6 +77,7 @@ async function handleRequest(
     return;
   }
 
+  workerMetrics?.prometheusWriteRequests.add(1);
   const observedAt = new Date().toISOString();
   let published = 0;
 
@@ -105,6 +109,7 @@ async function handleRequest(
     }
   }
 
+  workerMetrics?.prometheusMetricSamples.add(published);
   log(`Published ${published} Prometheus metric samples from remote_write`);
   res.writeHead(204).end();
 }
