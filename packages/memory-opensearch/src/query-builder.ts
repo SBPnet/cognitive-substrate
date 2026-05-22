@@ -88,8 +88,13 @@ export interface HybridQueryOptions {
 }
 
 /**
- * Builds a hybrid OpenSearch request body combining BM25 + kNN + script_score
- * with optional policy weighting and time/tag filters.
+ * Builds a hybrid OpenSearch request body combining BM25 + kNN using the
+ * native `hybrid` query type (OpenSearch 2.10+). This avoids the
+ * ConjunctionDISI segment-alignment bug that occurs when knn is mixed into a
+ * bool query alongside standard Lucene queries.
+ *
+ * Filters are applied inside each sub-query so they are respected by both
+ * the lexical and vector passes.
  */
 export function buildHybridQuery(options: HybridQueryOptions): Record<string, unknown> {
   const {
@@ -124,32 +129,59 @@ export function buildHybridQuery(options: HybridQueryOptions): Record<string, un
     filterClauses.push({ terms: { tags: requiredTags } });
   }
 
+  const lexicalQuery: Record<string, unknown> =
+    filterClauses.length > 0
+      ? {
+          bool: {
+            must: {
+              multi_match: {
+                query: queryText,
+                fields: textFields,
+                type: "best_fields",
+                tie_breaker: 0.3,
+                boost: lexicalWeight,
+              },
+            },
+            filter: filterClauses,
+          },
+        }
+      : {
+          multi_match: {
+            query: queryText,
+            fields: textFields,
+            type: "best_fields",
+            tie_breaker: 0.3,
+            boost: lexicalWeight,
+          },
+        };
+
+  const knnQuery: Record<string, unknown> =
+    filterClauses.length > 0
+      ? {
+          knn: {
+            [vectorField]: {
+              vector: Array.from(options.queryEmbedding),
+              k: options.k ?? size,
+              boost: vectorWeight,
+              filter: { bool: { filter: filterClauses } },
+            },
+          },
+        }
+      : {
+          knn: {
+            [vectorField]: {
+              vector: Array.from(options.queryEmbedding),
+              k: options.k ?? size,
+              boost: vectorWeight,
+            },
+          },
+        };
+
   return {
     size,
     query: {
-      bool: {
-        filter: filterClauses,
-        should: [
-          {
-            multi_match: {
-              query: queryText,
-              fields: textFields,
-              type: "best_fields",
-              tie_breaker: 0.3,
-              boost: lexicalWeight,
-            },
-          },
-          {
-            knn: {
-              [vectorField]: {
-                vector: Array.from(options.queryEmbedding),
-                k: options.k ?? size,
-                boost: vectorWeight,
-              },
-            },
-          },
-        ],
-        minimum_should_match: 1,
+      hybrid: {
+        queries: [lexicalQuery, knnQuery],
       },
     },
     _source: {
