@@ -27,9 +27,9 @@
     "smoke:aiven-ml-node": "pnpm tsx scripts/smoke/aiven-ml-node-validation.ts",
     "eval:baseline": "pnpm tsx scripts/eval/run-evaluations.ts",
     "clean": "pnpm -r clean",
-    "deploy:build": "docker compose -f docker-compose.app.yml build",
-    "deploy:up": "docker compose -f docker-compose.app.yml up -d",
-    "deploy": "pnpm deploy:build && pnpm deploy:up"
+    "docker:build": "docker compose -f docker-compose.app.yml build",
+    "docker:up": "docker compose -f docker-compose.app.yml up -d",
+    "docker:reload": "pnpm docker:build && pnpm docker:up"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.0.0",
