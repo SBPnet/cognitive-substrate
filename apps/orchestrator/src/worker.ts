@@ -81,6 +81,9 @@ export async function startOrchestrator(): Promise<void> {
     [Topics.EXPERIENCE_RAW],
     async (message) => {
       const event = message.value;
+      // Skip events the orchestrator itself published -- they feed the
+      // reinforcement pipeline but should not trigger a new cognitive loop turn.
+      if (event.type === "agent_action") return;
       let result;
       try {
         result = await loop.process(event);
