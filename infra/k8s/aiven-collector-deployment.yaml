@@ -6,9 +6,10 @@ metadata:
     app.kubernetes.io/name: cognitive-substrate
     app.kubernetes.io/component: aiven-collector
 spec:
-  # Singleton: holds in-memory log offsets and seen-event dedup state.
-  # Multiple replicas would produce duplicate Kafka messages without a
-  # shared offset/dedup store; scale vertically if poll latency grows.
+  # Singleton: Kafka consumer group membership and the Prometheus receiver
+  # port are both stateless and horizontally scalable, but log-consumer
+  # offsets are managed by Kafka so multiple replicas are safe. Start at 1
+  # and scale if receiver throughput demands it.
   replicas: 1
   selector:
     matchLabels:
@@ -25,7 +26,10 @@ spec:
           image: cognitive-substrate/aiven-collector:latest
           imagePullPolicy: Never
           ports:
-            - containerPort: 3000
+            - name: health
+              containerPort: 3000
+            - name: prom-write
+              containerPort: 9091
           env:
             - name: ENVIRONMENT
               value: dev
@@ -78,6 +82,15 @@ spec:
                   name: cognitive-substrate-aiven
                   key: otel-endpoint
                   optional: true
+            # Prometheus remote_write receiver port (must match Service below)
+            - name: PROMETHEUS_RECEIVER_PORT
+              value: "9091"
+            # Kafka consumer group for Aiven kafka_logs topics
+            - name: KAFKA_LOGS_GROUP_ID
+              value: aiven-collector-logs
+            # Topic prefix matching the kafka_logs integration config in Terraform
+            - name: AIVEN_LOGS_TOPIC_PREFIX
+              value: aiven.logs
           livenessProbe:
             httpGet:
               path: /health
@@ -98,3 +111,25 @@ spec:
             limits:
               cpu: 250m
               memory: 256Mi
+---
+# Service exposes the Prometheus remote_write port so Aiven can reach it.
+# In production this needs an external LoadBalancer or Ingress; the ClusterIP
+# type here is sufficient for in-cluster testing and local dev with port-forward.
+apiVersion: v1
+kind: Service
+metadata:
+  name: cognitive-substrate-aiven-collector
+  labels:
+    app.kubernetes.io/name: cognitive-substrate
+    app.kubernetes.io/component: aiven-collector
+spec:
+  selector:
+    app.kubernetes.io/name: cognitive-substrate
+    app.kubernetes.io/component: aiven-collector
+  ports:
+    - name: health
+      port: 3000
+      targetPort: 3000
+    - name: prom-write
+      port: 9091
+      targetPort: 9091

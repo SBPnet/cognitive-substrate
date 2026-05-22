@@ -18,6 +18,7 @@ import { ensureKafkaTopics, kafkaConfigFromEnv } from "@cognitive-substrate/kafk
 import { startResponseConsumer } from "./kafka/response-consumer.js";
 import { startExperienceProducer } from "./kafka/experience-producer.js";
 import { startAuditConsumer } from "./kafka/audit-consumer.js";
+import { startMetadataProducer, getMetadataProducer } from "./kafka/metadata-producer.js";
 import { createApp } from "./server.js";
 
 const log = (msg: string): void => {
@@ -28,11 +29,12 @@ async function main(): Promise<void> {
   const shutdownTelemetry = await initTelemetry(telemetryConfigFromEnv("api-bff"));
 
   const openSearchClient = createOpenSearchClient(opensearchConfigFromEnv());
-  const app = createApp(openSearchClient);
+  const app = createApp(openSearchClient, getMetadataProducer);
   const port = Number(process.env["PORT"] ?? process.env["API_PORT"] ?? "3001");
   let stopProducer: () => Promise<void> = async () => {};
   let stopConsumer: () => Promise<void> = async () => {};
   let stopAuditConsumer: () => Promise<void> = async () => {};
+  let stopMetadataProducer: () => Promise<void> = async () => {};
 
   const server = serve({ fetch: app.fetch, hostname: "0.0.0.0", port }, () => {
     log(`Listening on http://localhost:${port}`);
@@ -50,6 +52,7 @@ async function main(): Promise<void> {
       stopProducer = await startExperienceProducer(kafkaConfig);
       stopConsumer = await startResponseConsumer(kafkaConfig);
       stopAuditConsumer = await startAuditConsumer(kafkaConfig, openSearchClient);
+      stopMetadataProducer = await startMetadataProducer(kafkaConfig);
       log("Kafka producer and consumer connected.");
     } catch (err: unknown) {
       process.stderr.write(`[api] Bootstrap error: ${String(err)}\n`);
@@ -59,6 +62,7 @@ async function main(): Promise<void> {
   const handleShutdown = async (): Promise<void> => {
     log("Shutting down...");
     server.close();
+    await stopMetadataProducer();
     await stopAuditConsumer();
     await stopConsumer();
     await stopProducer();

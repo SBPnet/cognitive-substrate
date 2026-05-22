@@ -60,27 +60,29 @@ export class CognitiveConsumer {
     for (const topic of topics) {
       await this.consumer.subscribe({ topic, fromBeginning: false });
     }
+    await this.consumer.run({ eachMessage: this.makeEachMessage(handler) });
+  }
 
-    await this.consumer.run({
-      eachMessage: async (payload: EachMessagePayload): Promise<void> => {
-        const { topic, partition, message } = payload;
+  /**
+   * Subscribes to all topics whose names match `pattern` and processes messages
+   * with a typed handler. New topics matching the pattern are picked up
+   * automatically by KafkaJS's metadata refresh cycle (no restart required).
+   */
+  async subscribeRegex<T>(pattern: RegExp, handler: MessageHandler<T>): Promise<void> {
+    await this.consumer.subscribe({ topic: pattern, fromBeginning: false });
+    await this.consumer.run({ eachMessage: this.makeEachMessage(handler) });
+  }
 
-        if (!message.value) return;
-
-        const value = JSON.parse(message.value.toString()) as T;
-        const key = message.key ? message.key.toString() : null;
-        const traceContext = extractTraceContext(message.headers ?? undefined);
-
-        await handler({
-          topic,
-          partition,
-          offset: message.offset,
-          timestamp: message.timestamp,
-          key,
-          value,
-          traceContext,
-        });
-      },
-    });
+  private makeEachMessage<T>(
+    handler: MessageHandler<T>,
+  ): (payload: EachMessagePayload) => Promise<void> {
+    return async (payload: EachMessagePayload): Promise<void> => {
+      const { topic, partition, message } = payload;
+      if (!message.value) return;
+      const value = JSON.parse(message.value.toString()) as T;
+      const key = message.key ? message.key.toString() : null;
+      const traceContext = extractTraceContext(message.headers ?? undefined);
+      await handler({ topic, partition, offset: message.offset, timestamp: message.timestamp, key, value, traceContext });
+    };
   }
 }

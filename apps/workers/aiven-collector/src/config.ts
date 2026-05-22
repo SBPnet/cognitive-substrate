@@ -6,11 +6,11 @@ export interface AivenCollectorConfig {
   readonly environment: string;
   readonly kafkaClientId: string;
   readonly metadataIntervalMs: number;
-  readonly logsIntervalMs: number;
-  readonly metricsIntervalMs: number;
-  readonly eventsIntervalMs: number;
-  readonly logLimit: number;
   readonly once: boolean;
+  // Push receiver config
+  readonly prometheusReceiverPort: number;
+  readonly kafkaLogsGroupId: string;
+  readonly logsTopicPrefix: string;
 }
 
 export function collectorConfigFromEnv(): AivenCollectorConfig {
@@ -26,11 +26,10 @@ export function collectorConfigFromEnv(): AivenCollectorConfig {
     environment: process.env["ENVIRONMENT"] ?? project,
     kafkaClientId: process.env["KAFKA_CLIENT_ID"] ?? "aiven-collector-worker",
     metadataIntervalMs: positiveInteger("AIVEN_METADATA_INTERVAL_MS", 60_000),
-    logsIntervalMs: positiveInteger("AIVEN_LOGS_INTERVAL_MS", 15_000),
-    metricsIntervalMs: positiveInteger("AIVEN_METRICS_INTERVAL_MS", 30_000),
-    eventsIntervalMs: positiveInteger("AIVEN_EVENTS_INTERVAL_MS", 60_000),
-    logLimit: positiveInteger("AIVEN_LOG_LIMIT", 100),
     once: process.env["AIVEN_COLLECTOR_ONCE"] === "true",
+    prometheusReceiverPort: positiveInteger("PROMETHEUS_RECEIVER_PORT", 9091),
+    kafkaLogsGroupId: process.env["KAFKA_LOGS_GROUP_ID"] ?? "aiven-collector-logs",
+    logsTopicPrefix: process.env["AIVEN_LOGS_TOPIC_PREFIX"] ?? "aiven.logs",
   };
 }
 

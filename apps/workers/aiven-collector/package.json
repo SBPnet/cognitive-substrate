@@ -17,7 +17,8 @@
     "@cognitive-substrate/aiven-client": "workspace:*",
     "@cognitive-substrate/kafka-bus": "workspace:*",
     "@cognitive-substrate/telemetry-otel": "workspace:*",
-    "@opentelemetry/api": "^1.9.0"
+    "@opentelemetry/api": "^1.9.0",
+    "snappyjs": "^0.7.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

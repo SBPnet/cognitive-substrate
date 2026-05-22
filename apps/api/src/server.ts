@@ -7,11 +7,13 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import type { Client } from "@opensearch-project/opensearch";
+import type { CognitiveProducer } from "@cognitive-substrate/kafka-bus";
 import { sessionsRouter } from "./routes/sessions.js";
 import { messagesRouter } from "./routes/messages.js";
 import { streamRouter } from "./routes/stream.js";
 import { createMemoriesRouter } from "./routes/memories.js";
 import { createCollectorRouter } from "./routes/collector.js";
+import { createAivenWebhookRouter } from "./routes/aiven-webhook.js";
 import {
   createPolicyRouter,
   createAgentActivityRouter,
@@ -20,7 +22,10 @@ import {
   createGoalsRouter,
 } from "./routes/policy.js";
 
-export function createApp(openSearchClient: Client): Hono {
+export function createApp(
+  openSearchClient: Client,
+  getMetadataProducer?: () => CognitiveProducer | null,
+): Hono {
   const app = new Hono();
 
   const corsOrigin = process.env["API_CORS_ORIGIN"] ?? "http://localhost:3000";
@@ -56,6 +61,10 @@ export function createApp(openSearchClient: Client): Hono {
   app.route("/api/sessions/:sessionId/goals", createGoalsRouter(openSearchClient));
 
   app.route("/api/collector", createCollectorRouter());
+
+  if (getMetadataProducer) {
+    app.route("/api/aiven/webhook", createAivenWebhookRouter(getMetadataProducer));
+  }
 
   return app;
 }
