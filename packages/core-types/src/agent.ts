@@ -54,6 +54,15 @@ export interface AgentContext {
    * the executor has not declared its capability surface (e.g. stubs).
    */
   readonly capabilities: ReadonlyArray<ToolCapability>;
+  /**
+   * Result of the tool call from the previous reasoning step. Present only
+   * during the follow-up reasoning pass so the model can formulate a final
+   * response grounded in the tool output.
+   */
+  readonly toolResult?: {
+    readonly tool: string;
+    readonly output: string;
+  };
 }
 
 /** The proposal produced by a single agent. */

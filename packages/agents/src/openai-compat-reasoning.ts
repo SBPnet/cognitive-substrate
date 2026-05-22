@@ -53,6 +53,27 @@ export class OpenAICompatReasoningModel implements ReasoningModel {
   async reason(context: AgentContext): Promise<ReasoningDecision> {
     const tools = buildOpenAITools(context.capabilities);
 
+    // Follow-up pass after tool execution: no tools offered, inject result.
+    if (context.toolResult) {
+      const response = await this.client.chat.completions.create({
+        model: this.model,
+        max_tokens: this.maxTokens,
+        messages: [
+          { role: "system", content: buildSystemPrompt(context) },
+          { role: "user", content: context.input.input.text },
+          {
+            role: "assistant",
+            content: `I retrieved results from ${context.toolResult.tool}.`,
+          },
+          {
+            role: "user",
+            content: `Tool result:\n${context.toolResult.output}\n\nNow answer the original question using this information.`,
+          },
+        ],
+      });
+      return parseResponse(response);
+    }
+
     const response = await this.client.chat.completions.create({
       model: this.model,
       max_tokens: this.maxTokens,
