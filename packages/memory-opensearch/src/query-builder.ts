@@ -85,6 +85,12 @@ export interface HybridQueryOptions {
 
   /** Relative BM25 and k-NN weights used by bool-query score fusion. */
   readonly fusion?: RetrievalFusionOptions;
+
+  /**
+   * When true, skip BM25 and use a pure knn query (required for faiss-backed
+   * indices where the hybrid query type triggers a ConjunctionDISI bug).
+   */
+  readonly knnOnly?: boolean;
 }
 
 /**
@@ -109,6 +115,7 @@ export function buildHybridQuery(options: HybridQueryOptions): Record<string, un
     includeTagFilter = true,
     retrievalMode = "legacy",
     fusion,
+    knnOnly = false,
   } = options;
 
   const retrievalBias = policy?.retrievalBias ?? 0.5;
@@ -127,6 +134,36 @@ export function buildHybridQuery(options: HybridQueryOptions): Record<string, un
 
   if (includeTagFilter && requiredTags && requiredTags.length > 0) {
     filterClauses.push({ terms: { tags: requiredTags } });
+  }
+
+  // faiss-backed indices crash with the hybrid query type (ConjunctionDISI bug
+  // in OpenSearch 3.0). Use a plain knn query with filters pushed into the
+  // knn filter clause instead.
+  if (knnOnly) {
+    return {
+      size,
+      query: filterClauses.length > 0
+        ? {
+            knn: {
+              [vectorField]: {
+                vector: Array.from(options.queryEmbedding),
+                k: options.k ?? size,
+                filter: { bool: { filter: filterClauses } },
+              },
+            },
+          }
+        : {
+            knn: {
+              [vectorField]: {
+                vector: Array.from(options.queryEmbedding),
+                k: options.k ?? size,
+              },
+            },
+          },
+      _source: {
+        excludes: ["embedding", "embedding_qwen", "embedding_nomic", "embedding_bge_m3"],
+      },
+    };
   }
 
   const lexicalQuery: Record<string, unknown> =

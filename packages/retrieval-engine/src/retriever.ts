@@ -207,12 +207,16 @@ function queryOptionsForIndex(index: RetrievalSearchIndex): {
   readonly textFields: ReadonlyArray<string>;
   readonly timestampField: "created_at" | "timestamp";
   readonly includeTagFilter: boolean;
+  readonly knnOnly?: boolean;
 } {
   if (index === "experience_events") {
     return {
       textFields: ["summary"],
       timestampField: "timestamp",
       includeTagFilter: true,
+      // experience_events uses a faiss HNSW engine which crashes with the
+      // hybrid query type (OpenSearch 3.0 ConjunctionDISI bug). Use knn-only.
+      knnOnly: true,
     };
   }
 
