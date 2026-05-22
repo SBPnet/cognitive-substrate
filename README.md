@@ -59,4 +59,6 @@ Architecture specs, articles, research paper, and whitepaper: [SBPnet/cognitive-
 
 ## License
 
-PolyForm Noncommercial 1.0.0 — see `LICENSE`.
+This project is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**. You are free to use, modify, and distribute it, provided that any derivative works or services using this code also remain open source.
+
+Commercial licensing is also available for companies that want to use this in proprietary products or services without AGPL obligations. Contact me for commercial licensing terms.
