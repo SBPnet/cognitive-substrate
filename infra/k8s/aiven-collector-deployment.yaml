@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cognitive-substrate-aiven-collector
+  labels:
+    app.kubernetes.io/name: cognitive-substrate
+    app.kubernetes.io/component: aiven-collector
+spec:
+  # Singleton: holds in-memory log offsets and seen-event dedup state.
+  # Multiple replicas would produce duplicate Kafka messages without a
+  # shared offset/dedup store; scale vertically if poll latency grows.
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cognitive-substrate
+      app.kubernetes.io/component: aiven-collector
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cognitive-substrate
+        app.kubernetes.io/component: aiven-collector
+    spec:
+      containers:
+        - name: aiven-collector
+          image: cognitive-substrate/aiven-collector:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3000
+          env:
+            - name: ENVIRONMENT
+              value: dev
+            - name: KAFKA_CLIENT_ID
+              value: aiven-collector-worker
+            - name: KAFKA_BROKERS
+              valueFrom:
+                secretKeyRef:
+                  name: cognitive-substrate-aiven
+                  key: kafka-brokers
+            - name: KAFKA_SSL
+              valueFrom:
+                secretKeyRef:
+                  name: cognitive-substrate-aiven
+                  key: kafka-ssl
+            - name: KAFKA_SASL_MECHANISM
+              valueFrom:
+                secretKeyRef:
+                  name: cognitive-substrate-aiven
+                  key: kafka-sasl-mechanism
+            - name: KAFKA_SASL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: cognitive-substrate-aiven
+                  key: kafka-username
+            - name: KAFKA_SASL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cognitive-substrate-aiven
+                  key: kafka-password
+            - name: AIVEN_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: cognitive-substrate-aiven
+                  key: aiven-token
+            - name: AIVEN_PROJECT
+              valueFrom:
+                secretKeyRef:
+                  name: cognitive-substrate-aiven
+                  key: aiven-project
+            - name: AIVEN_SERVICES
+              valueFrom:
+                secretKeyRef:
+                  name: cognitive-substrate-aiven
+                  key: aiven-services
+                  optional: true
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: cognitive-substrate-aiven
+                  key: otel-endpoint
+                  optional: true
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi

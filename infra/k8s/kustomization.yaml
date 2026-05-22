@@ -13,3 +13,4 @@ resources:
   - pattern-worker-deployment.yaml
   - reinforcement-worker-deployment.yaml
   - web-deployment.yaml
+  - aiven-collector-deployment.yaml
