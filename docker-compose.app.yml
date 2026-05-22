@@ -50,7 +50,7 @@ services:
   api:
     build:
       context: .
-      dockerfile: deploy/api/Dockerfile
+      dockerfile: apps/api/Dockerfile
     container_name: cs-api
     restart: unless-stopped
     ports:
@@ -74,7 +74,7 @@ services:
   orchestrator:
     build:
       context: .
-      dockerfile: deploy/orchestrator/Dockerfile
+      dockerfile: apps/orchestrator/Dockerfile
     container_name: cs-orchestrator
     restart: unless-stopped
     extra_hosts:
@@ -109,7 +109,7 @@ services:
     <<: *worker-common
     build:
       context: .
-      dockerfile: deploy/ingestion/Dockerfile
+      dockerfile: apps/workers/ingestion/Dockerfile
     container_name: cs-worker-ingestion
     depends_on:
       - api
@@ -128,7 +128,7 @@ services:
     <<: *worker-common
     build:
       context: .
-      dockerfile: deploy/consolidation/Dockerfile
+      dockerfile: apps/workers/consolidation/Dockerfile
     container_name: cs-worker-consolidation
     depends_on:
       - api
@@ -140,7 +140,7 @@ services:
     <<: *worker-common
     build:
       context: .
-      dockerfile: deploy/reinforcement/Dockerfile
+      dockerfile: apps/workers/reinforcement/Dockerfile
     container_name: cs-worker-reinforcement
     depends_on:
       - api
@@ -154,7 +154,7 @@ services:
     <<: *worker-common
     build:
       context: .
-      dockerfile: deploy/pattern/Dockerfile
+      dockerfile: apps/workers/pattern/Dockerfile
     container_name: cs-worker-pattern
     depends_on:
       - api
@@ -168,7 +168,7 @@ services:
     <<: *worker-common
     build:
       context: .
-      dockerfile: deploy/telemetry/Dockerfile
+      dockerfile: apps/workers/telemetry/Dockerfile
     container_name: cs-worker-telemetry
     depends_on:
       - api
@@ -187,7 +187,7 @@ services:
     <<: *worker-common
     build:
       context: .
-      dockerfile: deploy/memory-critique/Dockerfile
+      dockerfile: apps/workers/memory-critique/Dockerfile
     container_name: cs-worker-memory-critique
     depends_on:
       - api
@@ -206,7 +206,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: deploy/web/Dockerfile
+      dockerfile: apps/web/Dockerfile
       args:
         # Server-side (Next.js SSR proxy): use container name so web→api works
         # inside Docker. The browser always uses relative /api paths so this

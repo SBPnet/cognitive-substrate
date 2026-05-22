@@ -14,5 +14,5 @@ COPY --from=builder /workspace/packages ./packages
 COPY --from=builder /workspace/apps/api ./apps/api
 WORKDIR /app/apps/api
 ENV NODE_ENV=production
-EXPOSE 3001
+EXPOSE 4000
 CMD ["node", "dist/main.js"]

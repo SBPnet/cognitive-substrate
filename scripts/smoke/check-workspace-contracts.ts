@@ -69,9 +69,7 @@ async function checkKafkaTopics(): Promise<void> {
 }
 
 async function checkEnvExamples(): Promise<void> {
-  const files = (await walk(repoRoot))
-    .filter((file) => file.endsWith(".env.example"))
-    .filter((file) => !file.includes("/deploy/"));
+  const files = (await walk(repoRoot)).filter((file) => file.endsWith(".env.example"));
   const sourceText = (await allSourceContents()).map((source) => source.contents).join("\n");
   const envReadPattern = /process\.env\[['"]([^'"]+)['"]\]/g;
   const readVars = new Set([...sourceText.matchAll(envReadPattern)].map((match) => match[1]!));
@@ -127,8 +125,7 @@ async function allSourceContents(): Promise<Array<{ path: string; contents: stri
   const roots = ["apps", "packages", "scripts"];
   const files = (await Promise.all(roots.map((root) => walk(join(repoRoot, root)))))
     .flat()
-    .filter((file) => file.endsWith(".ts"))
-    .filter((file) => !file.includes("/deploy/"));
+    .filter((file) => file.endsWith(".ts"));
   return Promise.all(files.map(async (path) => ({ path, contents: await readFile(path, "utf8") })));
 }
 

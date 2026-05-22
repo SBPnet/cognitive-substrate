@@ -46,7 +46,7 @@ pnpm install
 pnpm build
 ```
 
-Requires Node 22+, pnpm 10+. A running OpenSearch instance is needed for retrieval and reinforcement experiments — see `deploy/` for Docker Compose and Aiven configurations.
+Requires Node 22+, pnpm 10+. A running OpenSearch instance is needed for retrieval and reinforcement experiments. Container images: Dockerfiles under `apps/`; thor stack in `docker-compose.app.yml`; Dashboards assets in `deploy/opensearch-dashboards/`.
 
 ## Experiments
 
