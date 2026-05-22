@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@cognitive-substrate/agents": "workspace:*",
+    "@cognitive-substrate/plugin-loader": "workspace:*",
     "@cognitive-substrate/tool-executor": "workspace:*",
     "@cognitive-substrate/constitution-engine": "workspace:*",
     "@cognitive-substrate/core-types": "workspace:*",

@@ -15,7 +15,7 @@ import { randomUUID } from "node:crypto";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
-import type { AgentContext, EventResult, ExperienceEvent, ToolCapability } from "@cognitive-substrate/core-types";
+import type { AgentContext, ContentBlock, EventResult, ExperienceEvent, ToolCapability } from "@cognitive-substrate/core-types";
 import type { ActionRequest } from "@cognitive-substrate/agents";
 import type { CognitiveProducer } from "@cognitive-substrate/kafka-bus";
 import { Topics } from "@cognitive-substrate/kafka-bus";
@@ -94,19 +94,27 @@ export class McpToolBridge {
     await client.connect(transport as Parameters<typeof client.connect>[0]);
 
     const { tools: rawTools } = await client.listTools();
-    const tools: ToolCapability[] = rawTools.map((t) => ({
-      tool: mcpToolName(cfg.name, t.name),
-      description: `[MCP:${cfg.name}] ${t.description ?? t.name}`,
-      parameters: Object.entries(
-        (t.inputSchema as { properties?: Record<string, { type?: string }> }).properties ?? {},
-      ).map(([name, schema]) => ({
-        name,
-        type: (schema as { type?: string }).type ?? "string",
-        required: (
-          (t.inputSchema as { required?: string[] }).required ?? []
-        ).includes(name),
-      })),
-    }));
+    const tools: ToolCapability[] = rawTools.map((t) => {
+      const schema = t.inputSchema as {
+        properties?: Record<string, { type?: string; description?: string }>;
+        required?: string[];
+      };
+      const properties = schema.properties ?? {};
+      const required = schema.required ?? [];
+      return {
+        tool: mcpToolName(cfg.name, t.name),
+        description: `[MCP:${cfg.name}] ${t.description ?? t.name}`,
+        // Preserve the full JSON Schema for MCP-aware consumers.
+        inputSchema: t.inputSchema as Record<string, unknown>,
+        // Flat view for internal agents that enumerate parameters.
+        parameters: Object.entries(properties).map(([name, prop]) => ({
+          name,
+          type: prop.type ?? "string",
+          required: required.includes(name),
+          ...(prop.description ? { description: prop.description } : {}),
+        })),
+      };
+    });
 
     this.servers.push({ name: cfg.name, client, tools });
   }
@@ -141,17 +149,41 @@ export class McpToolBridge {
         arguments: (action.parameters ?? {}) as Record<string, unknown>,
       });
 
-      const content = response.content as Array<{ type: string; text?: string }>;
+      const rawContent = response.content as Array<Record<string, unknown>>;
+      const content: ContentBlock[] = rawContent.map((b) => {
+        if (b["type"] === "image") {
+          return {
+            type: "image" as const,
+            data: String(b["data"] ?? ""),
+            mimeType: String(b["mimeType"] ?? "application/octet-stream"),
+          };
+        }
+        if (b["type"] === "resource_link") {
+          return {
+            type: "resource_link" as const,
+            uri: String(b["uri"] ?? ""),
+            ...(b["name"] !== undefined ? { name: String(b["name"]) } : {}),
+            ...(b["description"] !== undefined ? { description: String(b["description"]) } : {}),
+            ...(b["mimeType"] !== undefined ? { mimeType: String(b["mimeType"]) } : {}),
+          };
+        }
+        // Default: treat as text block (covers "text" and any unknown types).
+        return { type: "text" as const, text: String(b["text"] ?? "") };
+      });
+
       const outputText = content
-        .filter((b) => b.type === "text")
-        .map((b) => b.text ?? "")
+        .filter((b): b is { type: "text"; text: string } => b.type === "text")
+        .map((b) => b.text)
         .join("\n");
 
+      const isError = Boolean(response.isError);
       result = {
         output: outputText || "(empty response)",
-        success: !response.isError,
+        success: !isError,
+        isError,
+        content,
         latencyMs: Date.now() - start,
-        ...(response.isError ? { errorCode: "MCP_TOOL_ERROR" } : {}),
+        ...(isError ? { errorCode: "MCP_TOOL_ERROR" } : {}),
       };
     } catch (err) {
       result = {

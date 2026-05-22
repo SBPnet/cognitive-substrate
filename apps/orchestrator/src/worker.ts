@@ -16,6 +16,7 @@ import {
   initTelemetry,
   telemetryConfigFromEnv,
 } from "@cognitive-substrate/telemetry-otel";
+import { loadPluginsFromEnv } from "@cognitive-substrate/plugin-loader";
 import { queryEmbedderFromEnv } from "./embedder.js";
 import { createSocietyLoop } from "./society.js";
 import { AgentActionPublisher } from "./publishers.js";
@@ -41,10 +42,30 @@ export async function startOrchestrator(): Promise<void> {
   const producer = new CognitiveProducer({ kafka, enableAuditMirror: true });
   await producer.connect();
 
+  log("Loading plugins...");
+  const plugins = await loadPluginsFromEnv();
+
+  const csEngineName = process.env["CS_ENGINE"];
+  const matchedEngine = csEngineName
+    ? plugins.engines.find((e) => e.name === csEngineName)
+    : undefined;
+  if (csEngineName !== undefined && matchedEngine === undefined) {
+    throw new Error(
+      `[orchestrator] CS_ENGINE="${csEngineName}" is set but no loaded engine plugin declares that name. ` +
+        `Loaded engines: [${plugins.engines.map((e) => e.name).join(", ")}]`,
+    );
+  }
+
+  const pluginToolExecutors = await Promise.all(
+    plugins.toolExecutors.map((p) => p.create()),
+  );
+
   const loop = await createSocietyLoop({
     openSearchClient,
     producer,
     embedder,
+    ...(matchedEngine !== undefined && { pluginReasoningModel: matchedEngine.create() }),
+    pluginToolExecutors,
   });
   const agentActionPublisher = new AgentActionPublisher(producer);
 

@@ -278,6 +278,45 @@ function buildTags(event: TelemetryEvent): string[] {
 // Main mapper
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Registry bridge
+// ---------------------------------------------------------------------------
+
+// Imported here so mapper-registry.ts can import from plugin-loader without
+// creating a circular dependency (mapper.ts → mapper-registry.ts → plugin-loader,
+// but plugin-loader does not import from ingest-worker).
+import type { IngestMapperRegistry } from "./mapper-registry.js";
+
+/**
+ * Registers all built-in TelemetryEvent type handlers into a registry.
+ * Call this once at startup before loading plugin mappers so that built-in
+ * types are always available and plugins cannot silently shadow them.
+ */
+export function registerBuiltinMappers(registry: IngestMapperRegistry): void {
+  const builtinTypes: ReadonlyArray<TelemetryEvent["type"]> = [
+    "page_view",
+    "article_complete",
+    "scroll_depth",
+    "copy_code",
+    "snippet_copy",
+    "repo_click",
+    "search_query",
+    "focus_gain",
+    "focus_loss",
+    "related_article_click",
+    "outbound_link",
+    "nav_click",
+    "tag_click",
+    "series_nav_click",
+  ];
+
+  for (const type of builtinTypes) {
+    registry.register(type, (ev) =>
+      mapTelemetryToExperience(ev as TelemetryEvent),
+    );
+  }
+}
+
 export function mapTelemetryToExperience(event: TelemetryEvent): ExperienceEvent {
   const context: EventContext = {
     sessionId: event.sessionId,

@@ -46,12 +46,45 @@ export interface EventAction {
   readonly reasoning?: string;
 }
 
+/**
+ * A single block in an MCP-compatible content array.
+ * Only `text` blocks are common for tool results; `image` and `resource_link`
+ * are included for full spec coverage.
+ */
+export type ContentBlock =
+  | { readonly type: "text"; readonly text: string }
+  | { readonly type: "image"; readonly data: string; readonly mimeType: string }
+  | {
+      readonly type: "resource_link";
+      readonly uri: string;
+      readonly name?: string;
+      readonly description?: string;
+      readonly mimeType?: string;
+    };
+
 /** The observed outcome of the action. */
 export interface EventResult {
+  /**
+   * Flat text output. For MCP-sourced results this is the concatenation of
+   * all `text` content blocks — kept for internal consumers that expect a
+   * single string. Prefer `content` when the full structured response matters.
+   */
   readonly output: string;
+  /** Convenience inverse of `isError`. True when the tool call succeeded. */
   readonly success: boolean;
   readonly latencyMs?: number;
   readonly errorCode?: string;
+  /**
+   * MCP-compatible structured content array. Present when the result came
+   * from an MCP tool call or a plugin that returns rich content. When absent,
+   * callers should fall back to `output`.
+   */
+  readonly content?: ReadonlyArray<ContentBlock>;
+  /**
+   * MCP wire-format error flag. True when the tool itself returned an error
+   * result (as opposed to a transport/invocation failure). Inverse of `success`.
+   */
+  readonly isError?: boolean;
 }
 
 /** Evaluation metadata used by the reinforcement engine. */

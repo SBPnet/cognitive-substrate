@@ -90,6 +90,9 @@ importers:
       '@cognitive-substrate/memory-opensearch':
         specifier: workspace:*
         version: link:../../packages/memory-opensearch
+      '@cognitive-substrate/plugin-loader':
+        specifier: workspace:*
+        version: link:../../packages/plugin-loader
       '@cognitive-substrate/policy-engine':
         specifier: workspace:*
         version: link:../../packages/policy-engine
@@ -680,6 +683,9 @@ importers:
       '@cognitive-substrate/memory-opensearch':
         specifier: workspace:*
         version: link:../memory-opensearch
+      '@cognitive-substrate/plugin-loader':
+        specifier: workspace:*
+        version: link:../plugin-loader
       '@opensearch-project/opensearch':
         specifier: ^2.7.0
         version: 2.13.0
@@ -760,6 +766,22 @@ importers:
       '@cognitive-substrate/kafka-bus':
         specifier: workspace:*
         version: link:../kafka-bus
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.19.18
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
+
+  packages/plugin-loader:
+    dependencies:
+      '@cognitive-substrate/agents':
+        specifier: workspace:*
+        version: link:../agents
+      '@cognitive-substrate/core-types':
+        specifier: workspace:*
+        version: link:../core-types
     devDependencies:
       '@types/node':
         specifier: ^22.0.0

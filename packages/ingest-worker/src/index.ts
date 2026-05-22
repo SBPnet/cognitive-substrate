@@ -30,7 +30,9 @@ import {
   createOpenSearchClient,
   opensearchConfigFromEnv,
 } from "@cognitive-substrate/memory-opensearch";
-import { mapTelemetryToExperience, type TelemetryEvent } from "./mapper.js";
+import { loadPluginsFromEnv } from "@cognitive-substrate/plugin-loader";
+import { registerBuiltinMappers } from "./mapper.js";
+import { IngestMapperRegistry, type RawEvent } from "./mapper-registry.js";
 import { ExperienceWriter } from "./writer.js";
 
 async function main(): Promise<void> {
@@ -43,6 +45,14 @@ async function main(): Promise<void> {
   console.log("[ingest-worker] Ensuring Kafka topics exist...");
   await ensureKafkaTopics(kafkaConfig, [Topics.TELEMETRY_LOGS_RAW]);
   console.log("[ingest-worker] Topics ready.");
+
+  // Build the mapper registry: built-in types first, then any CS_PLUGINS.
+  const plugins = await loadPluginsFromEnv();
+  const registry = new IngestMapperRegistry();
+  registerBuiltinMappers(registry);
+  for (const mapperPlugin of plugins.ingestMappers) {
+    registry.registerPlugin(mapperPlugin);
+  }
 
   const osClient = createOpenSearchClient(opensearchConfigFromEnv());
   const writer = new ExperienceWriter({
@@ -76,7 +86,7 @@ async function main(): Promise<void> {
   process.on("SIGTERM", () => { void shutdown("SIGTERM"); });
   process.on("SIGINT",  () => { void shutdown("SIGINT"); });
 
-  await consumer.subscribe<TelemetryEvent>(
+  await consumer.subscribe<RawEvent>(
     [Topics.TELEMETRY_LOGS_RAW],
     async (message) => {
       const event = message.value;
@@ -86,8 +96,10 @@ async function main(): Promise<void> {
         return;
       }
 
-      const experience = mapTelemetryToExperience(event);
-      await writer.write(experience);
+      const experience = registry.map(event);
+      if (experience !== null) {
+        await writer.write(experience);
+      }
     },
   );
 }

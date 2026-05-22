@@ -1,0 +1,28 @@
+{
+  "name": "@cognitive-substrate/plugin-loader",
+  "version": "0.1.0",
+  "description": "Runtime plugin loading for cognitive-substrate — ingest mappers, reasoning engines, and tool executors",
+  "license": "PolyForm-Noncommercial-1.0.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "clean": "rm -rf dist *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@cognitive-substrate/agents": "workspace:*",
+    "@cognitive-substrate/core-types": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.5.0"
+  }
+}

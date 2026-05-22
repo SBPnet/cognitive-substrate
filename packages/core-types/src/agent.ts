@@ -21,14 +21,23 @@ export type AgentType =
  * A single tool that the ToolExecutor can invoke. Agents receive the
  * capability manifest at context-build time so that planners can scope
  * proposals to available tools and critics can flag unavailable ones.
+ *
+ * `inputSchema` is a JSON Schema object (MCP wire format). When present it
+ * is the authoritative parameter description. `parameters` is a flattened
+ * convenience view kept for backwards compatibility with internal tools that
+ * declare simple name/type/required tuples.
  */
 export interface ToolCapability {
   readonly tool: string;
   readonly description: string;
+  /** JSON Schema describing the tool's input (MCP-compatible). */
+  readonly inputSchema?: Readonly<Record<string, unknown>>;
+  /** Flat parameter list. Use `inputSchema` for complex or nested schemas. */
   readonly parameters?: ReadonlyArray<{
     readonly name: string;
     readonly type: string;
     readonly required: boolean;
+    readonly description?: string;
   }>;
 }
 
