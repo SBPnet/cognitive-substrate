@@ -29,8 +29,11 @@ TypeScript monorepo implementing a persistent, learnable cognitive memory substr
 | `dream-engine` | Offline consolidation and memory replay |
 | `abstraction-engine` | Hierarchical abstraction over episodic clusters |
 | `budget-engine` | Cognitive resource budgeting and prioritisation |
-| `agents` | Agent runtime: debate, arbitration, multi-agent orchestration |
-| `kafka-bus` | Kafka topic definitions, producer/consumer helpers |
+| `agents` | Cognitive loop session and agent runtime primitives |
+| `plugin-loader` | Runtime plugin loading for ingest mappers, reasoning engines, and tool executors |
+| `tool-executor` | Built-in and MCP-backed ToolExecutor implementations (WebFetch, MemorySearch, WriteExperience) |
+| `kafka-bus` | Typed Kafka producers, consumers, topic registry, and trace propagation |
+| `ingest-worker` | Kafka consumer mapping TelemetryEvents to ExperienceEvents and indexing into OpenSearch |
 | `clickhouse-telemetry` | ClickHouse telemetry sink for operational metrics |
 | `telemetry-otel` | OpenTelemetry instrumentation |
 | `aiven-client` | Aiven platform client utilities |
