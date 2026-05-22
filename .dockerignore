@@ -1,0 +1,6 @@
+# Exclude compiled output -- Docker builds always compile from source.
+# Without this, tsbuildinfo files in dist/ cause tsc incremental builds
+# to skip recompilation even when source has changed.
+**/dist
+**/node_modules
+**/.next
