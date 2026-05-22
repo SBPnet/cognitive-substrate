@@ -212,6 +212,10 @@ services:
         # inside Docker. The browser always uses relative /api paths so this
         # only affects server-side rewrites, not client-side fetches.
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://cs-api:4000}
+        # SSE connections bypass the Next.js proxy (which buffers responses and
+        # breaks long-lived streams). The browser connects directly to the API.
+        # Set NEXT_PUBLIC_SSE_URL to the host:port reachable from the browser.
+        NEXT_PUBLIC_SSE_URL: ${NEXT_PUBLIC_SSE_URL:-http://thor.local:4000}
     container_name: cs-web
     restart: unless-stopped
     ports:

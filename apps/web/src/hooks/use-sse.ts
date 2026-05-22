@@ -3,11 +3,12 @@
 import { useEffect, useRef } from "react";
 import type { InteractionResponseDto, SseEnvelope } from "@/lib/api-client";
 
-// SSE connections always use a relative path so the browser routes through
-// the Next.js rewrite proxy (which handles the internal container URL).
-// Never use NEXT_PUBLIC_API_URL here — that bakes in the internal Docker
-// hostname (e.g. http://cs-api:4000) which is unreachable from the browser.
-const API_ORIGIN = "";
+// SSE connections bypass the Next.js rewrite proxy (which buffers responses
+// and breaks long-lived streams). Connect directly to the API using the
+// browser-accessible URL. NEXT_PUBLIC_SSE_URL must be set at build time to
+// the host:port reachable from the browser (e.g. http://thor.local:4000).
+// Falls back to empty string (relative) for local dev where API is on :3001.
+const API_ORIGIN = process.env["NEXT_PUBLIC_SSE_URL"] ?? "";
 
 export interface SseCallbacks {
   onResponse: (response: InteractionResponseDto) => void;
