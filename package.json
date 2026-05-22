@@ -28,7 +28,7 @@
     "eval:baseline": "pnpm tsx scripts/eval/run-evaluations.ts",
     "clean": "pnpm -r clean",
     "docker:build": "docker compose -f docker-compose.app.yml build",
-    "docker:up": "docker compose -f docker-compose.app.yml up -d",
+    "docker:up": "COMPOSE_IGNORE_ORPHANS=1 docker compose -f docker-compose.app.yml up -d",
     "docker:reload": "pnpm docker:build && pnpm docker:up"
   },
   "devDependencies": {
