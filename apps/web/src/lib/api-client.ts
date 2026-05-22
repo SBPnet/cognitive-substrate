@@ -181,6 +181,44 @@ export async function getAgentActivity(
 }
 
 // ---------------------------------------------------------------------------
+// Document Ingestion
+// ---------------------------------------------------------------------------
+
+export interface IngestDocumentResult {
+  filename: string;
+  format: string;
+  chunks: number;
+  eventIds: string[];
+}
+
+export interface IngestDocumentsResponse {
+  documents: IngestDocumentResult[];
+  totalChunks: number;
+}
+
+export async function ingestDocuments(
+  sessionId: string,
+  files: File[],
+  options?: { importance?: number; tags?: string },
+): Promise<IngestDocumentsResponse> {
+  const form = new FormData();
+  for (const file of files) form.append("files", file);
+  if (options?.importance !== undefined) form.append("importance", String(options.importance));
+  if (options?.tags) form.append("tags", options.tags);
+
+  // Do not set Content-Type — browser sets it with the correct multipart boundary
+  const res = await fetch(`${API_BASE}/sessions/${sessionId}/documents`, {
+    method: "POST",
+    body: form,
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({ error: res.statusText })) as { error?: string };
+    throw new Error(body.error ?? `Ingest failed: ${res.status}`);
+  }
+  return res.json() as Promise<IngestDocumentsResponse>;
+}
+
+// ---------------------------------------------------------------------------
 // Collector Control
 // ---------------------------------------------------------------------------
 

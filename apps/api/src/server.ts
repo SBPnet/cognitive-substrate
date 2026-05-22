@@ -21,6 +21,7 @@ import {
   createIdentityRouter,
   createGoalsRouter,
 } from "./routes/policy.js";
+import { createDocumentsRouter } from "./routes/documents.js";
 
 export function createApp(
   openSearchClient: Client,
@@ -40,6 +41,7 @@ export function createApp(
   app.route("/api/sessions", sessionsRouter);
 
   app.route("/api/sessions/:sessionId/messages", messagesRouter);
+  app.route("/api/sessions/:sessionId/documents", createDocumentsRouter());
   app.route("/api/sessions/:sessionId/stream", streamRouter);
 
   const memoriesRouter = createMemoriesRouter(openSearchClient);
