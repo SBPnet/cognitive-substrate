@@ -34,10 +34,12 @@ export class CognitiveConsumer {
   constructor(config: CognitiveConsumerConfig) {
     this.consumer = config.kafka.consumer({
       groupId: config.groupId,
-      // 30s session timeout gives fast rebalance on restart.
-      // heartbeatInterval must be < sessionTimeout/3 per KafkaJS docs.
-      sessionTimeout: 30_000,
-      heartbeatInterval: 3_000,
+      // 5 min session timeout accommodates slow handlers (two LLM round-trips
+      // can take 60-90s). heartbeatInterval must be < sessionTimeout/3.
+      // Without this, Kafka ejects the member mid-processing and redelivers
+      // the message, causing duplicate responses.
+      sessionTimeout: 300_000,
+      heartbeatInterval: 10_000,
     });
   }
 
