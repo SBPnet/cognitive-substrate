@@ -58,3 +58,6 @@ otel-data/
 
 # Source chat transcripts (never committed — keep private)
 docs/source-chats/
+
+# Cursor IDE (local rules, agents, hooks — never commit)
+.cursor/

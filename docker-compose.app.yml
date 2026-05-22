@@ -2,6 +2,7 @@
 #
 # Requires the infra stack to be running first:
 #   docker compose -f docker-compose.thor.yml up -d
+# Optional Dashboards UI: --profile dashboards (see deploy/opensearch-dashboards/README.md)
 #
 # This file joins the infra stack's default network so services can reach
 # kafka, opensearch-node1, clickhouse, and minio by container name.

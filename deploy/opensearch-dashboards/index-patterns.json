@@ -1,0 +1,15 @@
+[
+  { "id": "experience-events", "title": "experience_events", "timeFieldName": "timestamp" },
+  { "id": "memory-semantic", "title": "memory_semantic", "timeFieldName": "created_at" },
+  { "id": "policy-state", "title": "policy_state", "timeFieldName": "timestamp" },
+  { "id": "agent-activity", "title": "agent_activity", "timeFieldName": "timestamp" },
+  { "id": "world-model-predictions", "title": "world_model_predictions", "timeFieldName": "timestamp" },
+  { "id": "goal-system", "title": "goal_system", "timeFieldName": "created_at" },
+  { "id": "identity-state", "title": "identity_state", "timeFieldName": "timestamp" },
+  { "id": "self-modifications", "title": "self_modifications", "timeFieldName": "timestamp" },
+  { "id": "memory-links", "title": "memory_links", "timeFieldName": "created_at" },
+  { "id": "retrieval-feedback", "title": "retrieval_feedback", "timeFieldName": "timestamp" },
+  { "id": "operational-patterns", "title": "operational_patterns", "timeFieldName": "updated_at" },
+  { "id": "audit-events", "title": "audit_events", "timeFieldName": "timestamp" },
+  { "id": "model-registry", "title": "model_registry", "timeFieldName": "registered_at" }
+]

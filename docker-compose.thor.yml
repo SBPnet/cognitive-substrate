@@ -5,7 +5,7 @@
 #   opensearch-node2   data + ingest                       9201 / 9301
 #   opensearch-ml1     ml only (no data, no manager)       9202 / 9302
 #   opensearch-ml2     ml only (no data, no manager)       9203 / 9303
-#   opensearch-dashboards                                   5601
+#   opensearch-dashboards (profile: dashboards)             5601
 #
 # Heap sizing (rule: 50% of RAM up to 32GB per node, never exceed 31g)
 #   node1 / node2 : 24g  — data nodes need headroom for shard field data cache
@@ -22,6 +22,8 @@
 #
 # Usage:
 #   docker compose -f docker-compose.thor.yml up -d
+#   docker compose -f docker-compose.thor.yml --profile dashboards up -d opensearch-dashboards
+#   DASHBOARDS_URL=http://thor:5601 ./scripts/thor/bootstrap-dashboards.sh
 #   docker compose -f docker-compose.thor.yml logs -f opensearch-node1
 #   docker compose -f docker-compose.thor.yml down          # stop, keep data
 #   docker compose -f docker-compose.thor.yml down -v       # stop, delete data
@@ -171,10 +173,12 @@ services:
       - opensearch-ml2-data:/usr/share/opensearch/data
 
   # ---------------------------------------------------------------------------
-  # Dashboards — cluster management and ML model registry UI
-  # http://thor:5601  (or localhost:5601 from thor itself)
+  # Dashboards — optional dev UI (not started by default)
+  #   docker compose -f docker-compose.thor.yml --profile dashboards up -d
+  # http://thor:5601 — bootstrap index patterns: scripts/thor/bootstrap-dashboards.sh
   # ---------------------------------------------------------------------------
   opensearch-dashboards:
+    profiles: [dashboards]
     image: opensearchproject/opensearch-dashboards:3.0.0
     container_name: opensearch-dashboards
     restart: unless-stopped
