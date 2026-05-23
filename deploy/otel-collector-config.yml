@@ -32,25 +32,18 @@ processors:
         action: upsert
 
 exporters:
-  kafka/metrics:
+  kafka:
     brokers:
       - ${env:KAFKA_BROKERS}
-    topic: telemetry.metrics.otlp
-    encoding: otlp_json
-    producer:
-      compression: snappy
-  kafka/logs:
-    brokers:
-      - ${env:KAFKA_BROKERS}
-    topic: telemetry.logs.raw
-    encoding: otlp_json
-    producer:
-      compression: snappy
-  kafka/traces:
-    brokers:
-      - ${env:KAFKA_BROKERS}
-    topic: telemetry.traces.raw
-    encoding: otlp_json
+    metrics:
+      topic: telemetry.metrics.otlp
+      encoding: otlp_json
+    logs:
+      topic: telemetry.logs.raw
+      encoding: otlp_json
+    traces:
+      topic: telemetry.traces.raw
+      encoding: otlp_json
     producer:
       compression: snappy
 
@@ -59,12 +52,12 @@ service:
     metrics:
       receivers: [otlp]
       processors: [memory_limiter, resource, batch]
-      exporters: [kafka/metrics]
+      exporters: [kafka]
     logs:
       receivers: [otlp]
       processors: [memory_limiter, resource, batch]
-      exporters: [kafka/logs]
+      exporters: [kafka]
     traces:
       receivers: [otlp]
       processors: [memory_limiter, resource, batch]
-      exporters: [kafka/traces]
+      exporters: [kafka]
