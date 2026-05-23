@@ -1,85 +1,162 @@
-# Plugin Development Guide
+# Plugin Guide
 
-The cognitive-substrate plugin system lets you extend three parts of the runtime without touching the orchestrator or ingest-worker source code:
+The cognitive-substrate plugin system extends three parts of the runtime without touching core source:
 
-| Plugin kind | What it does |
+| Kind | What it does |
 |---|---|
-| `ingest-mapper` | Handles new raw event types arriving from Kafka and maps them to `ExperienceEvent` |
-| `engine` | Provides a custom `ReasoningModel` implementation (LLM, rule-based, etc.) |
-| `tool-executor` | Adds new tools the cognitive loop can call during a session |
-
-Every plugin is a normal pnpm workspace package. It exports one named constant and is activated with a single environment variable.
+| `ingest-mapper` | Claims raw event types from Kafka and maps them to `ExperienceEvent` objects. Optionally contributes a webhook receiver so an external service can push events directly to the API. |
+| `engine` | Provides a custom `ReasoningModel` (LLM, rule-based, etc.) selected by `CS_ENGINE`. |
+| `tool-executor` | Adds tools the cognitive loop can call during a session. |
 
 ---
 
-## How it works
+## How plugins load
 
-At startup, both the orchestrator and the ingest-worker read the `CS_PLUGINS` environment variable:
+At startup, the API, the orchestrator, and the ingest-worker all read `CS_PLUGINS`:
 
 ```
-CS_PLUGINS=@my-org/cs-plugin-github-events,@my-org/cs-plugin-gpt4o
+CS_PLUGINS=@cognitive-substrate/plugin-slack,@cognitive-substrate/plugin-jira
 ```
 
-Each name is a bare package specifier. The loader calls `await import(name)` on each, validates the exported `plugin` object, and wires it into the appropriate slot. If any plugin fails to import or export a valid manifest, the process exits immediately — broken plugins never degrade silently.
+The value is a comma-separated list of **bare npm package specifiers**. The loader calls `await import(name)` on each, validates the exported `plugin` object, and wires it into the appropriate slot. If any plugin fails to import or export a valid manifest, the process exits immediately -- broken plugins never degrade silently.
+
+Startup output confirms what loaded:
+
+```
+[plugin-loader] Loaded ingest-mapper plugin: @cognitive-substrate/plugin-slack
+[plugin-loader] Loaded ingest-mapper plugin: @cognitive-substrate/plugin-jira
+```
 
 ---
 
-## Package structure
+## Two models: monorepo vs. external repo
 
-Every plugin follows the same layout. Place it anywhere covered by the pnpm workspace glob (`packages/*` or `apps/workers/*`):
+Plugins can live inside the monorepo or in their own independent repositories. Choose based on how tightly coupled the plugin is to the core system.
+
+### Model A: inside the monorepo (workspace plugin)
+
+Use this when the plugin is tightly coupled to core type changes or is only ever used by this deployment.
+
+Place the package anywhere covered by the pnpm workspace glob (`packages/*` or `apps/workers/*`):
 
 ```
-packages/cs-plugin-<name>/
-  package.json
+packages/plugin-<name>/
+  package.json    ← workspace:* deps, extends ../../tsconfig.base.json
   tsconfig.json
-  src/
-    index.ts        ← exports `plugin`
+  src/index.ts
 ```
 
-### `package.json`
+`package.json` declares workspace deps:
 
 ```json
 {
-  "name": "@cognitive-substrate/cs-plugin-<name>",
-  "version": "0.1.0",
-  "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
-  },
-  "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
-  },
   "dependencies": {
-    "@cognitive-substrate/core-types": "workspace:*"
+    "@cognitive-substrate/core-types": "workspace:*",
+    "@cognitive-substrate/plugin-loader": "workspace:*"
+  }
+}
+```
+
+Build before activating:
+
+```bash
+pnpm --filter @my-org/plugin-name build
+```
+
+pnpm workspace symlinks handle resolution -- the bare package specifier in `CS_PLUGINS` resolves through `node_modules` without any path configuration.
+
+### Model B: external repo (independent plugin)
+
+Use this when the plugin is developed independently, versioned separately, or shared across deployments. This is the model used by the official first-party plugins (`plugin-slack`, `plugin-zendesk`, `plugin-jira`).
+
+The plugin lives in its own git repo (e.g. `~/Workspace/cognitive-substrate-plugin-slack`). Its `package.json` declares peer deps instead of workspace deps:
+
+```json
+{
+  "peerDependencies": {
+    "@cognitive-substrate/core-types": "^0.1.0",
+    "@cognitive-substrate/kafka-bus": "^0.1.0",
+    "@cognitive-substrate/plugin-loader": "^0.1.0",
+    "hono": "^4.6.0"
   },
   "devDependencies": {
-    "@cognitive-substrate/plugin-loader": "workspace:*",
+    "@cognitive-substrate/core-types": "^0.1.0",
+    "@cognitive-substrate/kafka-bus": "^0.1.0",
+    "@cognitive-substrate/plugin-loader": "^0.1.0",
     "@types/node": "^22.0.0",
+    "hono": "^4.6.14",
     "typescript": "^5.5.0"
   }
 }
 ```
 
-> `@cognitive-substrate/plugin-loader` is a dev dependency — you only need it for the TypeScript types. `@cognitive-substrate/core-types` is a runtime dependency if your mapper references `ExperienceEvent`.
+Peer deps are provided by the host application at runtime -- you only need dev deps listed to typecheck and build the plugin itself.
 
-### `tsconfig.json`
+---
+
+## How the deployment finds external plugins
+
+Node resolves `import(name)` by searching `node_modules` relative to the importing file. So **the plugin must be installed in the deployment's `node_modules`** before the process starts. There are two ways to do this:
+
+### Option 1: npm install (recommended for production)
+
+If the plugin is published to npm (public or private registry), add it to the service's `package.json` as a regular dependency:
 
 ```json
 {
-  "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "rootDir": "src",
-    "outDir": "dist",
-    "tsBuildInfoFile": "dist/.tsbuildinfo"
-  },
-  "include": ["src"]
+  "dependencies": {
+    "@cognitive-substrate/plugin-slack": "^0.1.0",
+    "@cognitive-substrate/plugin-jira": "^0.1.0"
+  }
 }
+```
+
+Then `npm install` / `pnpm install` installs it alongside everything else. Set `CS_PLUGINS` in the deployment environment and no other config is needed.
+
+### Option 2: local path (for development)
+
+When developing a plugin locally before publishing, add it to this monorepo's `pnpm-workspace.yaml` temporarily:
+
+```yaml
+packages:
+  - "packages/*"
+  - "apps/*"
+  - "apps/workers/*"
+  - "../cognitive-substrate-plugin-slack"   # local checkout
+```
+
+Then `pnpm install` creates a workspace symlink and the bare specifier resolves as normal. Remove the entry and run `pnpm install` again when you publish the package and switch to `npm install`.
+
+### Setting `CS_PLUGINS` in each service
+
+Every service that needs the plugin must have `CS_PLUGINS` set. The ingest-worker uses it to register mappers; the API uses it to mount webhook routes. They can be set independently if you only need one side.
+
+**Docker Compose:**
+
+```yaml
+services:
+  ingest-worker:
+    environment:
+      CS_PLUGINS: "@cognitive-substrate/plugin-slack,@cognitive-substrate/plugin-jira"
+
+  api:
+    environment:
+      CS_PLUGINS: "@cognitive-substrate/plugin-slack,@cognitive-substrate/plugin-jira"
+      SLACK_SIGNING_SECRET: "your-slack-signing-secret"
+      JIRA_WEBHOOK_SECRET: "your-jira-token"
+```
+
+**Kubernetes:**
+
+```yaml
+env:
+  - name: CS_PLUGINS
+    value: "@cognitive-substrate/plugin-slack,@cognitive-substrate/plugin-jira"
+  - name: SLACK_SIGNING_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: slack-credentials
+        key: signing-secret
 ```
 
 ---
@@ -88,57 +165,51 @@ packages/cs-plugin-<name>/
 
 ### 1. Ingest mapper
 
-An ingest-mapper plugin claims one or more `event.type` strings from the Kafka message stream and converts them to `ExperienceEvent` objects for the memory pipeline.
-
-**When to use:** You have a new data source (GitHub webhooks, IoT sensors, Stripe events, etc.) that publishes messages to the `telemetry.logs.raw` Kafka topic with a type string not already handled by the built-in mapper.
-
-**Interface:**
+Claims one or more `event.type` strings from `telemetry.logs.raw` and converts them to `ExperienceEvent` objects. Optionally provides a webhook receiver.
 
 ```typescript
 interface IngestMapperPlugin {
   readonly kind: "ingest-mapper";
-  readonly handles: ReadonlyArray<string>; // the event.type values this plugin owns
+  readonly handles: ReadonlyArray<string>;
   map(event: unknown): ExperienceEvent | null;
+  // optional: contribute a Hono router mounted at /api/webhooks/<handles[0]>
+  createWebhookRouter?(getProducer: () => CognitiveProducer | null): Hono;
 }
 ```
 
-`map()` receives the raw Kafka message value (typed as `unknown` — you own the type guard). Return a fully-populated `ExperienceEvent` or `null` to silently skip the event.
+`map()` receives the raw Kafka message value. Return a fully-populated `ExperienceEvent` or `null` to silently skip the event. Throw to surface a hard failure.
+
+`createWebhookRouter()` is called by the API at startup if the function is present. The router is mounted at `/api/webhooks/<handles[0]>`. The `getProducer` getter returns the shared `CognitiveProducer` connected to Kafka -- use it to publish raw events to `Topics.TELEMETRY_LOGS_RAW`, which the ingest-worker will then pick up and pass through `map()`.
 
 **`importanceScore` guidance:**
 
 | Signal strength | Range |
 |---|---|
-| Strong intent (purchase, commit, completion) | 0.75 – 1.0 |
-| Active engagement (click, search, deep interaction) | 0.50 – 0.75 |
-| Passive signal (view, hover, low-depth scroll) | 0.10 – 0.40 |
+| Strong intent (purchase, commit, completion) | 0.75 - 1.0 |
+| Active engagement (click, search, interaction) | 0.50 - 0.75 |
+| Passive signal (view, hover, low-depth scroll) | 0.10 - 0.40 |
 
-**Example — GitHub push events:**
+**`embedding` must always be an empty array.** The OpenSearch ingest pipeline generates embeddings from `input.text` at index time. Never compute embeddings in a plugin.
+
+**Example -- GitHub push events (mapper only, no webhook receiver):**
 
 ```typescript
-// src/index.ts
 import { randomUUID } from "node:crypto";
-import type { ExperienceEvent, EventContext } from "@cognitive-substrate/core-types";
+import type { ExperienceEvent } from "@cognitive-substrate/core-types";
 import type { IngestMapperPlugin } from "@cognitive-substrate/plugin-loader";
 
 interface GitHubPushEvent {
   type: "github_push";
   sessionId: string;
   timestamp: string;
-  payload: {
-    repository: string;
-    branch: string;
-    commitCount: number;
-    author: string;
-    message: string;
-  };
+  repository: string;
+  branch: string;
+  commitCount: number;
+  message: string;
 }
 
 function isGitHubPushEvent(ev: unknown): ev is GitHubPushEvent {
-  return (
-    typeof ev === "object" &&
-    ev !== null &&
-    (ev as { type?: unknown }).type === "github_push"
-  );
+  return typeof ev === "object" && ev !== null && (ev as { type?: unknown }).type === "github_push";
 }
 
 export const plugin: IngestMapperPlugin = {
@@ -147,219 +218,108 @@ export const plugin: IngestMapperPlugin = {
 
   map(event: unknown): ExperienceEvent | null {
     if (!isGitHubPushEvent(event)) return null;
-
-    const { payload } = event;
-
-    // Skip noise — single-commit pushes to non-main branches have low signal
-    if (payload.commitCount === 1 && payload.branch !== "main") return null;
-
-    const context: EventContext = {
-      sessionId: event.sessionId,
-      agentId: "cs-plugin-github",
-    };
+    if (event.commitCount === 1 && event.branch !== "main") return null;
 
     return {
       eventId: randomUUID(),
       timestamp: event.timestamp,
       type: "environmental_observation",
-      context,
+      context: { sessionId: event.sessionId, agentId: "plugin-github" },
       input: {
-        text: `${payload.author} pushed ${payload.commitCount} commit(s) to ${payload.repository}@${payload.branch}: "${payload.message}"`,
-        embedding: [], // generated by OpenSearch ingest pipeline at index time
+        text: `${event.commitCount} commit(s) pushed to ${event.repository}@${event.branch}: "${event.message}"`,
+        embedding: [],
       },
-      importanceScore: payload.branch === "main" ? 0.80 : 0.55,
-      tags: [
-        "source:github",
-        `event:github_push`,
-        `repo:${payload.repository}`,
-        `branch:${payload.branch}`,
-        payload.branch === "main" ? "engagement:deep" : "engagement:shallow",
-      ],
+      importanceScore: event.branch === "main" ? 0.80 : 0.55,
+      tags: ["source:github", `repo:${event.repository}`, `branch:${event.branch}`],
     };
   },
 };
 ```
 
-**Activation:**
+**Example -- with a webhook receiver:**
 
-```bash
-pnpm --filter @cognitive-substrate/cs-plugin-github build
-CS_PLUGINS=@cognitive-substrate/cs-plugin-github pnpm --filter @cognitive-substrate/ingest-worker start
+```typescript
+import { Hono } from "hono";
+import { Topics } from "@cognitive-substrate/kafka-bus";
+import type { CognitiveProducer } from "@cognitive-substrate/kafka-bus";
+import type { IngestMapperPlugin } from "@cognitive-substrate/plugin-loader";
+// ... map() implementation as above ...
+
+export const plugin: IngestMapperPlugin = {
+  kind: "ingest-mapper",
+  handles: ["github_push"],
+  map,
+
+  createWebhookRouter(getProducer: () => CognitiveProducer | null): Hono {
+    const router = new Hono();
+
+    router.post("/", async (c) => {
+      const producer = getProducer();
+      if (!producer) return c.json({ error: "not ready" }, 503);
+
+      const body = await c.req.json<{ ref: string; repository: { full_name: string }; commits: unknown[] }>();
+      const branch = body.ref.replace("refs/heads/", "");
+      const sessionId = `github:${body.repository.full_name}:${branch}`;
+
+      await producer.publish(Topics.TELEMETRY_LOGS_RAW, {
+        type: "github_push",
+        sessionId,
+        timestamp: new Date().toISOString(),
+        repository: body.repository.full_name,
+        branch,
+        commitCount: body.commits.length,
+        message: "(from webhook)",
+      }, { key: sessionId });
+
+      return c.json({ received: true });
+    });
+
+    return router;
+  },
+};
 ```
 
----
+The API mounts this at `POST /api/webhooks/github_push`. No changes to `server.ts` required.
 
-**Example — multiple event types in one plugin:**
-
-A single plugin can own several related event types. Declare all of them in `handles`:
+**Multiple event types in one plugin:**
 
 ```typescript
 export const plugin: IngestMapperPlugin = {
   kind: "ingest-mapper",
-  handles: ["stripe_payment_succeeded", "stripe_payment_failed", "stripe_refund_issued"],
-
+  handles: ["stripe_payment_succeeded", "stripe_payment_failed"],
   map(event: unknown): ExperienceEvent | null {
-    const ev = event as { type: string; sessionId: string; timestamp: string; payload: Record<string, unknown> };
-
+    const ev = event as { type: string; [k: string]: unknown };
     switch (ev.type) {
-      case "stripe_payment_succeeded":
-        return {
-          eventId: randomUUID(),
-          timestamp: ev.timestamp,
-          type: "environmental_observation",
-          context: { sessionId: ev.sessionId, agentId: "cs-plugin-stripe" },
-          input: {
-            text: `Payment succeeded: $${String(ev.payload["amount"])} ${String(ev.payload["currency"])}`,
-            embedding: [],
-          },
-          importanceScore: 0.90,
-          tags: ["source:stripe", "event:payment_succeeded", "engagement:conversion"],
-        };
-
-      case "stripe_payment_failed":
-        return {
-          eventId: randomUUID(),
-          timestamp: ev.timestamp,
-          type: "environmental_observation",
-          context: { sessionId: ev.sessionId, agentId: "cs-plugin-stripe" },
-          input: {
-            text: `Payment failed: ${String(ev.payload["failure_message"])}`,
-            embedding: [],
-          },
-          importanceScore: 0.85,
-          tags: ["source:stripe", "event:payment_failed", "engagement:exit"],
-        };
-
-      case "stripe_refund_issued":
-        return {
-          eventId: randomUUID(),
-          timestamp: ev.timestamp,
-          type: "environmental_observation",
-          context: { sessionId: ev.sessionId, agentId: "cs-plugin-stripe" },
-          input: {
-            text: `Refund issued: $${String(ev.payload["amount"])}`,
-            embedding: [],
-          },
-          importanceScore: 0.70,
-          tags: ["source:stripe", "event:refund_issued"],
-        };
-
-      default:
-        return null;
+      case "stripe_payment_succeeded": return mapPaymentSucceeded(ev);
+      case "stripe_payment_failed":    return mapPaymentFailed(ev);
+      default: return null;
     }
   },
 };
 ```
+
+When a plugin handles multiple types, `createWebhookRouter` (if present) is mounted under `handles[0]`. Design the receiver to route internally by event type if the upstream service sends multiple event shapes to one endpoint.
 
 ---
 
 ### 2. Engine (reasoning model)
 
-An engine plugin provides a custom `ReasoningModel` — the component that decides what the cognitive loop should propose and do next.
-
-**When to use:** You want to use an LLM provider not covered by the built-in chain (e.g., Mistral, Gemini, a fine-tuned model endpoint), or you want to run a deterministic/rule-based reasoner for testing.
-
-**Interface:**
+Provides a custom `ReasoningModel` selected when `CS_ENGINE` matches the plugin's `name`.
 
 ```typescript
 interface EnginePlugin {
   readonly kind: "engine";
-  readonly name: string;    // matched by CS_ENGINE env var
+  readonly name: string;
   create(): ReasoningModel;
-}
-
-// ReasoningModel (from @cognitive-substrate/agents):
-interface ReasoningModel {
-  reason(context: AgentContext): Promise<ReasoningDecision>;
-}
-
-// ReasoningDecision:
-interface ReasoningDecision {
-  readonly proposal: string;
-  readonly reasoning?: string;
-  readonly confidence: number;  // 0–1
-  readonly riskScore: number;   // 0–1, higher = riskier
-  readonly action?: {
-    readonly tool: string;
-    readonly parameters?: Record<string, unknown>;
-  };
 }
 ```
 
-**Example — Mistral via OpenAI-compatible API:**
+**Activation requires two env vars:** `CS_PLUGINS` (to load the package) and `CS_ENGINE` (to select it by name). If `CS_ENGINE` is not set, the built-in engine chain applies even if an engine plugin is loaded.
+
+**Example -- Mistral:**
 
 ```typescript
-// src/index.ts
-import type { ReasoningModel, ReasoningDecision } from "@cognitive-substrate/agents";
-import type { AgentContext } from "@cognitive-substrate/core-types";
 import type { EnginePlugin } from "@cognitive-substrate/plugin-loader";
-
-class MistralReasoningModel implements ReasoningModel {
-  private readonly baseURL: string;
-  private readonly apiKey: string;
-  private readonly model: string;
-
-  constructor() {
-    const baseURL = process.env["MISTRAL_BASE_URL"];
-    const apiKey = process.env["MISTRAL_API_KEY"];
-    if (!baseURL || !apiKey) {
-      throw new Error(
-        "[cs-plugin-mistral] MISTRAL_BASE_URL and MISTRAL_API_KEY must be set",
-      );
-    }
-    this.baseURL = baseURL;
-    this.apiKey = apiKey;
-    this.model = process.env["MISTRAL_MODEL"] ?? "mistral-large-latest";
-  }
-
-  async reason(context: AgentContext): Promise<ReasoningDecision> {
-    const systemPrompt = [
-      "You are a cognitive agent. Based on the session context and retrieved memories,",
-      "propose a concise action or response. Reply in JSON:",
-      '{ "proposal": "...", "reasoning": "...", "confidence": 0.0–1.0, "riskScore": 0.0–1.0 }',
-    ].join(" ");
-
-    const userMessage = [
-      `Session: ${context.session.sessionId}`,
-      `Active goals: ${context.goals.map((g) => g.description).join(", ") || "none"}`,
-      `Memories: ${context.memories.map((m) => m.summary).slice(0, 5).join(" | ")}`,
-    ].join("\n");
-
-    const response = await fetch(`${this.baseURL}/v1/chat/completions`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${this.apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: this.model,
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userMessage },
-        ],
-        response_format: { type: "json_object" },
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`[cs-plugin-mistral] API error: ${response.status}`);
-    }
-
-    const json = await response.json() as {
-      choices: Array<{ message: { content: string } }>;
-    };
-
-    const content = json.choices[0]?.message.content ?? "{}";
-    const parsed = JSON.parse(content) as Partial<ReasoningDecision>;
-
-    return {
-      proposal: parsed.proposal ?? "",
-      reasoning: parsed.reasoning,
-      confidence: parsed.confidence ?? 0.5,
-      riskScore: parsed.riskScore ?? 0.5,
-    };
-  }
-}
 
 export const plugin: EnginePlugin = {
   kind: "engine",
@@ -368,258 +328,97 @@ export const plugin: EnginePlugin = {
 };
 ```
 
-**Activation:**
-
 ```bash
-pnpm --filter @cognitive-substrate/cs-plugin-mistral build
-
-CS_PLUGINS=@cognitive-substrate/cs-plugin-mistral \
+CS_PLUGINS=@my-org/plugin-mistral \
 CS_ENGINE=mistral \
 MISTRAL_API_KEY=sk-... \
-MISTRAL_BASE_URL=https://api.mistral.ai \
-pnpm --filter @cognitive-substrate/orchestrator start
-```
-
-`CS_ENGINE` must match the `name` field exactly. If `CS_ENGINE` is set but no loaded plugin declares that name, the orchestrator exits with an error listing the available names.
-
-If `CS_ENGINE` is not set, the plugin is loaded but not used — the built-in env chain (Ollama → OpenAI → Claude → MultiAgent) applies as normal.
-
----
-
-**Example — deterministic test stub:**
-
-Useful for integration tests or development without a live LLM:
-
-```typescript
-import type { EnginePlugin } from "@cognitive-substrate/plugin-loader";
-import type { ReasoningModel } from "@cognitive-substrate/agents";
-import type { AgentContext } from "@cognitive-substrate/core-types";
-
-const echoModel: ReasoningModel = {
-  async reason(context: AgentContext) {
-    const topMemory = context.memories[0]?.summary ?? "no memories";
-    return {
-      proposal: `Echo: ${topMemory}`,
-      confidence: 1.0,
-      riskScore: 0.0,
-    };
-  },
-};
-
-export const plugin: EnginePlugin = {
-  kind: "engine",
-  name: "echo",
-  create: () => echoModel,
-};
+node dist/main.js
 ```
 
 ---
 
 ### 3. Tool executor
 
-A tool-executor plugin adds new tools the cognitive loop can invoke during a session. The model sees these tools listed in its context and can call them via `action.tool`.
-
-**When to use:** You want to give the agent the ability to call an external service — a database, an internal API, a third-party integration — that isn't covered by the built-in tool surface (web fetch, memory search, write experience) or MCP.
-
-**Interface:**
+Adds tools the cognitive loop can invoke during a session.
 
 ```typescript
 interface ToolExecutorPlugin {
   readonly kind: "tool-executor";
   create(): ToolExecutor | Promise<ToolExecutor>;
 }
-
-// ToolExecutor (from @cognitive-substrate/agents):
-interface ToolExecutor {
-  listTools(): ReadonlyArray<ToolCapability>;
-  execute(action: ActionRequest, context: AgentContext): Promise<EventResult>;
-}
-
-// ToolCapability (from @cognitive-substrate/core-types):
-interface ToolCapability {
-  readonly tool: string;                    // unique tool name
-  readonly description?: string;            // shown to the reasoning model
-  readonly parameters?: ReadonlyArray<{
-    readonly name: string;
-    readonly type: string;
-    readonly required: boolean;
-    readonly description?: string;
-  }>;
-}
-
-// EventResult (returned from execute):
-interface EventResult {
-  readonly output: string;   // text the model can read
-  readonly success: boolean;
-  readonly latencyMs?: number;
-  readonly errorCode?: string;
-}
 ```
 
-**Example — internal knowledge base search:**
+`create()` is called once at startup. Throw from `create()` if required configuration is missing -- the process will exit before serving traffic, which is the right behavior.
+
+**Example:**
 
 ```typescript
-// src/index.ts
-import type { ToolExecutorPlugin } from "@cognitive-substrate/plugin-loader";
-import type { ToolExecutor, ActionRequest } from "@cognitive-substrate/agents";
-import type { AgentContext, EventResult, ToolCapability } from "@cognitive-substrate/core-types";
-
-class KnowledgeBaseExecutor implements ToolExecutor {
-  private readonly endpoint: string;
-
-  constructor(endpoint: string) {
-    this.endpoint = endpoint;
-  }
-
-  listTools(): ReadonlyArray<ToolCapability> {
-    return [
-      {
-        tool: "knowledge_base_search",
-        description: "Search the internal company knowledge base for documentation, runbooks, and policies.",
-        parameters: [
-          { name: "query", type: "string", required: true, description: "Search query" },
-          { name: "limit", type: "number", required: false, description: "Max results (default 5)" },
-        ],
-      },
-      {
-        tool: "knowledge_base_get",
-        description: "Retrieve a specific knowledge base article by ID.",
-        parameters: [
-          { name: "articleId", type: "string", required: true },
-        ],
-      },
-    ];
-  }
-
-  async execute(action: ActionRequest, _context: AgentContext): Promise<EventResult> {
-    const start = Date.now();
-
-    try {
-      switch (action.tool) {
-        case "knowledge_base_search": {
-          const query = String(action.parameters?.["query"] ?? "");
-          const limit = Number(action.parameters?.["limit"] ?? 5);
-          const res = await fetch(`${this.endpoint}/search?q=${encodeURIComponent(query)}&limit=${limit}`);
-          const data = await res.json() as { results: Array<{ title: string; summary: string }> };
-          const output = data.results.map((r) => `• ${r.title}: ${r.summary}`).join("\n");
-          return { output: output || "No results found.", success: true, latencyMs: Date.now() - start };
-        }
-
-        case "knowledge_base_get": {
-          const articleId = String(action.parameters?.["articleId"] ?? "");
-          const res = await fetch(`${this.endpoint}/articles/${articleId}`);
-          if (!res.ok) {
-            return { output: `Article ${articleId} not found.`, success: false, latencyMs: Date.now() - start };
-          }
-          const data = await res.json() as { title: string; content: string };
-          return { output: `${data.title}\n\n${data.content}`, success: true, latencyMs: Date.now() - start };
-        }
-
-        default:
-          return {
-            output: `Unknown tool: ${action.tool}`,
-            success: false,
-            errorCode: "UNKNOWN_TOOL",
-            latencyMs: Date.now() - start,
-          };
-      }
-    } catch (err) {
-      return {
-        output: (err as Error).message,
-        success: false,
-        errorCode: "TOOL_ERROR",
-        latencyMs: Date.now() - start,
-      };
-    }
-  }
-}
-
 export const plugin: ToolExecutorPlugin = {
   kind: "tool-executor",
-
   async create(): Promise<ToolExecutor> {
     const endpoint = process.env["KB_ENDPOINT"];
-    if (!endpoint) throw new Error("[cs-plugin-kb] KB_ENDPOINT must be set");
-
-    // Verify connectivity before the loop starts
-    await fetch(`${endpoint}/health`).catch(() => {
-      throw new Error(`[cs-plugin-kb] Knowledge base at ${endpoint} is unreachable`);
-    });
-
+    if (!endpoint) throw new Error("[plugin-kb] KB_ENDPOINT must be set");
     return new KnowledgeBaseExecutor(endpoint);
   },
 };
 ```
 
-**Activation:**
+---
+
+## Using multiple plugins
+
+`CS_PLUGINS` is comma-separated. Order matters only for event type conflict detection -- built-in types are registered first and plugins are registered left-to-right:
 
 ```bash
-pnpm --filter @cognitive-substrate/cs-plugin-kb build
-
-CS_PLUGINS=@cognitive-substrate/cs-plugin-kb \
-KB_ENDPOINT=http://kb.internal \
-pnpm --filter @cognitive-substrate/orchestrator start
+CS_PLUGINS=@cognitive-substrate/plugin-slack,@cognitive-substrate/plugin-jira,@my-org/plugin-kb
 ```
+
+Each plugin must be installed in `node_modules` of the service running it. Mixed sources work fine -- you can combine a published npm package with a locally-symlinked workspace package in the same `CS_PLUGINS` list.
 
 ---
 
-## Using multiple plugins together
+## Building a plugin for an external repo
 
-`CS_PLUGINS` accepts a comma-separated list. All plugins load in order; the ingest mapper registry registers built-in types first so plugins cannot shadow them.
+Checklist when creating a plugin in its own repository:
 
-```bash
-CS_PLUGINS=@my-org/cs-plugin-github,@my-org/cs-plugin-stripe,@my-org/cs-plugin-kb \
-CS_ENGINE=mistral \
-MISTRAL_API_KEY=sk-... \
-KB_ENDPOINT=http://kb.internal \
-pnpm --filter @cognitive-substrate/orchestrator start
-```
-
-Startup output:
-
-```
-[plugin-loader] Loaded ingest-mapper plugin: @my-org/cs-plugin-github
-[plugin-loader] Loaded ingest-mapper plugin: @my-org/cs-plugin-stripe
-[plugin-loader] Loaded tool-executor plugin: @my-org/cs-plugin-kb
-```
-
----
-
-## Constraints and rules
-
-**Event type ownership is exclusive.** Two plugins cannot claim the same `event.type` string. The registry throws on the second registration. Built-in types (`page_view`, `article_complete`, `scroll_depth`, etc.) are always registered first and cannot be overridden.
-
-**Fail loudly.** A plugin that throws from `create()` or `map()` propagates the error up. If `create()` throws, the process exits before serving any traffic. If `map()` throws on a message, that message is surfaced as a consumer error — handle expected failures by returning `null` instead.
-
-**No hot-reload.** Node's ESM module cache means a second `import()` of the same specifier returns the cached module. To update a plugin, rebuild it and restart the process.
-
-**Always use bare specifiers.** The `CS_PLUGINS` list takes package names (`@my-org/pkg`), not file paths. pnpm workspace symlinks route the import through `node_modules`. File paths would break if the workspace layout changes.
-
-**Build before activating.** Plugins must be compiled to `dist/` before the runtime imports them. The runtime imports `dist/index.js` — not the TypeScript source.
-
-```bash
-pnpm --filter @my-org/cs-plugin-github build
-```
-
-Or build all workspace packages at once:
-
-```bash
-pnpm build
-```
-
-**`embedding` must be an empty array.** The OpenSearch ingest pipeline generates embeddings from `input.text` at index time. Set `embedding: []` in every `ExperienceEvent` you return — never attempt to compute embeddings client-side in a plugin.
-
----
-
-## Checklist for a new plugin
-
-- [ ] Package lives under `packages/` or `apps/workers/` (covered by pnpm workspace glob)
 - [ ] `"type": "module"` in `package.json`
-- [ ] `exports["."].import` points to `./dist/index.js`
-- [ ] `tsconfig.json` extends `../../tsconfig.base.json`
-- [ ] `src/index.ts` exports `const plugin: CognitiveSubstratePlugin`
-- [ ] `kind` is one of `"ingest-mapper"`, `"engine"`, `"tool-executor"`
-- [ ] Package is built (`pnpm --filter <name> build`) before activating
-- [ ] Package name added to `CS_PLUGINS` environment variable
-- [ ] If `kind: "engine"`, `CS_ENGINE=<plugin.name>` is also set
+- [ ] `exports["."].import` points to `./dist/index.js`, `exports["."].types` to `./dist/index.d.ts`
+- [ ] Declare `@cognitive-substrate/core-types`, `@cognitive-substrate/plugin-loader` as **peerDependencies** (and devDependencies), not regular dependencies
+- [ ] Declare `@cognitive-substrate/kafka-bus` and `hono` as peer deps only if the plugin uses `createWebhookRouter`
+- [ ] `src/index.ts` exports `export const plugin: CognitiveSubstratePlugin`
 - [ ] `embedding: []` in all returned `ExperienceEvent` objects
+- [ ] Standalone `tsconfig.json` (no `extends "../../tsconfig.base.json"` -- that path won't exist outside the monorepo)
+- [ ] `.gitignore` includes `node_modules/`, `dist/`, `*.tsbuildinfo`
+- [ ] Build produces `dist/index.js` and `dist/index.d.ts` before the package is consumed
+
+---
+
+## Constraints
+
+**Event type ownership is exclusive.** Two plugins cannot claim the same `event.type`. The registry throws on the second registration. Built-in types (`page_view`, `article_complete`, `scroll_depth`, etc.) are always registered first and cannot be overridden.
+
+**No hot-reload.** Node's ESM module cache means a second `import()` of the same specifier returns the cached module. Rebuild and restart the process to update a plugin.
+
+**Always use bare specifiers.** `CS_PLUGINS` takes package names, not file paths. File paths break when the package is installed via npm rather than a local symlink.
+
+**Build before activating.** The runtime imports `dist/index.js`. The TypeScript source is never executed directly (unless running with `tsx` in development).
+
+**Fail loudly from `create()`, silently from `map()`.** If a plugin is misconfigured, `create()` should throw so the process exits before serving traffic. If an individual event cannot be mapped, return `null` rather than throwing -- the message is dropped cleanly and processing continues.
+
+---
+
+## First-party plugins
+
+| Plugin | Repo | Handles | Webhook path |
+| --- | --- | --- | --- |
+| `@cognitive-substrate/plugin-slack` | [SBPnet/cognitive-substrate-plugin-slack](https://github.com/SBPnet/cognitive-substrate-plugin-slack) | `slack_thread` | `POST /api/webhooks/slack_thread` |
+| `@cognitive-substrate/plugin-zendesk` | [SBPnet/cognitive-substrate-plugin-zendesk](https://github.com/SBPnet/cognitive-substrate-plugin-zendesk) | `zendesk_ticket` | `POST /api/webhooks/zendesk_ticket` |
+| `@cognitive-substrate/plugin-jira` | [SBPnet/cognitive-substrate-plugin-jira](https://github.com/SBPnet/cognitive-substrate-plugin-jira) | `jira_issue` | `POST /api/webhooks/jira_issue` |
+
+Required env vars per plugin:
+
+| Plugin | Service | Env var | Description |
+| --- | --- | --- | --- |
+| plugin-slack | API | `SLACK_SIGNING_SECRET` | Signing secret from Slack app Basic Information page |
+| plugin-zendesk | API | `ZENDESK_WEBHOOK_SECRET` | Signing secret from Zendesk webhook detail page |
+| plugin-jira | API | `JIRA_WEBHOOK_SECRET` | Token appended as `?token=` on the Jira webhook URL |
