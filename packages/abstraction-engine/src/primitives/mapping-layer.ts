@@ -1,21 +1,26 @@
 import type { OperationalPrimitiveId } from "./taxonomy.js";
 
 /**
- * System mapping DSL — the adapter definition that binds a specific
+ * System mapping DSL -- the adapter definition that binds a specific
  * infrastructure environment to the system-agnostic primitive vocabulary.
  *
  * Rules for a valid mapping:
  *   1. metricMappings keys must be vendor metric names (not primitive names).
  *   2. Values must be OperationalPrimitiveId constants.
  *   3. No system names, cluster IDs, or topology references may appear in the
- *      OperationalPrimitiveId values — they are already system-agnostic.
+ *      OperationalPrimitiveId values -- they are already system-agnostic.
  *   4. Wildcard patterns use a trailing "*", e.g. "kafka.consumer.lag*".
  *
- * When a system is onboarded, only this mapping needs to change.  The pattern
+ * When a system is onboarded, only this mapping needs to change. The pattern
  * library, normaliser, and pattern worker remain unchanged.
+ *
+ * Provider-specific mappings (e.g. Aiven) live in their own integration
+ * packages and are registered via TelemetryPipelineConfig.extraMappings.
+ * The built-in set covers generic OTel semantic convention metric names and
+ * substrate-native workers only.
  */
 export interface SystemMapping {
-  /** Stable identifier for this mapping, e.g. "aiven.kafka". */
+  /** Stable identifier for this mapping, e.g. "kafka" or "aiven.kafka". */
   systemId: string;
   /**
    * Broad category used for grouping in dashboards and logs.
@@ -30,120 +35,113 @@ export interface SystemMapping {
 }
 
 // ----------------------------------------------------------------
-// Built-in mappings for Aiven-managed services
-// These ship with the abstraction-engine and are used by default
-// when the telemetry worker processes Aiven telemetry.
+// Generic mappings using OTel semantic convention metric names.
+// These match any Kafka, OpenSearch, ClickHouse, or PostgreSQL
+// deployment that exports standard OTel metrics -- self-hosted,
+// cloud-managed, or otherwise.
+//
+// Provider-specific metric names (e.g. Aiven's Prometheus exporter
+// names) require a custom mapping registered via extraMappings in
+// TelemetryPipelineConfig. The cognitive-substrate-aiven package
+// provides those mappings for Aiven-managed services.
 // ----------------------------------------------------------------
 
 /**
- * Aiven Kafka metric mappings.
- * Sources: Aiven Kafka metrics API and Kafka JMX exporter conventions.
+ * Generic Kafka mapping -- OTel semantic convention and JMX exporter names.
+ * Keyed as "kafka" to match the bare serviceType from any Kafka deployment.
  */
-export const AIVEN_KAFKA_MAPPING: SystemMapping = {
-  systemId: "aiven.kafka",
+export const GENERIC_KAFKA_MAPPING: SystemMapping = {
+  systemId: "kafka",
   systemType: "streaming",
   metricMappings: {
-    "consumer_lag":                           "BACKPRESSURE_ACCUMULATION",
-    "consumer_lag_sum":                       "BACKPRESSURE_ACCUMULATION",
-    "kafka_consumer_lag*":                    "BACKPRESSURE_ACCUMULATION",
-    "messages_in_per_sec":                    "THROUGHPUT_COLLAPSE",
-    "bytes_in_per_sec":                       "THROUGHPUT_COLLAPSE",
-    "request_queue_size":                     "QUEUE_GROWTH",
-    "produce_request_purgatory_size":         "QUEUE_GROWTH",
-    "broker_cpu_idle":                        "RESOURCE_PRESSURE",
-    "cpu_usage":                              "RESOURCE_PRESSURE",
-    "memory_usage":                           "MEMORY_PRESSURE",
-    "heap_memory_used":                       "MEMORY_PRESSURE",
-    "disk_usage":                             "IO_SATURATION",
-    "network_io_wait":                        "IO_SATURATION",
-    "under_replicated_partitions":            "REPLICATION_LAG",
-    "offline_partitions_count":               "INDEX_INCONSISTENCY",
-    "partition_count_skew":                   "LOAD_SKEW",
-    "leader_count_skew":                      "LOAD_SKEW",
-    "request_total_time_99th_percentile":     "TAIL_LATENCY_EXPANSION",
-    "produce_request_latency_ms_99th":        "TAIL_LATENCY_EXPANSION",
-    "produce_request_latency_ms_mean":        "RESPONSE_DEGRADATION",
-    "fetch_request_latency_ms_mean":          "RESPONSE_DEGRADATION",
-    "reassigning_partitions":                 "STRUCTURAL_REBALANCE",
-    "active_controller_count":                "STRUCTURAL_REBALANCE",
-    "total_produce_requests_per_sec":         "RETRY_AMPLIFICATION",
+    "kafka.consumer.group.lag":                        "BACKPRESSURE_ACCUMULATION",
+    "kafka.consumer.group.lag.sum":                    "BACKPRESSURE_ACCUMULATION",
+    "kafka.consumer_lag*":                             "BACKPRESSURE_ACCUMULATION",
+    "kafka.producer.record.send.rate":                 "THROUGHPUT_COLLAPSE",
+    "kafka.network.io.bytes.rate":                     "THROUGHPUT_COLLAPSE",
+    "kafka.request.queue.size":                        "QUEUE_GROWTH",
+    "kafka.partition.under.replicated":                "REPLICATION_LAG",
+    "kafka.partition.offline":                         "INDEX_INCONSISTENCY",
+    "kafka.leader.election.rate":                      "STRUCTURAL_REBALANCE",
+    "kafka.request.total.time.99p":                    "TAIL_LATENCY_EXPANSION",
+    "kafka.request.produce.time.mean":                 "RESPONSE_DEGRADATION",
+    "kafka.request.fetch.time.mean":                   "RESPONSE_DEGRADATION",
+    "process.cpu.time":                                "RESOURCE_PRESSURE",
+    "jvm.memory.used":                                 "MEMORY_PRESSURE",
+    "jvm.gc.duration":                                 "MEMORY_PRESSURE",
   },
 };
 
 /**
- * Aiven OpenSearch metric mappings.
+ * Generic OpenSearch / Elasticsearch mapping -- OTel semantic convention names.
+ * Keyed as "opensearch" to match any OpenSearch or Elasticsearch deployment.
  */
-export const AIVEN_OPENSEARCH_MAPPING: SystemMapping = {
-  systemId: "aiven.opensearch",
+export const GENERIC_OPENSEARCH_MAPPING: SystemMapping = {
+  systemId: "opensearch",
   systemType: "search",
   metricMappings: {
-    "search_query_latency_ms_99th":           "TAIL_LATENCY_EXPANSION",
-    "search_query_latency_ms_mean":           "RESPONSE_DEGRADATION",
-    "indexing_latency_ms_mean":               "RESPONSE_DEGRADATION",
-    "jvm_heap_used_percent":                  "MEMORY_PRESSURE",
-    "jvm_gc_time":                            "MEMORY_PRESSURE",
-    "cpu_usage":                              "RESOURCE_PRESSURE",
-    "disk_usage":                             "IO_SATURATION",
-    "merge_current":                          "IO_SATURATION",
-    "unassigned_shards":                      "INDEX_INCONSISTENCY",
-    "initializing_shards":                    "STRUCTURAL_REBALANCE",
-    "relocating_shards":                      "STRUCTURAL_REBALANCE",
-    "index_shard_imbalance":                  "LOAD_SKEW",
-    "search_rejected_count":                  "BACKPRESSURE_ACCUMULATION",
-    "indexing_rejected_count":                "BACKPRESSURE_ACCUMULATION",
-    "search_active_count":                    "QUEUE_GROWTH",
-    "indexing_active_count":                  "QUEUE_GROWTH",
-    "cluster_status":                         "CASCADING_FAILURE",
+    "elasticsearch.index.operations.time":             "RESPONSE_DEGRADATION",
+    "elasticsearch.index.operations.completed":        "THROUGHPUT_COLLAPSE",
+    "elasticsearch.indexing.pressure.memory":          "MEMORY_PRESSURE",
+    "jvm.memory.heap.used":                            "MEMORY_PRESSURE",
+    "jvm.gc.collections.elapsed":                      "MEMORY_PRESSURE",
+    "elasticsearch.node.cache.evictions":              "MEMORY_PRESSURE",
+    "elasticsearch.cluster.shards":                    "STRUCTURAL_REBALANCE",
+    "elasticsearch.cluster.pending_tasks":             "QUEUE_GROWTH",
+    "elasticsearch.node.thread_pool.queue":            "QUEUE_GROWTH",
+    "elasticsearch.node.thread_pool.rejected":         "BACKPRESSURE_ACCUMULATION",
+    "elasticsearch.node.documents":                    "IO_SATURATION",
+    "process.cpu.time":                                "RESOURCE_PRESSURE",
   },
 };
 
 /**
- * Aiven PostgreSQL metric mappings.
+ * Generic ClickHouse mapping -- system.* and OTel-compatible metric names.
+ * Keyed as "clickhouse" to match any ClickHouse deployment.
  */
-export const AIVEN_POSTGRES_MAPPING: SystemMapping = {
-  systemId: "aiven.postgres",
-  systemType: "database",
-  metricMappings: {
-    "pg_stat_bgwriter_buffers_backend":       "IO_SATURATION",
-    "pg_stat_bgwriter_checkpoint_write_time": "IO_SATURATION",
-    "pg_replication_lag":                     "REPLICATION_LAG",
-    "pg_replication_slot_lag":                "REPLICATION_LAG",
-    "pg_locks_count":                         "RESOURCE_PRESSURE",
-    "pg_active_queries":                      "QUEUE_GROWTH",
-    "pg_waiting_queries":                     "BACKPRESSURE_ACCUMULATION",
-    "pg_slow_queries":                        "TAIL_LATENCY_EXPANSION",
-    "pg_heap_bloat":                          "RESOURCE_PRESSURE",
-    "connection_count":                       "CONNECTION_EXHAUSTION",
-    "connection_pool_usage":                  "CONNECTION_EXHAUSTION",
-    "cpu_usage":                              "RESOURCE_PRESSURE",
-    "disk_usage":                             "IO_SATURATION",
-    "wal_size":                               "IO_SATURATION",
-  },
-};
-
-/**
- * Aiven ClickHouse metric mappings.
- */
-export const AIVEN_CLICKHOUSE_MAPPING: SystemMapping = {
-  systemId: "aiven.clickhouse",
+export const GENERIC_CLICKHOUSE_MAPPING: SystemMapping = {
+  systemId: "clickhouse",
   systemType: "analytics",
   metricMappings: {
-    "query_duration_ms_99th":                 "TAIL_LATENCY_EXPANSION",
-    "query_duration_ms_mean":                 "RESPONSE_DEGRADATION",
-    "parts_to_merge":                         "IO_SATURATION",
-    "background_pool_task":                   "QUEUE_GROWTH",
-    "memory_usage":                           "MEMORY_PRESSURE",
-    "cpu_usage":                              "RESOURCE_PRESSURE",
-    "disk_usage":                             "IO_SATURATION",
-    "insert_blocks_per_second":               "THROUGHPUT_COLLAPSE",
-    "failed_queries_per_second":              "CASCADING_FAILURE",
+    "ClickHouse.ProfileEvent.Query":                            "THROUGHPUT_COLLAPSE",
+    "ClickHouse.ProfileEvent.FailedQuery":                      "CASCADING_FAILURE",
+    "ClickHouse.ProfileEvent.InsertedRows":                     "THROUGHPUT_COLLAPSE",
+    "ClickHouse.ProfileEvent.MergesTimeMilliseconds":           "IO_SATURATION",
+    "ClickHouse.ProfileEvent.BackgroundMergesAndMutationsPoolTask": "QUEUE_GROWTH",
+    "ClickHouse.Metric.MemoryTracking":                         "MEMORY_PRESSURE",
+    "ClickHouse.Metric.ReplicatedChecks":                       "STRUCTURAL_REBALANCE",
+    "ClickHouse.Metric.Query":                                  "QUEUE_GROWTH",
+    "process.cpu.time":                                         "RESOURCE_PRESSURE",
+  },
+};
+
+/**
+ * Generic PostgreSQL mapping -- postgres_exporter and OTel convention names.
+ * Keyed as "postgres" to match any PostgreSQL deployment.
+ */
+export const GENERIC_POSTGRES_MAPPING: SystemMapping = {
+  systemId: "postgres",
+  systemType: "database",
+  metricMappings: {
+    "postgresql.bgwriter.buffers.writes":               "IO_SATURATION",
+    "postgresql.bgwriter.checkpoint.count":             "IO_SATURATION",
+    "postgresql.replication.data_delay":                "REPLICATION_LAG",
+    "postgresql.locks":                                 "RESOURCE_PRESSURE",
+    "postgresql.operations":                            "QUEUE_GROWTH",
+    "postgresql.rows":                                  "BACKPRESSURE_ACCUMULATION",
+    "postgresql.deadlocks":                             "TAIL_LATENCY_EXPANSION",
+    "postgresql.table.bloat":                           "RESOURCE_PRESSURE",
+    "postgresql.connection.count":                      "CONNECTION_EXHAUSTION",
+    "postgresql.connection.max":                        "CONNECTION_EXHAUSTION",
+    "process.cpu.time":                                 "RESOURCE_PRESSURE",
+    "postgresql.wal.age":                               "IO_SATURATION",
   },
 };
 
 // ----------------------------------------------------------------
 // Built-in mappings for substrate-native services
 // These cover the workers, API, and orchestrator that emit OTLP
-// metrics via the internal collector → telemetry.metrics.otlp.
+// metrics via the internal collector -> telemetry.metrics.otlp.
 //
 // Metric names follow the OTel semantic conventions used in
 // packages/telemetry-otel/src/metrics.ts.
@@ -235,7 +233,7 @@ export const SUBSTRATE_CONSOLIDATION_MAPPING: SystemMapping = {
     "worker.message.duration_ms":              "RESPONSE_DEGRADATION",
     "worker.errors":                           "CASCADING_FAILURE",
     "consolidation.source_events":             "QUEUE_GROWTH",
-    "consolidation.duration_ms":              "TAIL_LATENCY_EXPANSION",
+    "consolidation.duration_ms":               "TAIL_LATENCY_EXPANSION",
   },
 };
 
@@ -254,17 +252,23 @@ export const SUBSTRATE_TELEMETRY_MAPPING: SystemMapping = {
   },
 };
 
-/** All built-in mappings: Aiven services + substrate-native workers. */
+/**
+ * Built-in mappings: generic service types + substrate-native workers.
+ *
+ * Provider-specific mappings (e.g. "aiven.kafka") are NOT included here.
+ * Register them via TelemetryPipelineConfig.extraMappings in whatever
+ * integration package owns that provider.
+ */
 export const BUILTIN_MAPPINGS: ReadonlyMap<string, SystemMapping> = new Map([
-  [AIVEN_KAFKA_MAPPING.systemId, AIVEN_KAFKA_MAPPING],
-  [AIVEN_OPENSEARCH_MAPPING.systemId, AIVEN_OPENSEARCH_MAPPING],
-  [AIVEN_POSTGRES_MAPPING.systemId, AIVEN_POSTGRES_MAPPING],
-  [AIVEN_CLICKHOUSE_MAPPING.systemId, AIVEN_CLICKHOUSE_MAPPING],
-  [SUBSTRATE_INGESTION_MAPPING.systemId, SUBSTRATE_INGESTION_MAPPING],
-  [SUBSTRATE_ORCHESTRATOR_MAPPING.systemId, SUBSTRATE_ORCHESTRATOR_MAPPING],
-  [SUBSTRATE_API_MAPPING.systemId, SUBSTRATE_API_MAPPING],
-  [SUBSTRATE_PATTERN_MAPPING.systemId, SUBSTRATE_PATTERN_MAPPING],
-  [SUBSTRATE_REINFORCEMENT_MAPPING.systemId, SUBSTRATE_REINFORCEMENT_MAPPING],
-  [SUBSTRATE_CONSOLIDATION_MAPPING.systemId, SUBSTRATE_CONSOLIDATION_MAPPING],
-  [SUBSTRATE_TELEMETRY_MAPPING.systemId, SUBSTRATE_TELEMETRY_MAPPING],
+  [GENERIC_KAFKA_MAPPING.systemId,        GENERIC_KAFKA_MAPPING],
+  [GENERIC_OPENSEARCH_MAPPING.systemId,   GENERIC_OPENSEARCH_MAPPING],
+  [GENERIC_CLICKHOUSE_MAPPING.systemId,   GENERIC_CLICKHOUSE_MAPPING],
+  [GENERIC_POSTGRES_MAPPING.systemId,     GENERIC_POSTGRES_MAPPING],
+  [SUBSTRATE_INGESTION_MAPPING.systemId,      SUBSTRATE_INGESTION_MAPPING],
+  [SUBSTRATE_ORCHESTRATOR_MAPPING.systemId,   SUBSTRATE_ORCHESTRATOR_MAPPING],
+  [SUBSTRATE_API_MAPPING.systemId,            SUBSTRATE_API_MAPPING],
+  [SUBSTRATE_PATTERN_MAPPING.systemId,        SUBSTRATE_PATTERN_MAPPING],
+  [SUBSTRATE_REINFORCEMENT_MAPPING.systemId,  SUBSTRATE_REINFORCEMENT_MAPPING],
+  [SUBSTRATE_CONSOLIDATION_MAPPING.systemId,  SUBSTRATE_CONSOLIDATION_MAPPING],
+  [SUBSTRATE_TELEMETRY_MAPPING.systemId,      SUBSTRATE_TELEMETRY_MAPPING],
 ]);

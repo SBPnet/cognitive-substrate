@@ -15,11 +15,18 @@ import {
 
 /**
  * A raw metric message as it arrives on the telemetry.metrics.raw topic.
- * Producers (OTEL collectors, Aiven integration connectors) write this shape.
+ * Producers (OTEL collectors, Prometheus remote_write receivers, custom
+ * integrations) write this shape.
+ *
+ * systemId: explicit mapping key, e.g. "aiven.kafka" or "self-hosted.kafka".
+ * When present it takes priority over the serviceType inference fallback.
+ * Producers that know their mapping key should always set this field.
  */
 export interface RawMetricMessage {
   serviceId: string;
   serviceType: string;
+  /** Optional explicit system mapping key. Overrides serviceType inference. */
+  systemId?: string;
   metricName: string;
   value: number;
   previousValue?: number;
@@ -182,21 +189,29 @@ export async function processTelemetryBatch(
 function groupBySystem(messages: RawMetricMessage[]): Record<string, RawMetricMessage[]> {
   const result: Record<string, RawMetricMessage[]> = {};
   for (const m of messages) {
-    const key = inferSystemId(m.serviceId, m.serviceType);
+    const key = resolveSystemId(m);
     (result[key] ??= []).push(m);
   }
   return result;
 }
 
-function inferSystemId(serviceId: string, serviceType: string): string {
-  // Substrate-native services: the OTLP parser sets serviceType = "substrate.<serviceId>"
-  if (serviceType.startsWith("substrate.")) return serviceType;
-  // Aiven-managed services
-  if (serviceType === "kafka") return "aiven.kafka";
-  if (serviceType === "opensearch") return "aiven.opensearch";
-  if (serviceType === "pg" || serviceType === "postgres") return "aiven.postgres";
-  if (serviceType === "clickhouse") return "aiven.clickhouse";
-  return `aiven.${serviceType}`;
+/**
+ * Resolves the mapping key for a metric message.
+ *
+ * Priority order:
+ *   1. Explicit systemId field on the message (producer knows its mapping key).
+ *   2. Substrate-native services: serviceType starts with "substrate.".
+ *   3. Generic fallback: "<serviceType>" so unknown systems can still be
+ *      handled by a custom mapping registered via extraMappings.
+ *
+ * Producers that run against a specific managed provider (e.g. Aiven) should
+ * set systemId = "aiven.kafka" etc. in their metric messages rather than
+ * relying on inference.
+ */
+function resolveSystemId(m: RawMetricMessage): string {
+  if (m.systemId) return m.systemId;
+  if (m.serviceType.startsWith("substrate.")) return m.serviceType;
+  return m.serviceType;
 }
 
 function resolveMapping(

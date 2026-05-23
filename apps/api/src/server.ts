@@ -13,8 +13,6 @@ import { createSessionsRouter } from "./routes/sessions.js";
 import { createMessagesRouter } from "./routes/messages.js";
 import { streamRouter } from "./routes/stream.js";
 import { createMemoriesRouter } from "./routes/memories.js";
-import { createCollectorRouter } from "./routes/collector.js";
-import { createAivenWebhookRouter } from "./routes/aiven-webhook.js";
 import {
   createPolicyRouter,
   createAgentActivityRouter,
@@ -24,10 +22,24 @@ import {
 } from "./routes/policy.js";
 import { createDocumentsRouter } from "./routes/documents.js";
 
+/**
+ * A plugin that contributes one or more Hono routers to the API.
+ * Used by integration packages (e.g. cognitive-substrate-aiven) to mount
+ * control-plane and webhook routes without modifying core server code.
+ *
+ * Each router is mounted at the path returned by mountPath.
+ */
+export interface ApiRouterPlugin {
+  /** Absolute mount path, e.g. "/api/aiven/collector". */
+  readonly mountPath: string;
+  createRouter(getProducer: () => CognitiveProducer | null): Hono;
+}
+
 export function createApp(
   openSearchClient: Client,
   getMetadataProducer?: () => CognitiveProducer | null,
   ingestMapperPlugins: ReadonlyArray<IngestMapperPlugin> = [],
+  apiRouterPlugins: ReadonlyArray<ApiRouterPlugin> = [],
 ): Hono {
   const app = new Hono();
 
@@ -64,10 +76,8 @@ export function createApp(
   // Roadmap Stages 11-12: goal hierarchy (goal_system index)
   app.route("/api/sessions/:sessionId/goals", createGoalsRouter(openSearchClient));
 
-  app.route("/api/collector", createCollectorRouter());
-
+  // Ingest-mapper webhook receivers (one per plugin that opts in).
   if (getMetadataProducer) {
-    app.route("/api/aiven/webhook", createAivenWebhookRouter(getMetadataProducer));
     for (const plugin of ingestMapperPlugins) {
       if (plugin.createWebhookRouter) {
         const handle = plugin.handles[0];
@@ -76,6 +86,12 @@ export function createApp(
         }
       }
     }
+  }
+
+  // Integration router plugins (control-plane routes, provider webhooks, etc.).
+  const producer = getMetadataProducer ?? (() => null);
+  for (const routerPlugin of apiRouterPlugins) {
+    app.route(routerPlugin.mountPath, routerPlugin.createRouter(producer));
   }
 
   return app;

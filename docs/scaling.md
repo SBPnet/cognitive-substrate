@@ -45,24 +45,24 @@ Runs the full `CognitiveLoop` + `MultiAgentRuntime`. Holds working memory and pe
 
 **Path to horizontal scale:** externalize `WorkingMemory` and session state to a shared store (Redis or OpenSearch). Once session state is external, the orchestrator becomes stateless and can run multiple replicas behind a consistent-hash load balancer keyed on session ID.
 
-### aiven-collector
+### provider collector workers
 
-Polls the Aiven REST API on timers and holds two in-memory dedup structures:
+If you run an integration collector (e.g. the Aiven collector from `cognitive-substrate-aiven`) it polls a provider API on timers and holds two in-memory dedup structures:
 
 - `logOffsets: Map<serviceId, offset>`: tracks the last fetched log cursor per service.
 - `seenProjectEvents: Set<eventId>`: deduplicates project events within a process lifetime.
 
 Multiple replicas would produce duplicate messages on `telemetry.metrics.raw`, `telemetry.logs.raw`, `telemetry.metadata.raw`, and `telemetry.events.normalized` with no way to coordinate offsets across pods.
 
-**Scale vertically:** the collector is CPU-light (50m request / 250m limit). If the Aiven API rate-limits at high service counts, increase `AIVEN_SERVICES` granularity to shard by service across separate collector deployments, each watching a disjoint service list.
+**Scale vertically:** collector workers are CPU-light. If the provider API rate-limits at high service counts, shard by service across separate collector deployments each watching a disjoint service list.
 
-**Path to horizontal scale:** move `logOffsets` to a Redis hash and `seenProjectEvents` to a Redis set with TTL. Once state is external, two replicas can share a service list with one processing odd-indexed services and the other even, or use a partition key on service name.
+**Path to horizontal scale:** move `logOffsets` to a Redis hash and `seenProjectEvents` to a Redis set with TTL. Once state is external, two replicas can share a service list with a partition key on service name.
 
 ---
 
-## Infrastructure-tier scaling (Aiven-managed)
+## Infrastructure-tier scaling
 
-The services below are managed by Aiven and scaled independently of the k8s workloads.
+The substrate depends on three infrastructure services. These are provider-agnostic and can be run self-hosted (Docker Compose / Kubernetes) or on a managed platform.
 
 | Service | Scale axis | Notes |
 |---|---|---|
@@ -70,12 +70,14 @@ The services below are managed by Aiven and scaled independently of the k8s work
 | **Kafka** | Partition count + broker count | Scale partitions first; they directly gate worker horizontal scale. Broker count follows when partition count exceeds broker capacity. |
 | **ClickHouse** | Shard count | Pattern and reinforcement workers write here; scale when query latency climbs. |
 
+See the [docker-compose files](../deploy/) for self-hosted setup. For Aiven-managed deployments see the `cognitive-substrate-aiven` repository.
+
 ---
 
 ## Current resource baselines
 
 | Container | CPU request | CPU limit | Memory request | Memory limit |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | api | 100m | 500m | 256Mi | 512Mi |
 | web | 100m | 500m | 256Mi | 512Mi |
 | orchestrator | 250m | 1000m | 512Mi | 1Gi |
@@ -84,4 +86,3 @@ The services below are managed by Aiven and scaled independently of the k8s work
 | telemetry-worker | 250m | 1000m | 512Mi | 1Gi |
 | pattern-worker | 250m | 1000m | 512Mi | 1Gi |
 | reinforcement-worker | 250m | 1000m | 512Mi | 1Gi |
-| aiven-collector | 50m | 250m | 128Mi | 256Mi |

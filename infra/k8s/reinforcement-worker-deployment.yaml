@@ -31,62 +31,62 @@ spec:
             - name: KAFKA_BROKERS
               valueFrom:
                 secretKeyRef:
-                  name: cognitive-substrate-aiven
+                  name: cognitive-substrate
                   key: kafka-brokers
             - name: KAFKA_SSL
               valueFrom:
                 secretKeyRef:
-                  name: cognitive-substrate-aiven
+                  name: cognitive-substrate
                   key: kafka-ssl
             - name: KAFKA_SASL_MECHANISM
               valueFrom:
                 secretKeyRef:
-                  name: cognitive-substrate-aiven
+                  name: cognitive-substrate
                   key: kafka-sasl-mechanism
             - name: KAFKA_SASL_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: cognitive-substrate-aiven
+                  name: cognitive-substrate
                   key: kafka-username
             - name: KAFKA_SASL_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: cognitive-substrate-aiven
+                  name: cognitive-substrate
                   key: kafka-password
             - name: OPENSEARCH_URL
               valueFrom:
                 secretKeyRef:
-                  name: cognitive-substrate-aiven
+                  name: cognitive-substrate
                   key: opensearch-url
             - name: OPENSEARCH_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: cognitive-substrate-aiven
+                  name: cognitive-substrate
                   key: opensearch-username
             - name: OPENSEARCH_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: cognitive-substrate-aiven
+                  name: cognitive-substrate
                   key: opensearch-password
             - name: CLICKHOUSE_URL
               valueFrom:
                 secretKeyRef:
-                  name: cognitive-substrate-aiven
+                  name: cognitive-substrate
                   key: clickhouse-url
             - name: CLICKHOUSE_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: cognitive-substrate-aiven
+                  name: cognitive-substrate
                   key: clickhouse-username
             - name: CLICKHOUSE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: cognitive-substrate-aiven
+                  name: cognitive-substrate
                   key: clickhouse-password
             - name: CLICKHOUSE_DATABASE
               valueFrom:
                 secretKeyRef:
-                  name: cognitive-substrate-aiven
+                  name: cognitive-substrate
                   key: clickhouse-database
           resources:
             requests:
