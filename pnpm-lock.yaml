@@ -44,6 +44,9 @@ importers:
       '@cognitive-substrate/memory-opensearch':
         specifier: workspace:*
         version: link:../../packages/memory-opensearch
+      '@cognitive-substrate/plugin-loader':
+        specifier: workspace:*
+        version: link:../../packages/plugin-loader
       '@cognitive-substrate/telemetry-otel':
         specifier: workspace:*
         version: link:../../packages/telemetry-otel
@@ -791,6 +794,12 @@ importers:
       '@cognitive-substrate/core-types':
         specifier: workspace:*
         version: link:../core-types
+      '@cognitive-substrate/kafka-bus':
+        specifier: workspace:*
+        version: link:../kafka-bus
+      hono:
+        specifier: ^4.6.14
+        version: 4.12.18
     devDependencies:
       '@types/node':
         specifier: ^22.0.0

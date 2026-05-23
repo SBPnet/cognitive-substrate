@@ -1,5 +1,7 @@
 import type { ExperienceEvent } from "@cognitive-substrate/core-types";
 import type { ReasoningModel, ToolExecutor } from "@cognitive-substrate/agents";
+import type { Hono } from "hono";
+import type { CognitiveProducer } from "@cognitive-substrate/kafka-bus";
 
 /**
  * An ingest-mapper plugin handles raw events of one or more `event.type`
@@ -7,12 +9,19 @@ import type { ReasoningModel, ToolExecutor } from "@cognitive-substrate/agents";
  *
  * Return `null` from `map()` to silently drop an event (e.g. filtered out
  * by business logic). Throw to surface a hard failure.
+ *
+ * Optionally, a plugin may supply `createWebhookRouter` to contribute an HTTP
+ * receiver that publishes raw events onto telemetry.logs.raw. The API server
+ * mounts each plugin's router at `/api/webhooks/<handle>` automatically --
+ * no changes to server.ts are needed for new integrations.
  */
 export interface IngestMapperPlugin {
   readonly kind: "ingest-mapper";
   /** The `event.type` strings this plugin owns — must be globally unique across plugins. */
   readonly handles: ReadonlyArray<string>;
   map(event: unknown): ExperienceEvent | null;
+  /** Optional: contribute a Hono router that receives external webhook events. */
+  createWebhookRouter?(getProducer: () => CognitiveProducer | null): Hono;
 }
 
 /**

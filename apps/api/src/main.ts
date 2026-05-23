@@ -15,6 +15,7 @@ import {
   telemetryConfigFromEnv,
 } from "@cognitive-substrate/telemetry-otel";
 import { ensureKafkaTopics, kafkaConfigFromEnv } from "@cognitive-substrate/kafka-bus";
+import { loadPluginsFromEnv } from "@cognitive-substrate/plugin-loader";
 import { startResponseConsumer } from "./kafka/response-consumer.js";
 import { startCognitiveConsumer } from "./kafka/cognitive-consumer.js";
 import { startExperienceProducer } from "./kafka/experience-producer.js";
@@ -30,7 +31,8 @@ async function main(): Promise<void> {
   const shutdownTelemetry = await initTelemetry(telemetryConfigFromEnv("api-bff"));
 
   const openSearchClient = createOpenSearchClient(opensearchConfigFromEnv());
-  const app = createApp(openSearchClient, getMetadataProducer);
+  const { ingestMappers } = await loadPluginsFromEnv();
+  const app = createApp(openSearchClient, getMetadataProducer, ingestMappers);
   const port = Number(process.env["PORT"] ?? process.env["API_PORT"] ?? "3001");
   let stopProducer: () => Promise<void> = async () => {};
   let stopConsumer: () => Promise<void> = async () => {};

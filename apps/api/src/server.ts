@@ -8,6 +8,7 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import type { Client } from "@opensearch-project/opensearch";
 import type { CognitiveProducer } from "@cognitive-substrate/kafka-bus";
+import type { IngestMapperPlugin } from "@cognitive-substrate/plugin-loader";
 import { createSessionsRouter } from "./routes/sessions.js";
 import { createMessagesRouter } from "./routes/messages.js";
 import { streamRouter } from "./routes/stream.js";
@@ -26,6 +27,7 @@ import { createDocumentsRouter } from "./routes/documents.js";
 export function createApp(
   openSearchClient: Client,
   getMetadataProducer?: () => CognitiveProducer | null,
+  ingestMapperPlugins: ReadonlyArray<IngestMapperPlugin> = [],
 ): Hono {
   const app = new Hono();
 
@@ -66,6 +68,14 @@ export function createApp(
 
   if (getMetadataProducer) {
     app.route("/api/aiven/webhook", createAivenWebhookRouter(getMetadataProducer));
+    for (const plugin of ingestMapperPlugins) {
+      if (plugin.createWebhookRouter) {
+        const handle = plugin.handles[0];
+        if (handle) {
+          app.route(`/api/webhooks/${handle}`, plugin.createWebhookRouter(getMetadataProducer));
+        }
+      }
+    }
   }
 
   return app;

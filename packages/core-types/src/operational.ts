@@ -4,7 +4,7 @@
  * extended via dynamic registration.
  */
 
-export type OperationalSource = 
+export type OperationalSource =
   | "database_metrics"
   | "database_logs"
   | "zendesk_ticket"
