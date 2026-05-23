@@ -191,6 +191,22 @@ interface IngestMapperPlugin {
 
 **`embedding` must always be an empty array.** The OpenSearch ingest pipeline generates embeddings from `input.text` at index time. Never compute embeddings in a plugin.
 
+**`source` and `sessionId` for non-session events:**
+
+Events produced by background workers or external integrations that have no associated conversation should set `context.source` to `"ambient"`. This tells consolidation to treat them as freestanding memories rather than grouping them into a session window.
+
+```ts
+import { SystemSessionId } from "@cognitive-substrate/core-types";
+
+// For events tied to a real visitor or user session (e.g. blog page views):
+context: { sessionId: event.sessionId, source: "ambient", userId: event.readerId, ... }
+
+// For infrastructure or integration events with no session concept at all:
+context: { sessionId: SystemSessionId.AMBIENT_TELEMETRY, source: "ambient", ... }
+```
+
+Events produced during a live conversation (tool results, user messages, agent actions) omit `source` or set it to `"session"` -- this is the default and no change is needed for session-bound plugins.
+
 **Example -- GitHub push events (mapper only, no webhook receiver):**
 
 ```typescript

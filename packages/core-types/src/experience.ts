@@ -13,9 +13,46 @@ export type EventType =
   | "environmental_observation"
   | "consolidation_output";
 
+/**
+ * Discriminates the origin scope of an ExperienceEvent.
+ *
+ * - "session": produced within a live conversation or agent loop (default).
+ * - "ambient": background signal with no associated conversation -- blog
+ *   telemetry, reader engagement metrics, infrastructure observability data,
+ *   etc. These become freestanding memories that any future session may recall,
+ *   but they are never grouped into a session window by consolidation.
+ * - "system": internal substrate bookkeeping (dream cycles, consolidation
+ *   outputs, policy snapshots). No user or reader identity implied.
+ */
+export type EventSource = "session" | "ambient" | "system";
+
+/**
+ * Canonical sessionId values for non-session event sources.
+ *
+ * Use these instead of ad-hoc strings so that consolidation, retrieval, and
+ * observability tooling can identify and route ambient/system events uniformly.
+ *
+ * Session-bound events use real session UUIDs and do not need these constants.
+ */
+export const SystemSessionId = {
+  /** Windowed summaries from background infrastructure or telemetry workers. */
+  AMBIENT_TELEMETRY: "system:ambient:telemetry",
+  /** Synthetic replay events produced by the dream engine. */
+  DREAM_CYCLE: "system:dream-cycle",
+  /** Consolidation pass outputs (cross-session memory synthesis). */
+  CONSOLIDATION: "system:consolidation",
+} as const;
+
 /** Slim context block attached to every event. */
 export interface EventContext {
   readonly sessionId: string;
+  /**
+   * Origin scope of the event. Defaults to "session" when absent so that
+   * existing session-path code is unaffected. Set to "ambient" for all
+   * background ingestion workers (blog telemetry, infrastructure metrics,
+   * aiven collector). Set to "system" for substrate-internal events.
+   */
+  readonly source?: EventSource;
   readonly userId?: string;
   readonly goalId?: string;
   readonly policyVersion?: string;

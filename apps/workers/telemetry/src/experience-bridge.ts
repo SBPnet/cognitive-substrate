@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { ExperienceEvent } from "@cognitive-substrate/core-types";
+import { SystemSessionId } from "@cognitive-substrate/core-types";
 import { Topics, type CognitiveProducer } from "@cognitive-substrate/kafka-bus";
 import type { RawMetricMessage } from "./pipeline.js";
 
@@ -119,7 +120,8 @@ export class TelemetryExperienceBridge {
       timestamp: windowEnd,
       type: "environmental_observation",
       context: {
-        sessionId: "telemetry:aiven",
+        sessionId: SystemSessionId.AMBIENT_TELEMETRY,
+        source: "ambient",
         traceId: randomUUID(),
         agentId: "telemetry-worker",
       },

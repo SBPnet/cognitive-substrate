@@ -64,6 +64,18 @@ flowchart TD
 | Reinforcement → policy | agent completes turn | updated `ef`/`rt` vector |
 | Decay cycle | scheduled background job | RETAIN / SUPPRESS / COMPRESS / RETIRE / PRUNE |
 
+## Event source scoping
+
+Not all events entering `experience_events` are conversation-bound. `EventContext.source` distinguishes three origin scopes:
+
+| `source` | Examples | Consolidation behaviour |
+|---|---|---|
+| `"session"` (default) | user messages, tool results, agent actions | grouped into session windows |
+| `"ambient"` | blog telemetry, reader engagement, infrastructure summaries | freestanding memories; not session-windowed |
+| `"system"` | dream-cycle replays, consolidation outputs | internal bookkeeping; excluded from episodic stats |
+
+Producers of ambient and system events use `SystemSessionId` constants (from `@cognitive-substrate/core-types`) for the `sessionId` field so the value is stable, queryable, and not mistaken for a real session UUID. Reader identity (`userId`) is preserved where available (e.g. blog events carry `readerId`), enabling cross-session memory recall per reader without conflating readers into a single session stream.
+
 ## Key invariants
 
 - Re-consolidation must run every ≤5 epochs to prevent catastrophic convergence (Exp 13/16).

@@ -12,6 +12,7 @@
 
 import { randomUUID } from "node:crypto";
 import type { ExperienceEvent, SemanticMemory } from "@cognitive-substrate/core-types";
+import { SystemSessionId } from "@cognitive-substrate/core-types";
 import type { DreamCycleResult, DreamInput, DreamScenario } from "./types.js";
 
 export class DreamEngine {
@@ -58,7 +59,8 @@ function syntheticExperience(left: SemanticMemory, right: SemanticMemory, stress
     timestamp: new Date().toISOString(),
     type: "system_event",
     context: {
-      sessionId: "dream-cycle",
+      sessionId: SystemSessionId.DREAM_CYCLE,
+      source: "system",
       traceId: randomUUID(),
     },
     input: {

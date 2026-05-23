@@ -320,6 +320,8 @@ export function registerBuiltinMappers(registry: IngestMapperRegistry): void {
 export function mapTelemetryToExperience(event: TelemetryEvent): ExperienceEvent {
   const context: EventContext = {
     sessionId: event.sessionId,
+    source: "ambient",
+    ...(event.readerId !== undefined ? { userId: event.readerId } : {}),
     agentId: "ingest-worker",
     traceId: randomUUID(),
   };

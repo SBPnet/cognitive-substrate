@@ -137,7 +137,7 @@ otel-cli span \
 
 Logs that arrive via OTLP are routed to `telemetry.logs.raw`. If a log's body parses as JSON with a `type` field matching a registered ingest-mapper plugin, the ingest-worker converts it to an `ExperienceEvent` and indexes it into OpenSearch.
 
-To emit a log that the ingest-worker will pick up, structure it as a JSON body with `type` and `sessionId` fields:
+To emit a log that the ingest-worker will pick up, structure it as a JSON body with a `type` field matching a registered ingest-mapper plugin:
 
 ```typescript
 import { logs } from "@opentelemetry/api-logs";
@@ -147,7 +147,7 @@ const logger = logs.getLogger("my-service");
 logger.emit({
   body: JSON.stringify({
     type: "github_push",           // must match an ingest-mapper plugin's handles[]
-    sessionId: "session-abc123",
+    sessionId: "session-abc123",   // visitor/user session if one exists; see note below
     timestamp: new Date().toISOString(),
     repository: "SBPnet/cognitive-substrate",
     branch: "main",
@@ -159,6 +159,8 @@ logger.emit({
 ```
 
 The log travels: OTEL SDK -> collector -> `telemetry.logs.raw` -> ingest-worker -> `map()` -> OpenSearch.
+
+**Session vs. ambient events:** `sessionId` is required by the `ExperienceEvent` schema, but its meaning depends on the event origin. For events tied to a real visitor or user interaction, pass their session identifier. For background or infrastructure events with no associated conversation, the plugin's `map()` function should set `context.source: "ambient"` and use a `SystemSessionId` constant. The `source` field tells consolidation to treat the event as a freestanding memory rather than grouping it into a session window. See the [Plugin Guide](./plugins.md#1-ingest-mapper) for details.
 
 Logs that do not match any registered plugin are currently dropped with an error logged to the ingest-worker console. If you are sending logs for observability purposes only (not cognitive pipeline ingestion), use a separate OTEL log exporter that routes to your log storage backend rather than pointing at this collector.
 
