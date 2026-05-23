@@ -45,7 +45,7 @@ exporters:
       topic: telemetry.traces.raw
       encoding: otlp_json
     producer:
-      compression: snappy
+      compression: gzip
 
 service:
   pipelines:
