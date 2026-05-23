@@ -11,7 +11,7 @@ import type { ActionRequest, ToolExecutor } from "@cognitive-substrate/agents";
 import type { CognitiveProducer } from "@cognitive-substrate/kafka-bus";
 import type { MemoryRetrieverPort } from "@cognitive-substrate/agents";
 import { WEB_FETCH_CAPABILITY, webFetch } from "./web-fetch.js";
-import { MEMORY_SEARCH_CAPABILITY, MemorySearchTool } from "./memory-search.js";
+import { MemorySearchTool } from "./memory-search.js";
 import { WRITE_EXPERIENCE_CAPABILITY, WriteExperienceTool } from "./write-experience.js";
 import { McpToolBridge, type McpServerConfig } from "./mcp-bridge.js";
 
@@ -47,7 +47,6 @@ export class CompositeToolExecutor implements ToolExecutor {
   listTools(): ReadonlyArray<ToolCapability> {
     return [
       WEB_FETCH_CAPABILITY,
-      MEMORY_SEARCH_CAPABILITY,
       WRITE_EXPERIENCE_CAPABILITY,
       ...this.mcpBridge.listTools(),
     ];

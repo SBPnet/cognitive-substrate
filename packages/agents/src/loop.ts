@@ -86,34 +86,17 @@ export class CognitiveLoop {
       ? await this.config.toolExecutor.execute(decision.action, context)
       : skippedActionResult();
 
-    // When the model called a tool, do a second reasoning pass with the tool
-    // result injected so the final proposal is a real answer, not a placeholder
-    // like "Invoking tool: memory_search".
-    let finalDecision = decision;
-    if (decision.action && actionResult.success) {
-      const contextWithToolResult: AgentContext = {
-        ...context,
-        toolResult: {
-          tool: decision.action.tool,
-          output: typeof actionResult.output === "string"
-            ? actionResult.output
-            : JSON.stringify(actionResult.output),
-        },
-      };
-      finalDecision = await this.config.reasoningModel.reason(contextWithToolResult);
-    }
-
     const agentResult: AgentResult = {
       agentId: "cognitive-loop",
       agentType: "executor",
       traceId: context.traceId,
       timestamp: new Date().toISOString(),
-      proposal: finalDecision.proposal,
-      ...(finalDecision.reasoning ? { reasoning: finalDecision.reasoning } : {}),
-      confidence: finalDecision.confidence,
-      riskScore: finalDecision.riskScore,
+      proposal: decision.proposal,
+      ...(decision.reasoning ? { reasoning: decision.reasoning } : {}),
+      confidence: decision.confidence,
+      riskScore: decision.riskScore,
       retrievedMemories: retrieval.memories.map((memory) => memory.memoryId),
-      score: scoreDecision(finalDecision.confidence, finalDecision.riskScore, actionResult),
+      score: scoreDecision(decision.confidence, decision.riskScore, actionResult),
       selected: true,
     };
 
