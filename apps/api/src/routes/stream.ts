@@ -15,6 +15,7 @@ import { streamSSE } from "hono/streaming";
 import type { InteractionResponseEvent } from "@cognitive-substrate/core-types";
 import { sessionEventBus } from "../kafka/session-bus.js";
 import { kafkaEventBus } from "../kafka/kafka-event-bus.js";
+import { memoryRefToDto } from "../types.js";
 import type { SseEnvelope, InteractionResponseDto, KafkaEventDto } from "../types.js";
 
 export const streamRouter = new Hono();
@@ -34,6 +35,7 @@ streamRouter.get("/", (c) => {
     const unsubscribeResponse = sessionEventBus.subscribe(
       sessionId,
       (event: InteractionResponseEvent) => {
+        const ps = event.policySnapshot;
         const dto: InteractionResponseDto = {
           eventId: event.eventId,
           sessionId: event.sessionId,
@@ -43,6 +45,18 @@ streamRouter.get("/", (c) => {
           responseText: event.responseText,
           confidence: event.confidence,
           riskScore: event.riskScore,
+          retrievedMemories: event.retrievedMemories.map(memoryRefToDto),
+          policySnapshot: {
+            version: ps.version,
+            timestamp: ps.timestamp,
+            retrievalBias: ps.retrievalBias,
+            toolBias: ps.toolBias,
+            riskTolerance: ps.riskTolerance,
+            memoryTrust: ps.memoryTrust,
+            explorationFactor: ps.explorationFactor,
+            goalPersistence: ps.goalPersistence,
+            workingMemoryDecayRate: ps.workingMemoryDecayRate,
+          },
           ...(event.errorMessage !== undefined ? { errorMessage: event.errorMessage } : {}),
         };
 

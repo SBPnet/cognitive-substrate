@@ -29,8 +29,12 @@ export interface PolicySnapshotDto {
   version: string;
   timestamp: string;
   retrievalBias: number;
+  toolBias: number;
   riskTolerance: number;
+  memoryTrust: number;
   explorationFactor: number;
+  goalPersistence: number;
+  workingMemoryDecayRate: number;
 }
 
 export interface SendMessageResponse {
@@ -72,6 +76,8 @@ export interface InteractionResponseDto {
   responseText: string;
   confidence: number;
   riskScore: number;
+  retrievedMemories: MemoryDto[];
+  policySnapshot: PolicySnapshotDto;
   errorMessage?: string | undefined;
 }
 
@@ -285,7 +291,37 @@ export async function renameSession(sessionId: string, name: string): Promise<Se
 export async function getSessionPolicy(sessionId: string): Promise<PolicySnapshotDto> {
   const res = await fetch(`${API_BASE}/sessions/${sessionId}/policy`);
   if (!res.ok) {
-    return { version: "default", timestamp: new Date().toISOString(), retrievalBias: 0.5, riskTolerance: 0.5, explorationFactor: 0.5 };
+    return {
+      version: "default", timestamp: new Date().toISOString(),
+      retrievalBias: 0.5, toolBias: 0.5, riskTolerance: 0.5,
+      memoryTrust: 0.5, explorationFactor: 0.5, goalPersistence: 0.5,
+      workingMemoryDecayRate: 0.5,
+    };
   }
   return res.json() as Promise<PolicySnapshotDto>;
+}
+
+// ---------------------------------------------------------------------------
+// Conversation history
+// ---------------------------------------------------------------------------
+
+export interface ConversationTurnDto {
+  id: string;
+  role: "user" | "assistant";
+  text: string;
+  timestamp: string;
+  status: "complete" | "failed";
+  confidence?: number;
+  riskScore?: number;
+  eventId?: string;
+}
+
+export async function getConversationHistory(
+  sessionId: string,
+  limit = 200,
+): Promise<ConversationTurnDto[]> {
+  const res = await fetch(`${API_BASE}/sessions/${sessionId}/memories/turns?limit=${limit}`);
+  if (!res.ok) return [];
+  const data = await res.json() as { turns: ConversationTurnDto[] };
+  return data.turns ?? [];
 }

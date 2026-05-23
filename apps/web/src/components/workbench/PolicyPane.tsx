@@ -11,9 +11,25 @@ const DEFAULT: PolicySnapshotDto = {
   version: "default",
   timestamp: new Date().toISOString(),
   retrievalBias: 0.5,
+  toolBias: 0.5,
   riskTolerance: 0.5,
+  memoryTrust: 0.5,
   explorationFactor: 0.5,
+  goalPersistence: 0.5,
+  workingMemoryDecayRate: 0.5,
 };
+
+type GaugeColor = "indigo" | "amber" | "teal" | "purple" | "rose" | "sky" | "emerald";
+
+const GAUGES: { label: string; key: keyof PolicySnapshotDto; color: GaugeColor }[] = [
+  { label: "Retrieval Bias",         key: "retrievalBias",         color: "indigo"  },
+  { label: "Tool Bias",              key: "toolBias",               color: "purple"  },
+  { label: "Risk Tolerance",         key: "riskTolerance",          color: "amber"   },
+  { label: "Memory Trust",           key: "memoryTrust",            color: "teal"    },
+  { label: "Exploration Factor",     key: "explorationFactor",      color: "sky"     },
+  { label: "Goal Persistence",       key: "goalPersistence",        color: "emerald" },
+  { label: "Working Memory Decay",   key: "workingMemoryDecayRate", color: "rose"    },
+];
 
 export function PolicyPane({ policy, onRefresh }: Props) {
   const p = policy ?? DEFAULT;
@@ -39,10 +55,15 @@ export function PolicyPane({ policy, onRefresh }: Props) {
         )}
       </header>
 
-      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
-        <PolicyGauge label="Retrieval Bias" value={p.retrievalBias} color="indigo" />
-        <PolicyGauge label="Risk Tolerance" value={p.riskTolerance} color="amber" />
-        <PolicyGauge label="Exploration Factor" value={p.explorationFactor} color="teal" />
+      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
+        {GAUGES.map(({ label, key, color }) => (
+          <PolicyGauge
+            key={key}
+            label={label}
+            value={p[key] as number}
+            color={color}
+          />
+        ))}
       </div>
     </div>
   );
@@ -55,31 +76,29 @@ function PolicyGauge({
 }: {
   label: string;
   value: number;
-  color: "indigo" | "amber" | "teal";
+  color: GaugeColor;
 }) {
   const pct = Math.round(value * 100);
 
-  const barColors = {
-    indigo: "bg-indigo-500",
-    amber: "bg-amber-500",
-    teal: "bg-teal-500",
-  };
-
-  const glowColors = {
-    indigo: "shadow-indigo-500/20",
-    amber: "shadow-amber-500/20",
-    teal: "shadow-teal-500/20",
+  const barColors: Record<GaugeColor, string> = {
+    indigo:  "bg-indigo-500",
+    amber:   "bg-amber-500",
+    teal:    "bg-teal-500",
+    purple:  "bg-purple-500",
+    rose:    "bg-rose-500",
+    sky:     "bg-sky-500",
+    emerald: "bg-emerald-500",
   };
 
   return (
-    <div className="bg-zinc-800/50 border border-zinc-700/50 rounded-lg px-3 py-2.5">
-      <div className="flex justify-between items-center mb-2">
+    <div className="bg-zinc-800/50 border border-zinc-700/50 rounded-lg px-3 py-2">
+      <div className="flex justify-between items-center mb-1.5">
         <span className="text-xs text-zinc-300">{label}</span>
         <span className="text-xs font-mono text-zinc-400">{pct}%</span>
       </div>
       <div className="h-1 rounded-full bg-zinc-700">
         <div
-          className={`h-full rounded-full ${barColors[color]} shadow-sm ${glowColors[color]} transition-all duration-700`}
+          className={`h-full rounded-full ${barColors[color]} transition-all duration-700`}
           style={{ width: `${pct}%` }}
         />
       </div>

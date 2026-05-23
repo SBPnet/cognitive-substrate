@@ -9,12 +9,14 @@ import {
   getAgentActivity,
   searchMemories,
   getSessionPolicy,
+  getConversationHistory,
   type SessionDto,
   type MemoryDto,
   type TraceEventDto,
   type AgentActivityDto,
   type PolicySnapshotDto,
   type KafkaEventDto,
+  type ConversationTurnDto,
 } from "@/lib/api-client";
 
 const KAFKA_EVENT_CAP = 200;
@@ -50,6 +52,8 @@ export interface UseSessionResult {
     text: string,
     confidence: number,
     riskScore: number,
+    retrievedMemories: MemoryDto[],
+    policySnapshot: PolicySnapshotDto,
   ) => void;
   markTurnFailed: (eventId: string, errorMessage: string) => void;
   refreshMemories: (sid: string) => Promise<void>;
@@ -103,6 +107,18 @@ export function useSession(): UseSessionResult {
       setSession({ sessionId, createdAt: "", messageCount: 0, status: "active" });
       setTurns([]);
       await Promise.all([
+        getConversationHistory(sessionId).then((history: ConversationTurnDto[]) => {
+          setTurns(history.map((t) => ({
+            id: t.id,
+            role: t.role,
+            text: t.text,
+            timestamp: t.timestamp,
+            status: t.status,
+            confidence: t.confidence,
+            riskScore: t.riskScore,
+            eventId: t.eventId,
+          })));
+        }),
         getSessionMemories(sessionId).then((r) => setMemories(r.memories as MemoryDto[])),
         getSessionTrace(sessionId).then((r) => setTraceEvents(r.events as TraceEventDto[])),
         getAgentActivity(sessionId).then((r) => setAgentActivities(r.activities as AgentActivityDto[])),
@@ -154,7 +170,14 @@ export function useSession(): UseSessionResult {
   );
 
   const addAssistantTurn = useCallback(
-    (eventId: string, text: string, confidence: number, riskScore: number) => {
+    (
+      eventId: string,
+      text: string,
+      confidence: number,
+      riskScore: number,
+      retrievedMemories: MemoryDto[],
+      policySnapshot: PolicySnapshotDto,
+    ) => {
       const assistantTurn: ConversationTurn = {
         id: `assistant-${eventId}`,
         role: "assistant",
@@ -166,6 +189,8 @@ export function useSession(): UseSessionResult {
         eventId,
       };
       setTurns((prev) => [...prev, assistantTurn]);
+      setMemories(retrievedMemories);
+      setPolicy(policySnapshot);
     },
     [],
   );

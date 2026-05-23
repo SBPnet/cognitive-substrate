@@ -18,16 +18,24 @@ interface PolicyStateDoc extends Record<string, unknown> {
   readonly policy_id?: string | undefined;
   readonly timestamp?: string | undefined;
   readonly retrieval_bias?: number | undefined;
+  readonly tool_bias?: number | undefined;
   readonly risk_tolerance?: number | undefined;
+  readonly memory_trust?: number | undefined;
   readonly exploration_factor?: number | undefined;
+  readonly goal_persistence?: number | undefined;
+  readonly working_memory_decay_rate?: number | undefined;
 }
 
 const DEFAULT_POLICY: PolicySnapshotDto = {
   version: "default",
   timestamp: new Date().toISOString(),
   retrievalBias: 0.5,
+  toolBias: 0.5,
   riskTolerance: 0.5,
+  memoryTrust: 0.5,
   explorationFactor: 0.5,
+  goalPersistence: 0.5,
+  workingMemoryDecayRate: 0.5,
 };
 
 export function createPolicyRouter(openSearchClient: Client): Hono {
@@ -59,8 +67,12 @@ export function createPolicyRouter(openSearchClient: Client): Hono {
         version: doc.policy_id ?? "unknown",
         timestamp: doc.timestamp ?? new Date().toISOString(),
         retrievalBias: doc.retrieval_bias ?? 0.5,
+        toolBias: doc.tool_bias ?? 0.5,
         riskTolerance: doc.risk_tolerance ?? 0.5,
+        memoryTrust: doc.memory_trust ?? 0.5,
         explorationFactor: doc.exploration_factor ?? 0.5,
+        goalPersistence: doc.goal_persistence ?? 0.5,
+        workingMemoryDecayRate: doc.working_memory_decay_rate ?? 0.5,
       };
       return c.json(snapshot);
     } catch {

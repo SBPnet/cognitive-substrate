@@ -8,7 +8,7 @@ import {
   search,
   type RetrievalMode,
 } from "@cognitive-substrate/memory-opensearch";
-import type { MemoryDto } from "../types.js";
+import type { ConversationTurnDto, MemoryDto } from "../types.js";
 
 interface ExperienceHit extends Record<string, unknown> {
   readonly event_id?: string | undefined;
@@ -151,6 +151,98 @@ export async function getRecentAuditEvents(
   try {
     const hits = await search<Record<string, unknown>>(client, "audit_events" as never, query);
     return hits.map((h) => h._source);
+  } catch {
+    return [];
+  }
+}
+
+interface AuditHit extends Record<string, unknown> {
+  readonly originalTopic?: string;
+  readonly timestamp?: string;
+  readonly payload?: Record<string, unknown>;
+}
+
+export async function getConversationTurns(
+  client: Client,
+  sessionId: string,
+  limit = 200,
+): Promise<ConversationTurnDto[]> {
+  const query = {
+    query: {
+      bool: {
+        must: [
+          {
+            bool: {
+              should: [
+                { term: { "payload.sessionId": sessionId } },
+                { term: { "payload.context.sessionId": sessionId } },
+                { term: { "payload.sessionId.keyword": sessionId } },
+                { term: { "payload.context.sessionId.keyword": sessionId } },
+              ],
+              minimum_should_match: 1,
+            },
+          },
+          {
+            terms: {
+              "originalTopic.keyword": ["experience.raw", "interaction.response"],
+            },
+          },
+        ],
+      },
+    },
+    sort: [{ timestamp: { order: "asc" } }],
+    size: limit,
+    _source: ["originalTopic", "timestamp", "payload"],
+  };
+
+  try {
+    const hits = await search<AuditHit>(client, "audit_events" as never, query);
+    const turns: ConversationTurnDto[] = [];
+
+    for (const h of hits) {
+      const src = h._source;
+      const topic = src.originalTopic ?? "";
+      const payload = src.payload ?? {};
+      const ts = src.timestamp ?? new Date().toISOString();
+
+      if (topic === "experience.raw") {
+        const type = payload["type"] as string | undefined;
+        if (type !== "user_input") continue;
+        const input = payload["input"] as Record<string, unknown> | undefined;
+        const text = typeof input?.["text"] === "string" ? input["text"] : "";
+        if (!text) continue;
+        const userEventId = payload["eventId"] as string | undefined;
+        const userTurn: ConversationTurnDto = {
+          id: `user-${userEventId ?? ts}`,
+          role: "user",
+          text,
+          timestamp: ts,
+          status: "complete",
+          ...(userEventId !== undefined ? { eventId: userEventId } : {}),
+        };
+        turns.push(userTurn);
+      } else if (topic === "interaction.response") {
+        const status = payload["status"] as string | undefined;
+        const responseText = typeof payload["responseText"] === "string" ? payload["responseText"] : "";
+        if (!responseText) continue;
+        const eventId = payload["eventId"] as string | undefined;
+        const confidence = typeof payload["confidence"] === "number" ? payload["confidence"] : undefined;
+        const riskScore = typeof payload["riskScore"] === "number" ? payload["riskScore"] : undefined;
+        const assistantTurn: ConversationTurnDto = {
+          id: `assistant-${eventId ?? ts}`,
+          role: "assistant",
+          text: responseText,
+          timestamp: ts,
+          status: status === "failed" ? "failed" : "complete",
+          ...(confidence !== undefined ? { confidence } : {}),
+          ...(riskScore !== undefined ? { riskScore } : {}),
+          ...(eventId !== undefined ? { eventId } : {}),
+        };
+        turns.push(assistantTurn);
+      }
+    }
+
+    return turns;
   } catch {
     return [];
   }

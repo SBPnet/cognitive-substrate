@@ -9,8 +9,9 @@
 import { Hono } from "hono";
 import type { Client } from "@opensearch-project/opensearch";
 import type { RetrievalMode } from "@cognitive-substrate/memory-opensearch";
-import type { MemoriesResponse, TraceEventDto } from "../types.js";
+import type { ConversationHistoryResponse, MemoriesResponse, TraceEventDto } from "../types.js";
 import {
+  getConversationTurns,
   getSessionMemories,
   searchSemanticMemories,
   getRecentAuditEvents,
@@ -41,6 +42,16 @@ export function createMemoriesRouter(openSearchClient: Client): Hono {
 
     const memories = await searchSemanticMemories(openSearchClient, q, limit, retrievalMode, sessionId);
     const response: MemoriesResponse = { memories, total: memories.length };
+    return c.json(response);
+  });
+
+  router.get("/turns", async (c) => {
+    const sessionId = c.req.param("sessionId");
+    if (!sessionId) return c.json({ error: "sessionId is required" }, 400);
+    const limit = Math.min(500, Math.max(1, Number(c.req.query("limit") ?? "200")));
+
+    const turns = await getConversationTurns(openSearchClient, sessionId, limit);
+    const response: ConversationHistoryResponse = { turns, total: turns.length };
     return c.json(response);
   });
 

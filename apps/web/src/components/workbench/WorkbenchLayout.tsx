@@ -52,17 +52,17 @@ export function WorkbenchLayout() {
           response.responseText,
           response.confidence,
           response.riskScore,
+          response.retrievedMemories,
+          response.policySnapshot,
         );
       }
 
       const sid = sessionRef.current?.sessionId;
       if (sid) {
-        void refreshMemories(sid);
         void refreshAgentActivity(sid);
-        void refreshPolicy(sid);
       }
     },
-    [addAssistantTurn, markTurnFailed, refreshAgentActivity, refreshMemories, refreshPolicy],
+    [addAssistantTurn, markTurnFailed, refreshAgentActivity],
   );
 
   const handleKafkaEvent = useCallback(

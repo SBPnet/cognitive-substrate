@@ -53,6 +53,8 @@ export interface InteractionResponseDto {
   readonly responseText: string;
   readonly confidence: number;
   readonly riskScore: number;
+  readonly retrievedMemories: ReadonlyArray<MemoryDto>;
+  readonly policySnapshot: PolicySnapshotDto;
   readonly errorMessage?: string | undefined;
 }
 
@@ -87,6 +89,26 @@ export function memoryRefToDto(ref: MemoryReference): MemoryDto {
     return { ...dto, lastRetrieved: ref.lastRetrieved };
   }
   return dto;
+}
+
+// ---------------------------------------------------------------------------
+// Conversation turn history
+// ---------------------------------------------------------------------------
+
+export interface ConversationTurnDto {
+  readonly id: string;
+  readonly role: "user" | "assistant";
+  readonly text: string;
+  readonly timestamp: string;
+  readonly status: "complete" | "failed";
+  readonly confidence?: number;
+  readonly riskScore?: number;
+  readonly eventId?: string;
+}
+
+export interface ConversationHistoryResponse {
+  readonly turns: ReadonlyArray<ConversationTurnDto>;
+  readonly total: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -131,8 +153,12 @@ export type PolicySnapshotDto = Pick<
   | "version"
   | "timestamp"
   | "retrievalBias"
+  | "toolBias"
   | "riskTolerance"
+  | "memoryTrust"
   | "explorationFactor"
+  | "goalPersistence"
+  | "workingMemoryDecayRate"
 >;
 
 // ---------------------------------------------------------------------------
