@@ -138,8 +138,6 @@ export async function getRecentAuditEvents(
         should: [
           { term: { "payload.sessionId": sessionId } },
           { term: { "payload.context.sessionId": sessionId } },
-          { term: { "payload.sessionId.keyword": sessionId } },
-          { term: { "payload.context.sessionId.keyword": sessionId } },
         ],
         minimum_should_match: 1,
       },
@@ -176,15 +174,13 @@ export async function getConversationTurns(
               should: [
                 { term: { "payload.sessionId": sessionId } },
                 { term: { "payload.context.sessionId": sessionId } },
-                { term: { "payload.sessionId.keyword": sessionId } },
-                { term: { "payload.context.sessionId.keyword": sessionId } },
               ],
               minimum_should_match: 1,
             },
           },
           {
             terms: {
-              "originalTopic.keyword": ["experience.raw", "interaction.response"],
+              originalTopic: ["experience.raw", "interaction.response"],
             },
           },
         ],

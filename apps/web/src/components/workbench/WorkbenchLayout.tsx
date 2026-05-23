@@ -52,8 +52,8 @@ export function WorkbenchLayout() {
           response.responseText,
           response.confidence,
           response.riskScore,
-          response.retrievedMemories,
-          response.policySnapshot,
+          response.retrievedMemories ?? [],
+          response.policySnapshot ?? null,
         );
       }
 

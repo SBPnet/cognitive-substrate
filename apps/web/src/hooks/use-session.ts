@@ -52,8 +52,8 @@ export interface UseSessionResult {
     text: string,
     confidence: number,
     riskScore: number,
-    retrievedMemories: MemoryDto[],
-    policySnapshot: PolicySnapshotDto,
+    retrievedMemories: MemoryDto[] | null,
+    policySnapshot: PolicySnapshotDto | null,
   ) => void;
   markTurnFailed: (eventId: string, errorMessage: string) => void;
   refreshMemories: (sid: string) => Promise<void>;
@@ -175,8 +175,8 @@ export function useSession(): UseSessionResult {
       text: string,
       confidence: number,
       riskScore: number,
-      retrievedMemories: MemoryDto[],
-      policySnapshot: PolicySnapshotDto,
+      retrievedMemories: MemoryDto[] | null,
+      policySnapshot: PolicySnapshotDto | null,
     ) => {
       const assistantTurn: ConversationTurn = {
         id: `assistant-${eventId}`,
@@ -189,8 +189,8 @@ export function useSession(): UseSessionResult {
         eventId,
       };
       setTurns((prev) => [...prev, assistantTurn]);
-      setMemories(retrievedMemories);
-      setPolicy(policySnapshot);
+      if (retrievedMemories !== null) setMemories(retrievedMemories);
+      if (policySnapshot !== null) setPolicy(policySnapshot);
     },
     [],
   );
