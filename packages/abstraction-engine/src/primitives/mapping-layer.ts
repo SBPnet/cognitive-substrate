@@ -140,10 +140,131 @@ export const AIVEN_CLICKHOUSE_MAPPING: SystemMapping = {
   },
 };
 
-/** All built-in Aiven service mappings, keyed by systemId. */
+// ----------------------------------------------------------------
+// Built-in mappings for substrate-native services
+// These cover the workers, API, and orchestrator that emit OTLP
+// metrics via the internal collector → telemetry.metrics.otlp.
+//
+// Metric names follow the OTel semantic conventions used in
+// packages/telemetry-otel/src/metrics.ts.
+// ----------------------------------------------------------------
+
+/**
+ * Ingestion worker: embeddings and OpenSearch write latency.
+ * High write latency or embedding stalls signal cognitive slowdown.
+ */
+export const SUBSTRATE_INGESTION_MAPPING: SystemMapping = {
+  systemId: "substrate.ingestion-worker",
+  systemType: "cognitive-ingestion",
+  metricMappings: {
+    "worker.message.duration_ms":              "RESPONSE_DEGRADATION",
+    "worker.errors":                           "CASCADING_FAILURE",
+    "worker.messages.processed":               "THROUGHPUT_COLLAPSE",
+    "ingestion.embedding.duration_ms":         "RESPONSE_DEGRADATION",
+    "ingestion.opensearch.write_duration_ms":  "IO_SATURATION",
+    "ingestion.importance_score":              "COMPOSITE",
+  },
+};
+
+/**
+ * Orchestrator: CognitiveLoop turn latency and agent processing.
+ * High turn latency or cascading errors signal cognitive overload.
+ */
+export const SUBSTRATE_ORCHESTRATOR_MAPPING: SystemMapping = {
+  systemId: "substrate.orchestrator",
+  systemType: "cognitive-orchestration",
+  metricMappings: {
+    "worker.message.duration_ms":              "TAIL_LATENCY_EXPANSION",
+    "worker.errors":                           "CASCADING_FAILURE",
+    "worker.messages.processed":               "THROUGHPUT_COLLAPSE",
+  },
+};
+
+/**
+ * API: request latency, error rate.
+ */
+export const SUBSTRATE_API_MAPPING: SystemMapping = {
+  systemId: "substrate.api-bff",
+  systemType: "cognitive-api",
+  metricMappings: {
+    "http.server.request.duration":            "RESPONSE_DEGRADATION",
+    "http.server.active_requests":             "QUEUE_GROWTH",
+    "http.server.response.body.size":          "IO_SATURATION",
+    "worker.errors":                           "CASCADING_FAILURE",
+  },
+};
+
+/**
+ * Pattern worker: sliding window depth and match scores.
+ * Growing window without matches signals detection stall.
+ */
+export const SUBSTRATE_PATTERN_MAPPING: SystemMapping = {
+  systemId: "substrate.pattern-worker",
+  systemType: "cognitive-pattern",
+  metricMappings: {
+    "worker.message.duration_ms":              "RESPONSE_DEGRADATION",
+    "worker.errors":                           "CASCADING_FAILURE",
+    "pattern.window_size":                     "BACKPRESSURE_ACCUMULATION",
+    "pattern.matches":                         "THROUGHPUT_COLLAPSE",
+    "pattern.match_score":                     "COMPOSITE",
+  },
+};
+
+/**
+ * Reinforcement worker: reward signal distribution and outcome tracking.
+ */
+export const SUBSTRATE_REINFORCEMENT_MAPPING: SystemMapping = {
+  systemId: "substrate.reinforcement-worker",
+  systemType: "cognitive-reinforcement",
+  metricMappings: {
+    "worker.message.duration_ms":              "RESPONSE_DEGRADATION",
+    "worker.errors":                           "CASCADING_FAILURE",
+    "reinforcement.recommendations_tracked":   "THROUGHPUT_COLLAPSE",
+    "reinforcement.outcomes_recorded":         "THROUGHPUT_COLLAPSE",
+    "reinforcement.reward_score":              "COMPOSITE",
+  },
+};
+
+/**
+ * Consolidation worker: semantic memory merge latency and source event count.
+ */
+export const SUBSTRATE_CONSOLIDATION_MAPPING: SystemMapping = {
+  systemId: "substrate.consolidation-worker",
+  systemType: "cognitive-consolidation",
+  metricMappings: {
+    "worker.message.duration_ms":              "RESPONSE_DEGRADATION",
+    "worker.errors":                           "CASCADING_FAILURE",
+    "consolidation.source_events":             "QUEUE_GROWTH",
+    "consolidation.duration_ms":              "TAIL_LATENCY_EXPANSION",
+  },
+};
+
+/**
+ * Telemetry worker: ClickHouse write latency and batch size.
+ */
+export const SUBSTRATE_TELEMETRY_MAPPING: SystemMapping = {
+  systemId: "substrate.telemetry-worker",
+  systemType: "cognitive-telemetry",
+  metricMappings: {
+    "worker.message.duration_ms":              "RESPONSE_DEGRADATION",
+    "worker.errors":                           "CASCADING_FAILURE",
+    "telemetry.batch_size":                    "QUEUE_GROWTH",
+    "telemetry.clickhouse.write_duration_ms":  "IO_SATURATION",
+    "telemetry.primitive_events_emitted":      "THROUGHPUT_COLLAPSE",
+  },
+};
+
+/** All built-in mappings: Aiven services + substrate-native workers. */
 export const BUILTIN_MAPPINGS: ReadonlyMap<string, SystemMapping> = new Map([
   [AIVEN_KAFKA_MAPPING.systemId, AIVEN_KAFKA_MAPPING],
   [AIVEN_OPENSEARCH_MAPPING.systemId, AIVEN_OPENSEARCH_MAPPING],
   [AIVEN_POSTGRES_MAPPING.systemId, AIVEN_POSTGRES_MAPPING],
   [AIVEN_CLICKHOUSE_MAPPING.systemId, AIVEN_CLICKHOUSE_MAPPING],
+  [SUBSTRATE_INGESTION_MAPPING.systemId, SUBSTRATE_INGESTION_MAPPING],
+  [SUBSTRATE_ORCHESTRATOR_MAPPING.systemId, SUBSTRATE_ORCHESTRATOR_MAPPING],
+  [SUBSTRATE_API_MAPPING.systemId, SUBSTRATE_API_MAPPING],
+  [SUBSTRATE_PATTERN_MAPPING.systemId, SUBSTRATE_PATTERN_MAPPING],
+  [SUBSTRATE_REINFORCEMENT_MAPPING.systemId, SUBSTRATE_REINFORCEMENT_MAPPING],
+  [SUBSTRATE_CONSOLIDATION_MAPPING.systemId, SUBSTRATE_CONSOLIDATION_MAPPING],
+  [SUBSTRATE_TELEMETRY_MAPPING.systemId, SUBSTRATE_TELEMETRY_MAPPING],
 ]);

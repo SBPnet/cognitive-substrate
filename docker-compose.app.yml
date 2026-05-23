@@ -33,6 +33,8 @@ x-worker-common: &worker-common
   networks:
     - infra
     - kafka-net
+  depends_on:
+    - otel-collector
   environment: &worker-env
     NODE_ENV: production
     KAFKA_BROKERS: kafka:29092
@@ -41,8 +43,32 @@ x-worker-common: &worker-common
     EMBEDDING_PROVIDER: opensearch
     OPENSEARCH_MODEL_ID: ${OPENSEARCH_MODEL_ID:-YYGXOJ4BgYB_vs2klaSo}
     EMBEDDING_DIMENSION: "768"
+    OTEL_EXPORTER_OTLP_ENDPOINT: http://cs-otel-collector:4318
 
 services:
+  # ---------------------------------------------------------------------------
+  # OTEL Collector — receives OTLP from all substrate services, routes to Kafka
+  # Metrics  → telemetry.metrics.otlp
+  # Logs     → telemetry.logs.raw
+  # Traces   → telemetry.traces.raw
+  # ---------------------------------------------------------------------------
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: cs-otel-collector
+    restart: unless-stopped
+    command: ["--config=/etc/otel/config.yml"]
+    volumes:
+      - ./deploy/otel-collector-config.yml:/etc/otel/config.yml:ro
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    networks:
+      - infra
+      - kafka-net
+    environment:
+      KAFKA_BROKERS: kafka:29092
+      ENVIRONMENT: ${ENVIRONMENT:-production}
+
   # ---------------------------------------------------------------------------
   # API — REST + SSE gateway
   # http://thor:4000
@@ -53,6 +79,8 @@ services:
       dockerfile: apps/api/Dockerfile
     container_name: cs-api
     restart: unless-stopped
+    depends_on:
+      - otel-collector
     ports:
       - "4000:4000"
     networks:
@@ -65,7 +93,8 @@ services:
       KAFKA_CLIENT_ID: api
       KAFKA_TOPIC_REPLICATION_FACTOR: "1"
       OPENSEARCH_URL: http://opensearch-node1:9200
-      OTEL_SDK_DISABLED: "true"
+      OTEL_SERVICE_NAME: api-bff
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://cs-otel-collector:4318
       API_CORS_ORIGIN: "*"
 
   # ---------------------------------------------------------------------------
@@ -100,7 +129,8 @@ services:
       OPENAI_BASE_URL: ${OPENAI_BASE_URL:-}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       OPENAI_MODEL: ${OPENAI_MODEL:-qwen2.5:7b}
-      OTEL_SDK_DISABLED: "true"
+      OTEL_SERVICE_NAME: orchestrator
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://cs-otel-collector:4318
 
   # ---------------------------------------------------------------------------
   # Workers
@@ -113,9 +143,11 @@ services:
     container_name: cs-worker-ingestion
     depends_on:
       - api
+      - otel-collector
     environment:
       <<: *worker-env
       KAFKA_CLIENT_ID: ingestion-worker-full
+      OTEL_SERVICE_NAME: ingestion-worker
       INGEST_PIPELINE: experience-events-embed
       S3_ENDPOINT: http://minio:9000
       S3_BUCKET: cognitive-substrate
@@ -132,9 +164,11 @@ services:
     container_name: cs-worker-consolidation
     depends_on:
       - api
+      - otel-collector
     environment:
       <<: *worker-env
       KAFKA_CLIENT_ID: consolidation-worker
+      OTEL_SERVICE_NAME: consolidation-worker
 
   worker-reinforcement:
     <<: *worker-common
@@ -144,9 +178,11 @@ services:
     container_name: cs-worker-reinforcement
     depends_on:
       - api
+      - otel-collector
     environment:
       <<: *worker-env
       KAFKA_CLIENT_ID: reinforcement-worker
+      OTEL_SERVICE_NAME: reinforcement-worker
       CLICKHOUSE_URL: http://clickhouse:8123
       CLICKHOUSE_PASSWORD: substrate
 
@@ -158,9 +194,11 @@ services:
     container_name: cs-worker-pattern
     depends_on:
       - api
+      - otel-collector
     environment:
       <<: *worker-env
       KAFKA_CLIENT_ID: pattern-worker
+      OTEL_SERVICE_NAME: pattern-worker
       CLICKHOUSE_URL: http://clickhouse:8123
       CLICKHOUSE_PASSWORD: substrate
 
@@ -172,6 +210,7 @@ services:
     container_name: cs-worker-telemetry
     depends_on:
       - api
+      - otel-collector
     environment:
       <<: *worker-env
       KAFKA_CLIENT_ID: telemetry-worker
@@ -181,7 +220,8 @@ services:
       CLICKHOUSE_DATABASE: cognitive_substrate_telemetry
       CLICKHOUSE_USERNAME: default
       CLICKHOUSE_PASSWORD: substrate
-      OTEL_SDK_DISABLED: "true"
+      OTEL_SERVICE_NAME: telemetry-worker
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://cs-otel-collector:4318
 
   worker-memory-critique:
     <<: *worker-common
@@ -191,9 +231,11 @@ services:
     container_name: cs-worker-memory-critique
     depends_on:
       - api
+      - otel-collector
     environment:
       <<: *worker-env
       KAFKA_CLIENT_ID: memory-critique-worker
+      OTEL_SERVICE_NAME: memory-critique-worker
 
   # ---------------------------------------------------------------------------
   # Web UI

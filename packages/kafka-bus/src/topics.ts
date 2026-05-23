@@ -102,6 +102,13 @@ export const Topics = {
   TELEMETRY_TRACES_RAW: "telemetry.traces.raw",
 
   /**
+   * OTLP-JSON metric batches emitted by the internal OTEL collector.
+   * Shape: serialised ExportMetricsServiceRequest (protobuf-json).
+   * Consumed by the telemetry worker alongside telemetry.metrics.raw.
+   */
+  TELEMETRY_METRICS_OTLP: "telemetry.metrics.otlp",
+
+  /**
    * Normalised telemetry events: vendor-specific metric names resolved to
    * system-agnostic operational primitives by the telemetry worker.
    */
@@ -178,6 +185,7 @@ export const TOPIC_CONFIGS: ReadonlyArray<TopicConfig> = [
   { name: Topics.TELEMETRY_LOGS_RAW, partitions: 24, retentionMs: 7 * 86_400_000, replicationFactor: 3, diskless: true },
   { name: Topics.TELEMETRY_METADATA_RAW, partitions: 6, retentionMs: 30 * 86_400_000, replicationFactor: 3, diskless: true },
   { name: Topics.TELEMETRY_TRACES_RAW, partitions: 12, retentionMs: 3 * 86_400_000, replicationFactor: 3, diskless: true },
+  { name: Topics.TELEMETRY_METRICS_OTLP, partitions: 12, retentionMs: 7 * 86_400_000, replicationFactor: 3, diskless: true },
   { name: Topics.TELEMETRY_EVENTS_NORMALIZED, partitions: 12, retentionMs: 14 * 86_400_000, replicationFactor: 3, diskless: true },
 
   // Cognition tier (Diskless)

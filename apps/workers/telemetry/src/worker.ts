@@ -21,6 +21,7 @@ import {
   type RawMetadataMessage,
 } from "./experience-bridge.js";
 import { processTelemetryBatch, type RawMetricMessage } from "./pipeline.js";
+import { parseOtlpMetricBatch } from "./otlp-parser.js";
 
 const BATCH_WINDOW_MS = 5_000;
 const BATCH_MAX_SIZE = 500;
@@ -28,7 +29,8 @@ const BATCH_MAX_SIZE = 500;
 type TelemetryWorkerMessage =
   | RawMetricMessage
   | RawLogMessage
-  | RawMetadataMessage;
+  | RawMetadataMessage
+  | unknown; // OTLP JSON batches on telemetry.metrics.otlp
 
 export async function startWorker(): Promise<void> {
   const shutdown = await initTelemetry(
@@ -63,6 +65,7 @@ export async function startWorker(): Promise<void> {
   log(
     `Subscribing to ${[
       Topics.TELEMETRY_METRICS_RAW,
+      Topics.TELEMETRY_METRICS_OTLP,
       Topics.TELEMETRY_LOGS_RAW,
       Topics.TELEMETRY_METADATA_RAW,
     ].join(", ")}...`,
@@ -107,9 +110,12 @@ export async function startWorker(): Promise<void> {
     }
   };
 
+  const environment = process.env["ENVIRONMENT"] ?? "production";
+
   await consumer.subscribe<TelemetryWorkerMessage>(
     [
       Topics.TELEMETRY_METRICS_RAW,
+      Topics.TELEMETRY_METRICS_OTLP,
       Topics.TELEMETRY_LOGS_RAW,
       Topics.TELEMETRY_METADATA_RAW,
     ],
@@ -123,6 +129,20 @@ export async function startWorker(): Promise<void> {
           await flush();
         } else {
           scheduleFlush();
+        }
+      } else if (message.topic === Topics.TELEMETRY_METRICS_OTLP) {
+        const parsed = parseOtlpMetricBatch(message.value, environment);
+        if (parsed.length > 0) {
+          workerMetrics.messagesProcessed.add(1, { topic: "metrics.otlp" });
+          for (const metric of parsed) {
+            experienceBridge?.observeMetric(metric);
+          }
+          batch.push(...parsed);
+          if (batch.length >= BATCH_MAX_SIZE) {
+            await flush();
+          } else {
+            scheduleFlush();
+          }
         }
       } else if (message.topic === Topics.TELEMETRY_LOGS_RAW) {
         const logMessage = message.value as RawLogMessage;

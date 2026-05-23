@@ -1,0 +1,70 @@
+# OTEL Collector configuration for the cognitive-substrate internal telemetry pipeline.
+#
+# Receives OTLP from all substrate services (api, orchestrator, workers) and routes:
+#   metrics  -> telemetry.metrics.otlp (Kafka, OTLP JSON)
+#              consumed by the telemetry worker's OTLP metric handler
+#   logs     -> telemetry.logs.raw (Kafka, OTLP JSON)
+#              consumed by the telemetry worker's log handler
+#   traces   -> telemetry.traces.raw (Kafka, OTLP JSON)
+#              retained for incident reconstruction
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    timeout: 5s
+    send_batch_size: 512
+  memory_limiter:
+    check_interval: 5s
+    limit_mib: 256
+  # Inject environment resource attribute so the telemetry worker can populate
+  # the `environment` field on every row without relying on each service sending it.
+  resource:
+    attributes:
+      - key: deployment.environment
+        value: ${env:ENVIRONMENT}
+        action: upsert
+
+exporters:
+  kafka/metrics:
+    brokers:
+      - ${env:KAFKA_BROKERS}
+    topic: telemetry.metrics.otlp
+    encoding: otlp_json
+    producer:
+      compression: snappy
+  kafka/logs:
+    brokers:
+      - ${env:KAFKA_BROKERS}
+    topic: telemetry.logs.raw
+    encoding: otlp_json
+    producer:
+      compression: snappy
+  kafka/traces:
+    brokers:
+      - ${env:KAFKA_BROKERS}
+    topic: telemetry.traces.raw
+    encoding: otlp_json
+    producer:
+      compression: snappy
+
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, resource, batch]
+      exporters: [kafka/metrics]
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, resource, batch]
+      exporters: [kafka/logs]
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, resource, batch]
+      exporters: [kafka/traces]

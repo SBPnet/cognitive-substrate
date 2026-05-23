@@ -189,6 +189,9 @@ function groupBySystem(messages: RawMetricMessage[]): Record<string, RawMetricMe
 }
 
 function inferSystemId(serviceId: string, serviceType: string): string {
+  // Substrate-native services: the OTLP parser sets serviceType = "substrate.<serviceId>"
+  if (serviceType.startsWith("substrate.")) return serviceType;
+  // Aiven-managed services
   if (serviceType === "kafka") return "aiven.kafka";
   if (serviceType === "opensearch") return "aiven.opensearch";
   if (serviceType === "pg" || serviceType === "postgres") return "aiven.postgres";
