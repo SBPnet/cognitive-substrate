@@ -8,7 +8,7 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import type { Client } from "@opensearch-project/opensearch";
 import type { CognitiveProducer } from "@cognitive-substrate/kafka-bus";
-import type { IngestMapperPlugin } from "@cognitive-substrate/plugin-loader";
+import type { IngestMapperPlugin, ApiRouterPlugin } from "@cognitive-substrate/plugin-loader";
 import { createSessionsRouter } from "./routes/sessions.js";
 import { createMessagesRouter } from "./routes/messages.js";
 import { streamRouter } from "./routes/stream.js";
@@ -22,18 +22,7 @@ import {
 } from "./routes/policy.js";
 import { createDocumentsRouter } from "./routes/documents.js";
 
-/**
- * A plugin that contributes one or more Hono routers to the API.
- * Used by integration packages (e.g. cognitive-substrate-aiven) to mount
- * control-plane and webhook routes without modifying core server code.
- *
- * Each router is mounted at the path returned by mountPath.
- */
-export interface ApiRouterPlugin {
-  /** Absolute mount path, e.g. "/api/aiven/collector". */
-  readonly mountPath: string;
-  createRouter(getProducer: () => CognitiveProducer | null): Hono;
-}
+export type { ApiRouterPlugin };
 
 export function createApp(
   openSearchClient: Client,

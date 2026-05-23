@@ -48,3 +48,17 @@ export type CognitiveSubstratePlugin =
   | IngestMapperPlugin
   | EnginePlugin
   | ToolExecutorPlugin;
+
+/**
+ * An API router plugin contributes one or more Hono routers to the API server.
+ * Used by integration packages to mount control-plane routes and provider
+ * webhooks without modifying core server code.
+ *
+ * Each plugin is mounted at the path returned by mountPath.
+ * Register via the apiRouterPlugins parameter of createApp().
+ */
+export interface ApiRouterPlugin {
+  /** Absolute mount path, e.g. "/api/aiven/collector". */
+  readonly mountPath: string;
+  createRouter(getProducer: () => CognitiveProducer | null): Hono;
+}
