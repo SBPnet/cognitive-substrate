@@ -63,12 +63,18 @@ function proposalFromCurriculum(item: CurriculumItem): SelfModificationProposal 
   return {
     mutationId: randomUUID(),
     timestamp: new Date().toISOString(),
-    mutationType: "capability_search",
+    mutationType: 'metric_capture',
     description: `Explore capability ${item.capabilityId} with curriculum item ${item.itemId}.`,
     expectedGain: item.expectedGain,
     stabilityRisk: Math.max(0, item.difficulty - item.expectedGain),
     approved: false,
     rollbackAvailable: true,
+    payload: {
+      indexName: 'experience_events',
+      fieldName: `capability_${item.capabilityId}`,
+      fieldType: 'float',
+      reason: `Curriculum-driven capability exploration: ${item.capabilityId}`,
+    },
   };
 }
 

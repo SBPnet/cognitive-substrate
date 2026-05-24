@@ -21,6 +21,7 @@ import {
   createGoalsRouter,
 } from "./routes/policy.js";
 import { createDocumentsRouter } from "./routes/documents.js";
+import { createProposalsRouter } from "./routes/proposals.js";
 
 export type { ApiRouterPlugin };
 
@@ -64,6 +65,9 @@ export function createApp(
 
   // Roadmap Stages 11-12: goal hierarchy (goal_system index)
   app.route("/api/sessions/:sessionId/goals", createGoalsRouter(openSearchClient));
+
+  // IntrospectionEngine: human review of self-modification proposals
+  app.route("/api/admin/proposals", createProposalsRouter(openSearchClient));
 
   // Ingest-mapper webhook receivers (one per plugin that opts in).
   if (getMetadataProducer) {

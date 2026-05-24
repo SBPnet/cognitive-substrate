@@ -108,12 +108,19 @@ function maybeProposeSelfModification(
   return {
     mutationId: randomUUID(),
     timestamp: new Date().toISOString(),
-    mutationType: "strategy_adjustment",
+    mutationType: 'parameter_tune',
     description: reflectOnStrategy(input, calibrationError),
     expectedGain: clamp(calibrationError),
     stabilityRisk: clamp(risk),
     approved: false,
     rollbackAvailable: true,
+    payload: {
+      engine: 'ReflectionEngine',
+      parameter: 'confidenceCalibration',
+      currentValue: clamp(input.loopResult.agentResult.confidence),
+      proposedValue: clamp(input.loopResult.agentResult.confidence - calibrationError * 0.1),
+      evidenceSummary: `calibrationError=${calibrationError.toFixed(3)} riskScore=${risk.toFixed(3)}`,
+    },
   };
 }
 

@@ -1085,6 +1085,7 @@ All major subsystems run together over 100 turns (normal→degraded→outage→r
 | Full-stack 100-turn: 0 errors, ef monotone 0.809→0.000, 245 feedback records, all 4 goals progress=1.0 | Exp 44 | 2.45× feedback records/turn from multi-doc retrieval; ef does not recover post-incident without positive signal |
 | Blog telemetry pipeline: H1/H2/H3 PASS, H4 FAIL; 136 real events, 18/18 kNN slugs, importance_score median flat across session counts | Exp 45 | First real-data experiment; cross-session salience requires reinforcement engine (retrieval_priority), not importance_score |
 | Reinforcement engine over seeded exp45 docs: retrieval_priority written; multi-session rp > single-session rp | Exp 46 | importance_score uncorrupted; Pearson r(rp, session_count) ≥ 0.5 confirms retrieval_priority encodes cross-session salience |
+| IntrospectionEngine pipeline: gap detection, typed proposal schema, ProposalStore round-trip, SchemaEvolutionApplier writes schema_evolution event | Exp 48 | Validates full suggestion-to-apply path; ConstitutionEngine gates on stabilityRisk < 0.7; substrate_proposals index stores pending proposals for human review |
 
 ---
 

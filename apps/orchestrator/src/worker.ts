@@ -17,9 +17,14 @@ import {
   telemetryConfigFromEnv,
 } from "@cognitive-substrate/telemetry-otel";
 import { loadPluginsFromEnv } from "@cognitive-substrate/plugin-loader";
+import { operationalRegistry } from "@cognitive-substrate/core-types";
+import { ReflectionEngine, CalibrationMonitor } from "@cognitive-substrate/metacog-engine";
+import { IntrospectionEngine } from "@cognitive-substrate/introspection-engine";
+import { ConstitutionEngine } from "@cognitive-substrate/constitution-engine";
 import { queryEmbedderFromEnv } from "./embedder.js";
 import { createSocietyLoop } from "./society.js";
 import { AgentActionPublisher } from "./publishers.js";
+import { ProposalStore } from "./schema-evolution/proposal-store.js";
 
 export async function startOrchestrator(): Promise<void> {
   const shutdown = await initTelemetry(telemetryConfigFromEnv("orchestrator"));
@@ -68,6 +73,12 @@ export async function startOrchestrator(): Promise<void> {
     pluginToolExecutors,
   });
   const agentActionPublisher = new AgentActionPublisher(producer);
+  const reflectionEngine = new ReflectionEngine();
+  const calibrationMonitor = new CalibrationMonitor();
+  const introspectionEngine = new IntrospectionEngine();
+  const constitutionEngine = new ConstitutionEngine();
+  const proposalStore = new ProposalStore(openSearchClient);
+  let reflectionsThisSession = 0;
 
   const consumer = new CognitiveConsumer({
     kafka,
@@ -95,6 +106,52 @@ export async function startOrchestrator(): Promise<void> {
         // Publish agent_action ExperienceEvent so LLM decisions feed back into
         // the reinforcement and consolidation pipeline (Gap 2).
         await agentActionPublisher.publish(event, result);
+
+        // Introspection: detect coverage gaps and emit a proposal if salient.
+        const reflectionResult = await reflectionEngine.reflect({
+          loopResult: result,
+          priorReflectionsInSession: reflectionsThisSession,
+        });
+        reflectionsThisSession++;
+
+        const traceEntry = {
+          operationId: event.eventId,
+          operationType: event.type,
+          confidence: result.agentResult.confidence,
+          succeeded: result.actionResult.success,
+          riskScore: result.agentResult.riskScore,
+          ...(result.actionResult.latencyMs !== undefined && { latencyMs: result.actionResult.latencyMs }),
+        };
+        const calibrationReport = calibrationMonitor.evaluate([traceEntry]);
+
+        const proposal = introspectionEngine.assess(
+          calibrationReport,
+          operationalRegistry.getRegisteredSources(),
+          [],
+        );
+
+        if (proposal) {
+          const stableIdentity = {
+            identityId: 'orchestrator',
+            timestamp: new Date().toISOString(),
+            curiosity: 0.5,
+            caution: 0.5,
+            verbosity: 0.5,
+            toolDependence: 0.5,
+            explorationPreference: 0.5,
+            stabilityScore: 0.8,
+          };
+          const assessment = constitutionEngine.assess({
+            policy: result.context.policy,
+            identity: stableIdentity,
+            proposal,
+          });
+          if (assessment.approved) {
+            await proposalStore.save(proposal);
+            log(`IntrospectionEngine: proposal saved mutation_id=${proposal.mutationId} type=${proposal.mutationType}`);
+          }
+        }
+        void reflectionResult;
 
         const response: InteractionResponseEvent = {
           eventId: event.eventId,

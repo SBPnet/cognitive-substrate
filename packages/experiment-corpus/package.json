@@ -64,7 +64,8 @@
     "exp44": "node --import tsx/esm src/experiment-44.ts",
     "exp45": "node --import tsx/esm src/experiment-45.ts",
     "exp46": "node --import tsx/esm src/experiment-46.ts",
-    "exp47": "node --import tsx/esm src/experiment-47.ts"
+    "exp47": "node --import tsx/esm src/experiment-47.ts",
+    "exp48": "node --import tsx/esm src/experiment-48.ts"
   },
   "dependencies": {
     "@cognitive-substrate/agents": "workspace:*",
@@ -89,6 +90,7 @@
     "@cognitive-substrate/development-engine": "workspace:*",
     "@cognitive-substrate/dream-engine": "workspace:*",
     "@cognitive-substrate/metacog-engine": "workspace:*",
+    "@cognitive-substrate/introspection-engine": "workspace:*",
     "@cognitive-substrate/social-engine": "workspace:*",
     "@opensearch-project/opensearch": "^2.7.0",
     "uuid": "^11.1.1"

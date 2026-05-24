@@ -368,6 +368,26 @@ const sessionsSchema = {
   },
 } as const;
 
+const substrateProposalsSchema = {
+  settings: { number_of_shards: 1, number_of_replicas: 1 },
+  mappings: {
+    properties: {
+      mutation_id:    { type: "keyword" },
+      status:         { type: "keyword" },
+      mutation_type:  { type: "keyword" },
+      description:    { type: "text" },
+      expected_gain:  { type: "float" },
+      stability_risk: { type: "float" },
+      payload:        { type: "object", enabled: false },
+      reviewed_by:    { type: "keyword" },
+      reviewed_at:    { type: "date" },
+      applied_at:     { type: "date" },
+      outcome_notes:  { type: "text" },
+      created_at:     { type: "date" },
+    },
+  },
+} as const;
+
 export const INDEX_SCHEMAS = {
   experience_events: experienceEventsSchema,
   memory_semantic: memorySemanticSchema,
@@ -383,6 +403,7 @@ export const INDEX_SCHEMAS = {
   audit_events: auditEventsSchema,
   model_registry: modelRegistrySchema,
   sessions: sessionsSchema,
+  substrate_proposals: substrateProposalsSchema,
 } as const;
 
 export type CognitiveIndex = keyof typeof INDEX_SCHEMAS;

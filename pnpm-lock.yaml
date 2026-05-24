@@ -32,9 +32,6 @@ importers:
 
   apps/api:
     dependencies:
-      '@cognitive-substrate/aiven-client':
-        specifier: workspace:*
-        version: link:../../packages/aiven-client
       '@cognitive-substrate/core-types':
         specifier: workspace:*
         version: link:../../packages/core-types
@@ -93,12 +90,18 @@ importers:
       '@cognitive-substrate/development-engine':
         specifier: workspace:*
         version: link:../../packages/development-engine
+      '@cognitive-substrate/introspection-engine':
+        specifier: workspace:*
+        version: link:../../packages/introspection-engine
       '@cognitive-substrate/kafka-bus':
         specifier: workspace:*
         version: link:../../packages/kafka-bus
       '@cognitive-substrate/memory-opensearch':
         specifier: workspace:*
         version: link:../../packages/memory-opensearch
+      '@cognitive-substrate/metacog-engine':
+        specifier: workspace:*
+        version: link:../../packages/metacog-engine
       '@cognitive-substrate/plugin-loader':
         specifier: workspace:*
         version: link:../../packages/plugin-loader
@@ -155,31 +158,6 @@ importers:
       tailwindcss:
         specifier: ^4.1.6
         version: 4.2.4
-      typescript:
-        specifier: ^5.5.0
-        version: 5.9.3
-
-  apps/workers/aiven-collector:
-    dependencies:
-      '@cognitive-substrate/aiven-client':
-        specifier: workspace:*
-        version: link:../../../packages/aiven-client
-      '@cognitive-substrate/kafka-bus':
-        specifier: workspace:*
-        version: link:../../../packages/kafka-bus
-      '@cognitive-substrate/telemetry-otel':
-        specifier: workspace:*
-        version: link:../../../packages/telemetry-otel
-      '@opentelemetry/api':
-        specifier: ^1.9.0
-        version: 1.9.1
-      snappyjs:
-        specifier: ^0.7.0
-        version: 0.7.0
-    devDependencies:
-      '@types/node':
-        specifier: ^22.0.0
-        version: 22.19.18
       typescript:
         specifier: ^5.5.0
         version: 5.9.3
@@ -434,15 +412,6 @@ importers:
         specifier: ^5.5.0
         version: 5.9.3
 
-  packages/aiven-client:
-    devDependencies:
-      '@types/node':
-        specifier: ^22.0.0
-        version: 22.19.18
-      typescript:
-        specifier: ^5.5.0
-        version: 5.9.3
-
   packages/attention-engine:
     dependencies:
       '@cognitive-substrate/core-types':
@@ -624,6 +593,9 @@ importers:
       '@cognitive-substrate/grounding-engine':
         specifier: workspace:*
         version: link:../grounding-engine
+      '@cognitive-substrate/introspection-engine':
+        specifier: workspace:*
+        version: link:../introspection-engine
       '@cognitive-substrate/memory-opensearch':
         specifier: workspace:*
         version: link:../memory-opensearch
@@ -714,6 +686,22 @@ importers:
       tsx:
         specifier: ^4.19.0
         version: 4.21.0
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
+
+  packages/introspection-engine:
+    dependencies:
+      '@cognitive-substrate/core-types':
+        specifier: workspace:*
+        version: link:../core-types
+      '@cognitive-substrate/metacog-engine':
+        specifier: workspace:*
+        version: link:../metacog-engine
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.19.18
       typescript:
         specifier: ^5.5.0
         version: 5.9.3
@@ -4006,9 +3994,6 @@ packages:
   slash@3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
-
-  snappyjs@0.7.0:
-    resolution: {integrity: sha512-u5iEEXkMe2EInQio6Wv9LWHOQYRDbD2O9hzS27GpT/lwfIQhTCnHCTqedqHIHe9ZcvQo+9au6vngQayipz1NYw==}
 
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
@@ -7971,8 +7956,6 @@ snapshots:
   sisteransi@1.0.5: {}
 
   slash@3.0.0: {}
-
-  snappyjs@0.7.0: {}
 
   source-map-js@1.2.1: {}
 
