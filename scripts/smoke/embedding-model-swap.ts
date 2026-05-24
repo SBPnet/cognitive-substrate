@@ -285,7 +285,7 @@ async function checkMlNodeSetting(client: OpenSearchClient): Promise<{
   const KEY = "plugins.ml_commons.only_run_on_ml_node";
   try {
     const response = await client.cluster.getSettings({ include_defaults: true, flat_settings: true });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const body = response.body as any;
     // flat_settings=true merges all tiers under their respective keys.
     const value: unknown =
@@ -428,7 +428,7 @@ async function indexCorpus(
 async function verifyVectorField(client: OpenSearchClient, fieldName: string): Promise<boolean> {
   try {
     const mapping = await client.indices.getMapping({ index: INDEX_NAME });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const properties = (mapping.body as any)[INDEX_NAME]?.mappings?.properties ?? {};
     return fieldName in properties && (properties as Record<string, { type?: string }>)[fieldName]?.type === "knn_vector";
   } catch {
@@ -479,7 +479,7 @@ async function runQuery(
   const result = await client.search({ index: INDEX_NAME, body });
   const latencyMs = Date.now() - start;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const hits: Array<any> = (result.body as any).hits?.hits ?? [];
 
   return {

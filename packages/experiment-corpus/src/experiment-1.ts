@@ -60,7 +60,7 @@ async function fetchTopK(client: Client, k: number): Promise<SemanticHit[]> {
       _source: ["memory_id", "semantic_cluster", "importance_score", "summary"],
     },
   });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   return (response.body as any).hits.hits as SemanticHit[];
 }
 

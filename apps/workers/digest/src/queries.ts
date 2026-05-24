@@ -69,11 +69,11 @@ export async function fetchWeeklyEvents(
     },
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const body = result.body as any;
   const totalCount = body.hits?.total?.value ?? 0;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const buckets: any[] = body.aggregations?.tag_frequencies?.buckets ?? [];
   const tags: TagFrequency[] = buckets
     .filter((b) => !BLOG_TAGS.includes(b.key as string))
@@ -110,7 +110,7 @@ export async function fetchRecentAbstractionPatterns(
     },
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const hits: any[] = (result.body as any).hits?.hits ?? [];
   return hits.map((h) => ({
     level: h._source?.abstraction_level ?? "unknown",
@@ -140,7 +140,7 @@ export async function fetchTrustDeltaMemories(
     },
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const hits: any[] = (result.body as any).hits?.hits ?? [];
   return hits.map((h) => ({
     memoryId: h._source?.memory_id ?? h._id,
@@ -177,9 +177,9 @@ export async function fetchBehaviorAnomalies(client: Client): Promise<BehaviorAn
     }),
   ]);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const priorBuckets: any[] = (priorResult.body as any).aggregations?.tags?.buckets ?? [];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const currentBuckets: any[] = (currentResult.body as any).aggregations?.tags?.buckets ?? [];
 
   const priorMap = new Map<string, number>(priorBuckets.map((b) => [b.key as string, b.doc_count as number]));
@@ -216,7 +216,7 @@ export async function fetchKnowledgeGapTopics(client: Client): Promise<string[]>
     },
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const buckets: any[] = (result.body as any).aggregations?.tags?.buckets ?? [];
   return buckets
     .filter((b) => !BLOG_TAGS.includes(b.key as string) && !(b.key as string).startsWith("source:"))

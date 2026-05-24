@@ -26,7 +26,7 @@ export class FrozenPolicyStore implements PolicyStore {
     return this.state;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   async saveSnapshot(_state: PolicyState, _event?: PolicyUpdateEvent): Promise<void> {
     // intentional no-op — policy is frozen for the duration of the experiment
   }

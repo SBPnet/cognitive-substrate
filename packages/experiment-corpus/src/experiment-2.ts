@@ -106,7 +106,7 @@ async function fetchTopK(
     index: "memory_semantic",
     body: buildQuery(explorationFactor, k),
   });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   return (response.body as any).hits.hits as SemanticHit[];
 }
 

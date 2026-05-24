@@ -117,7 +117,7 @@ async function fetchAllMemories(client: Client): Promise<SemanticDoc[]> {
       _source: ["memory_id", "semantic_cluster", "importance_score", "usage_frequency", "summary"],
     },
   });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   return (response.body as any).hits.hits.map((h: any) => h._source as SemanticDoc);
 }
 

@@ -396,7 +396,7 @@ async function fetchAll<T>(
   source: string[],
 ): Promise<T[]> {
   const r = await client.search({ index, body: { size: 50, query: { match_all: {} }, _source: source } });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   return (r.body as any).hits.hits.map((h: any) => h._source as T);
 }
 

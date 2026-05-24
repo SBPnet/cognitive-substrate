@@ -203,9 +203,14 @@ async function main(): Promise<void> {
 
   const constitution = new ConstitutionEngine();
   let h2Pass = false;
-  let assessmentResult = {
+  let assessmentResult: {
+    approved: boolean;
+    violations: ReadonlyArray<string>;
+    quarantineRequired: boolean;
+    epistemicHygieneScore: number;
+  } = {
     approved: false,
-    violations: [] as string[],
+    violations: [],
     quarantineRequired: false,
     epistemicHygieneScore: 0,
   };
@@ -311,7 +316,7 @@ async function main(): Promise<void> {
   // Cleanup: remove exp48 entries
   if (proposal) {
     try {
-      await client.delete({ index: 'substrate_proposals', id: proposal.mutationId, refresh: 'true' });
+      await client.delete({ index: 'substrate_proposals', id: proposal.mutationId, refresh: 'wait_for' });
     } catch { /* best-effort */ }
   }
   try {

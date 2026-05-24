@@ -337,7 +337,7 @@ async function fetchAllMemories(client: ReturnType<typeof createOpenSearchClient
     index: "memory_semantic",
     body: { size: 50, query: { match_all: {} }, _source: ["memory_id","semantic_cluster","importance_score","usage_frequency","summary"] },
   });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   return (r.body as any).hits.hits.map((h: any) => h._source as SemanticDoc);
 }
 
@@ -346,7 +346,7 @@ async function fetchAllLinks(client: ReturnType<typeof createOpenSearchClient>):
     index: "memory_links",
     body: { size: 50, query: { match_all: {} }, _source: ["link_id","source_memory_id","target_memory_id","relationship_type","strength"] },
   });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   return (r.body as any).hits.hits.map((h: any) => h._source as LinkDoc);
 }
 

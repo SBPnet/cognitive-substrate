@@ -99,7 +99,7 @@ async function fetchSemanticMemory(
 ): Promise<SemanticMemoryDoc | undefined> {
   try {
     const result = await client.get({ index: "memory_semantic", id: memoryId });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     return (result.body as any)._source as SemanticMemoryDoc | undefined;
   } catch {
     return undefined;

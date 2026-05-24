@@ -112,7 +112,7 @@ async function runReinforcement(
   byArticle: Map<string, ExperienceDoc[]>,
   sessionCounts: Map<string, number>,
 ): Promise<void> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const engineWithClient = new ReinforcementEngine({
     openSearch: client as any,
     priorWeight: 0.3,

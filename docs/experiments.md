@@ -12,6 +12,89 @@ OPENSEARCH_URL=http://thor:9200 pnpm --filter @cognitive-substrate/experiment-co
 
 ---
 
+## Running experiments
+
+### Prerequisites
+
+Start an OpenSearch cluster:
+
+```bash
+docker compose -f docker-compose.opensearch-cluster.yml up -d
+```
+
+Provision the indexes for the target experiment (one-time per index, or after dropping):
+
+```bash
+OPENSEARCH_URL=http://localhost:9200 pnpm --filter @cognitive-substrate/experiment-corpus provision
+```
+
+Run a specific experiment:
+
+```bash
+OPENSEARCH_URL=http://localhost:9200 pnpm --filter @cognitive-substrate/experiment-corpus exp44
+```
+
+Results are written to `packages/experiment-corpus/results/experiment-N-results.md`.
+
+### Adding a new experiment
+
+1. Create `packages/experiment-corpus/src/experiment-N.ts`. Use an existing experiment as the template for setup, seed, run, assert, cleanup.
+2. Add `"expN": "node --import tsx/esm src/experiment-N.ts"` to the `scripts` block in `packages/experiment-corpus/package.json`.
+3. Seed your corpus with `ExperienceEvent` documents. Required fields:
+
+   ```typescript
+   {
+     eventId: string,          // unique UUID or stable test ID
+     timestamp: string,        // ISO-8601
+     type: "user_input" | "system_event" | ...,
+     context: { sessionId: string },
+     input: { text: string, embedding: number[] },
+     importanceScore: number,  // [0, 1] -- the primary ranking signal
+     tags: string[]
+   }
+   ```
+
+   Embeddings can be left as `[]` for BM25-only experiments. For k-NN experiments, index into a dedicated index that has the `knn_vector` mapping and supply real embeddings (via the ML node ingest pipeline or pre-computed from an experiment-local embedder).
+
+4. Follow the hypothesis pattern: define H1 -- HN at the top of the file, assert each one, write PASS/FAIL to the results file.
+5. Always clean up: drop experiment-specific indexes at the end of the run so they don't interfere with subsequent experiments.
+6. Write results to `results/experiment-N-results.md` following prior conventions (header, hypothesis table, key findings, production implications).
+7. Add a one-line summary row to the table in `docs/experiments.md` under the series it belongs to.
+
+### Index naming rules
+
+- Never share a live experiment index between runs without reprovisioning. Stale data from a prior run silently corrupts results.
+- The `memoryIndex` field in loop/retriever config must exactly match the index name used when seeding. A mismatch produces zero results with no error (Exp 28).
+- Experiment-specific indexes should use a name prefix like `exp29_events`, `exp36_rerank`, etc. so they can be identified and cleaned up.
+
+### Interpreting results
+
+| Metric | What it measures |
+| ------ | ---------------- |
+| Hit rate | Fraction of expected memories that appear in top-k retrievals across N turns |
+| Cluster coverage | Fraction of distinct clusters represented in top-k retrievals across N turns |
+| b3 | Hit rate for the hardest-to-retrieve memory (cluster-B3 in the standard 9-memory corpus) |
+| P@1 / P@5 | Precision at 1 / 5: fraction of top-k results belonging to the expected window |
+| Shannon entropy (breadth) | Normalised entropy over retrieved memory-ID distribution; higher = more diverse coverage |
+| A-C gap | Difference in retrieval_priority or arbitration score between cluster-A (trusted) and cluster-C (contradictory) |
+| Per-step drift | Maximum absolute change in any single policy vector dimension per turn |
+
+### Key invariants (production defaults)
+
+These values are the calibrated production defaults, validated by experiment. Changing them requires re-running the relevant experiments.
+
+| Invariant | Value | Validated by |
+| --------- | ----- | ------------ |
+| Re-consolidation interval | every 5 epochs | Exp 16 |
+| countBonus (Hebbian coefficient) | 0.02 | Exp 10/11 |
+| noveltyWeight (AttentionEngine) | 0.30 | Exp 6 |
+| compressionThreshold (DecayEngine) | 0.45 retention score | Exp 29 |
+| suppressionThreshold | 0.28 | Exp 19 |
+| retirementThreshold | 0.22 | Exp 19 |
+| priorWeight (ReinforcementEngine EMA) | 0 (stateless default) | Exp 8/9 |
+
+---
+
 ## Corpus
 
 9 synthetic memories across 3 clusters, 6 associative links.

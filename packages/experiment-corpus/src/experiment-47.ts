@@ -53,7 +53,7 @@ interface SemanticMemoryDoc extends Record<string, unknown> {
 async function applyTrustDelta(client: Client, memoryId: string, delta: number): Promise<void> {
   try {
     const result = await client.get({ index: INDEX, id: memoryId });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const doc = (result.body as any)._source as SemanticMemoryDoc;
     const current = doc.retrieval_priority ?? 0.5;
     const next = Math.max(0, Math.min(1, current + delta));
@@ -121,7 +121,7 @@ async function seedMemory(
 
 async function fetchDoc(client: OSClient, id: string): Promise<Record<string, number>> {
   const res = await client.get({ index: INDEX, id });
-  return res.body._source as Record<string, number>;
+  return res.body['_source'] as Record<string, number>;
 }
 
 // ---------------------------------------------------------------------------
@@ -286,7 +286,7 @@ async function main(): Promise<void> {
     await client.delete({ index: INDEX, id, refresh: "wait_for" }).catch(() => null);
   }
 
-  await saveResults(47, results, lines.join("\n"));
+  await saveResults("47", lines.join("\n"), results);
   process.exit(results.allPass ? 0 : 1);
 }
 

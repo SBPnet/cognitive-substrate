@@ -5,7 +5,7 @@ TypeScript monorepo implementing a persistent, learnable cognitive memory substr
 ## Packages
 
 | Package | Description |
-|---------|-------------|
+| ------- | ----------- |
 | `core-types` | Shared types: `ExperienceEvent`, `MemoryRecord`, `OperationalSignal`, policy vectors |
 | `memory-opensearch` | OpenSearch client, index schemas, BM25 + k-NN retrieval helpers |
 | `memory-objectstore` | S3-compatible object store archive for raw experience events |
@@ -60,7 +60,27 @@ OPENSEARCH_URL=http://localhost:9200 pnpm --filter @cognitive-substrate/experime
 
 ## Documentation
 
-See https://bigpines.net for my blog about this project. More detailed internal documentation to come.
+### Internal (this repo)
+
+| Doc | What it covers |
+| --- | -------------- |
+| [Quick Start](docs/quickstart.md) | From `git clone` to a running cognitive loop in 10 minutes |
+| [Cognitive Loop](docs/architecture/cognitive-loop.md) | Turn lifecycle, engine invocation order, multi-agent debate, policy evaluation |
+| [Memory Lifecycle](docs/architecture/memory-lifecycle.md) | ExperienceEvent write through reinforcement, consolidation, decay, and pruning |
+| [Retrieval Pipeline](docs/architecture/retrieval-pipeline.md) | Hybrid BM25 + k-NN, policy weighting, reranking, diversity slot, feedback loop |
+| [Engine Contracts](docs/architecture/engine-contracts.md) | Plugin interfaces: IngestMapperPlugin, EnginePlugin, ToolExecutorPlugin |
+| [Package Map](docs/architecture/package-map.md) | All 34 packages and apps with stage numbers and entry points |
+| [Event Lifecycle](docs/architecture/event-lifecycle.md) | Telemetry to ingest to loop to consolidation to decay |
+| [Adding an Engine](docs/contributing/engines.md) | Scaffold an EnginePlugin, ToolExecutorPlugin, or first-party package |
+| [Experiments](docs/experiments.md) | Running experiments, adding new ones, invariants table |
+| [Scaling](docs/scaling.md) | Horizontal and vertical scaling; Kafka consumer workers, KEDA |
+| [Plugins](docs/plugins.md) | Plugin API for ingest mappers, reasoning engines, tool executors |
+| [Telemetry Ingestion](docs/telemetry-ingestion.md) | OpenTelemetry Collector setup; sending from Node, Python, Go, browsers |
+| [Operational Signal Pipeline](docs/operational-signal-pipeline.md) | Signal to ExperienceEvent to ConsolidationEngine to semantic memory |
+
+### External
+
+See [bigpines.net](https://bigpines.net) for the blog series covering the architecture, experiments, and design rationale.
 
 ## License
 

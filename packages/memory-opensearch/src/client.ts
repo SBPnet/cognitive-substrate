@@ -104,7 +104,7 @@ export async function getDocument<T extends Record<string, unknown>>(
 ): Promise<T | undefined> {
   try {
     const result = await client.get({ index, id });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     return (result.body as any)._source as T | undefined;
   } catch {
     return undefined;
@@ -118,6 +118,6 @@ export async function search<T extends Record<string, unknown>>(
   query: Record<string, unknown>,
 ): Promise<Array<{ _id: string; _score: number; _source: T }>> {
   const result = await client.search({ index, body: query });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   return (result.body as any).hits.hits as Array<{ _id: string; _score: number; _source: T }>;
 }
