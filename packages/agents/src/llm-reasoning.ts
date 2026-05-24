@@ -104,24 +104,29 @@ function formatMemory(mem: MemoryReference): string {
 
 function buildAnthropicTools(capabilities: ReadonlyArray<ToolCapability>): Anthropic.Tool[] {
   return capabilities.map((cap) => {
-    const properties: Record<string, { type: string; description?: string }> = {};
-    const required: string[] = [];
+    // Prefer the full JSON Schema when present (e.g. MCP tools) so that
+    // required, enum, and default constraints are preserved.
+    const input_schema: Anthropic.Tool["input_schema"] = cap.inputSchema
+      ? (cap.inputSchema as Anthropic.Tool["input_schema"])
+      : buildInputSchemaFromFlat(cap.parameters ?? []);
 
-    for (const param of cap.parameters ?? []) {
-      properties[param.name] = { type: param.type };
-      if (param.required) required.push(param.name);
-    }
-
-    return {
-      name: cap.tool,
-      description: cap.description,
-      input_schema: {
-        type: "object" as const,
-        properties,
-        ...(required.length > 0 ? { required } : {}),
-      },
-    };
+    return { name: cap.tool, description: cap.description, input_schema };
   });
+}
+
+function buildInputSchemaFromFlat(
+  params: ReadonlyArray<{ name: string; type: string; required?: boolean; description?: string | undefined }>,
+): Anthropic.Tool["input_schema"] {
+  const properties: Record<string, { type: string; description?: string }> = {};
+  const required: string[] = [];
+  for (const param of params) {
+    properties[param.name] = {
+      type: param.type,
+      ...(param.description !== undefined ? { description: param.description } : {}),
+    };
+    if (param.required) required.push(param.name);
+  }
+  return { type: "object" as const, properties, ...(required.length > 0 ? { required } : {}) };
 }
 
 // ---------------------------------------------------------------------------

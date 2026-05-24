@@ -41,6 +41,8 @@ TypeScript monorepo implementing a persistent, learnable cognitive memory substr
 
 ## Getting started
 
+See [docs/quickstart.md](docs/quickstart.md) to go from `git clone` to a running cognitive loop in under 10 minutes.
+
 ```bash
 pnpm install
 pnpm build

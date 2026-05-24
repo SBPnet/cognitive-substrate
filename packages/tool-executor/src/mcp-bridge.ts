@@ -48,8 +48,10 @@ function isHttpConfig(c: McpServerConfig): c is McpHttpServerConfig {
 
 interface ConnectedServer {
   readonly name: string;
-  readonly client: Client;
-  readonly tools: ReadonlyArray<ToolCapability>;
+  client: Client;
+  tools: ReadonlyArray<ToolCapability>;
+  readonly config: McpServerConfig;
+  healthy: boolean;
 }
 
 /** MCP tool name prefix used in ToolCapability.tool to namespace by server. */
@@ -75,26 +77,78 @@ export class McpToolBridge {
     await Promise.all(configs.map((cfg) => this.connectOne(cfg)));
   }
 
-  private async connectOne(cfg: McpServerConfig): Promise<void> {
-    const client = new Client({ name: "cognitive-substrate", version: "1.0.0" });
+  private async connectOne(cfg: McpServerConfig, retryDelayMs = 500, maxRetries = 5): Promise<void> {
+    let attempt = 0;
+    while (attempt <= maxRetries) {
+      try {
+        const client = new Client({ name: "cognitive-substrate", version: "1.0.0" });
+        let transport;
+        if (isHttpConfig(cfg)) {
+          transport = new StreamableHTTPClientTransport(new URL(cfg.url));
+        } else {
+          transport = new StdioClientTransport({
+            command: cfg.command,
+            args: cfg.args ?? [],
+            ...(cfg.env ? { env: cfg.env } : {}),
+          });
+        }
 
-    let transport;
-    if (isHttpConfig(cfg)) {
-      transport = new StreamableHTTPClientTransport(new URL(cfg.url));
-    } else {
-      transport = new StdioClientTransport({
-        command: cfg.command,
-        args: cfg.args ?? [],
-        ...(cfg.env ? { env: cfg.env } : {}),
-      });
+        // The MCP SDK Transport type uses exactOptionalPropertyTypes internally;
+        // cast through unknown to satisfy the strict assignment check.
+        await client.connect(transport as Parameters<typeof client.connect>[0]);
+
+        const { tools: rawTools } = await client.listTools();
+        const tools = this.mapTools(cfg.name, rawTools);
+
+        const existing = this.servers.findIndex((s) => s.name === cfg.name);
+        if (existing >= 0) {
+          const entry = this.servers[existing];
+          if (entry !== undefined) {
+            entry.client = client;
+            entry.tools = tools;
+            entry.healthy = true;
+          }
+        } else {
+          this.servers.push({ name: cfg.name, client, tools, config: cfg, healthy: true });
+        }
+        return;
+      } catch (err) {
+        attempt++;
+        if (attempt > maxRetries) {
+          process.stderr.write(
+            `[mcp-bridge] Failed to connect to "${cfg.name}" after ${maxRetries} retries: ${(err as Error).message}\n`,
+          );
+          // Mark as unhealthy if a prior entry exists; otherwise push a stub.
+          const existing = this.servers.findIndex((s) => s.name === cfg.name);
+          if (existing < 0) {
+            // No entry yet — push a zero-tool placeholder so healthStatus() shows the failure.
+            this.servers.push({
+              name: cfg.name,
+              client: new Client({ name: "cognitive-substrate", version: "1.0.0" }),
+              tools: [],
+              config: cfg,
+              healthy: false,
+            });
+          } else {
+            const entry = this.servers[existing];
+            if (entry !== undefined) entry.healthy = false;
+          }
+          return;
+        }
+        const delay = retryDelayMs * Math.pow(2, attempt - 1);
+        process.stderr.write(
+          `[mcp-bridge] Retrying "${cfg.name}" in ${delay}ms (attempt ${attempt}/${maxRetries})\n`,
+        );
+        await new Promise<void>((r) => setTimeout(r, delay));
+      }
     }
+  }
 
-    // The MCP SDK Transport type uses exactOptionalPropertyTypes internally;
-    // cast through unknown to satisfy the strict assignment check.
-    await client.connect(transport as Parameters<typeof client.connect>[0]);
-
-    const { tools: rawTools } = await client.listTools();
-    const tools: ToolCapability[] = rawTools.map((t) => {
+  private mapTools(
+    serverName: string,
+    rawTools: ReadonlyArray<{ name: string; description?: string | undefined; inputSchema: unknown }>,
+  ): ToolCapability[] {
+    return rawTools.map((t) => {
       const schema = t.inputSchema as {
         properties?: Record<string, { type?: string; description?: string }>;
         required?: string[];
@@ -102,8 +156,8 @@ export class McpToolBridge {
       const properties = schema.properties ?? {};
       const required = schema.required ?? [];
       return {
-        tool: mcpToolName(cfg.name, t.name),
-        description: `[MCP:${cfg.name}] ${t.description ?? t.name}`,
+        tool: mcpToolName(serverName, t.name),
+        description: `[MCP:${serverName}] ${t.description ?? t.name}`,
         // Preserve the full JSON Schema for MCP-aware consumers.
         inputSchema: t.inputSchema as Record<string, unknown>,
         // Flat view for internal agents that enumerate parameters.
@@ -115,8 +169,15 @@ export class McpToolBridge {
         })),
       };
     });
+  }
 
-    this.servers.push({ name: cfg.name, client, tools });
+  /** Returns connection health for each configured MCP server. */
+  healthStatus(): ReadonlyArray<{ name: string; healthy: boolean; toolCount: number }> {
+    return this.servers.map((s) => ({
+      name: s.name,
+      healthy: s.healthy,
+      toolCount: s.tools.length,
+    }));
   }
 
   /** All discovered MCP tool capabilities, prefixed with mcp:<server>:. */

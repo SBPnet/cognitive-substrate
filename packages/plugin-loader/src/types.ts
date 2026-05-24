@@ -32,6 +32,8 @@ export interface EnginePlugin {
   readonly kind: "engine";
   readonly name: string;
   create(): ReasoningModel;
+  /** Optional: close connections opened by create() on process shutdown. */
+  shutdown?(): Promise<void>;
 }
 
 /**
@@ -42,6 +44,8 @@ export interface EnginePlugin {
 export interface ToolExecutorPlugin {
   readonly kind: "tool-executor";
   create(): ToolExecutor | Promise<ToolExecutor>;
+  /** Optional: close connections opened by create() on process shutdown. */
+  shutdown?(): Promise<void>;
 }
 
 export type CognitiveSubstratePlugin =

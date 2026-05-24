@@ -16,7 +16,7 @@ import {
   initTelemetry,
   telemetryConfigFromEnv,
 } from "@cognitive-substrate/telemetry-otel";
-import { loadPluginsFromEnv } from "@cognitive-substrate/plugin-loader";
+import { loadPluginsFromEnv, shutdownPlugins } from "@cognitive-substrate/plugin-loader";
 import { operationalRegistry } from "@cognitive-substrate/core-types";
 import { ReflectionEngine, CalibrationMonitor } from "@cognitive-substrate/metacog-engine";
 import { IntrospectionEngine } from "@cognitive-substrate/introspection-engine";
@@ -237,7 +237,10 @@ export async function startOrchestrator(): Promise<void> {
 
   const handleShutdown = async (): Promise<void> => {
     log("Shutting down...");
-    await consumer.disconnect();
+    await Promise.allSettled([
+      consumer.disconnect(),
+      shutdownPlugins(plugins),
+    ]);
     await producer.disconnect();
     await shutdown();
     process.exit(0);

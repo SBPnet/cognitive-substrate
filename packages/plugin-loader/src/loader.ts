@@ -5,6 +5,10 @@ import type {
   ToolExecutorPlugin,
 } from "./types.js";
 
+type ShutdownablePlugin = (EnginePlugin | ToolExecutorPlugin) & {
+  shutdown(): Promise<void>;
+};
+
 export interface LoadedPlugins {
   readonly ingestMappers: ReadonlyArray<IngestMapperPlugin>;
   readonly engines: ReadonlyArray<EnginePlugin>;
@@ -86,6 +90,18 @@ export async function loadPluginsFromEnv(): Promise<LoadedPlugins> {
   }
 
   return { ingestMappers, engines, toolExecutors };
+}
+
+/**
+ * Call shutdown() on all plugins that implement it, in parallel.
+ * Uses allSettled so one plugin's failure does not prevent others from closing.
+ */
+export async function shutdownPlugins(plugins: LoadedPlugins): Promise<void> {
+  const candidates = [...plugins.engines, ...plugins.toolExecutors];
+  const shutdownable = candidates.filter(
+    (p): p is ShutdownablePlugin => typeof (p as unknown as Record<string, unknown>)["shutdown"] === "function",
+  );
+  await Promise.allSettled(shutdownable.map((p) => p.shutdown()));
 }
 
 function validateIngestMapper(p: IngestMapperPlugin, name: string): void {

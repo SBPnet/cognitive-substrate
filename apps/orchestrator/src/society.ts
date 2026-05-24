@@ -7,6 +7,8 @@ import {
   claudeAvailable,
   OpenAICompatReasoningModel,
   openAICompatAvailable,
+  GeminiReasoningModel,
+  geminiAvailable,
   MultiAgentReasoningModel,
   MultiAgentRuntime,
   OpenSearchAgentActivityStore,
@@ -69,28 +71,7 @@ export async function createSocietyLoop(config: SocietyLoopConfig): Promise<Cogn
       ? new PluginCompositeToolExecutor(baseToolExecutor, config.pluginToolExecutors)
       : baseToolExecutor;
 
-  // Reasoning model priority (cost-ascending):
-  //   0. Plugin reasoning model               — CS_ENGINE set and plugin loaded (explicit override)
-  //   1. OpenAICompatReasoningModel (local) — OLLAMA_BASE_URL set (free, Ollama on same machine)
-  //   2. OpenAICompatReasoningModel (cloud)  — OPENAI_BASE_URL set (xAI Grok, etc.; per-token cost)
-  //   3. ClaudeReasoningModel                — ANTHROPIC_API_KEY set (per-token cost)
-  //   4. MultiAgentReasoningModel            — heuristic fallback, no LLM (dev only)
-  const ollamaBaseURL = process.env["OLLAMA_BASE_URL"];
-  const reasoningModel: ReasoningModel = config.pluginReasoningModel
-    ? config.pluginReasoningModel
-    : ollamaBaseURL
-      ? new OpenAICompatReasoningModel({ baseURL: ollamaBaseURL, apiKey: "ollama" })
-      : openAICompatAvailable()
-        ? new OpenAICompatReasoningModel()
-        : claudeAvailable()
-          ? new ClaudeReasoningModel()
-          : new MultiAgentReasoningModel(
-              new MultiAgentRuntime({
-                activityStore: new OpenSearchAgentActivityStore({
-                  openSearch: config.openSearchClient,
-                }),
-              }),
-            );
+  const reasoningModel: ReasoningModel = selectReasoningModel(config);
 
   return new CognitiveLoop({
     sessionManager: new InMemorySessionManager(),
@@ -101,6 +82,56 @@ export async function createSocietyLoop(config: SocietyLoopConfig): Promise<Cogn
     toolExecutor,
     policyEvaluationPublisher: new KafkaPolicyEvaluationPublisher(config.producer),
   });
+}
+
+/**
+ * Select a reasoning model based on available env vars and CS_ENGINE_ORDER.
+ *
+ * CS_ENGINE_ORDER (comma-separated) controls priority among built-in providers.
+ * Valid tokens: ollama, openai-compat, gemini, claude, multi-agent
+ * Default order: ollama,openai-compat,gemini,claude,multi-agent
+ *
+ * Plugin model always wins when pluginReasoningModel is set.
+ */
+function selectReasoningModel(config: SocietyLoopConfig): ReasoningModel {
+  if (config.pluginReasoningModel) return config.pluginReasoningModel;
+
+  const order = (process.env["CS_ENGINE_ORDER"] ?? "ollama,openai-compat,gemini,claude,multi-agent")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  for (const token of order) {
+    switch (token) {
+      case "ollama": {
+        const ollamaURL = process.env["OLLAMA_BASE_URL"];
+        if (ollamaURL)
+          return new OpenAICompatReasoningModel({ baseURL: ollamaURL, apiKey: "ollama" });
+        break;
+      }
+      case "openai-compat":
+        if (openAICompatAvailable()) return new OpenAICompatReasoningModel();
+        break;
+      case "gemini":
+        if (geminiAvailable()) return new GeminiReasoningModel();
+        break;
+      case "claude":
+        if (claudeAvailable()) return new ClaudeReasoningModel();
+        break;
+      case "multi-agent":
+        return buildMultiAgentModel(config.openSearchClient);
+    }
+  }
+
+  return buildMultiAgentModel(config.openSearchClient);
+}
+
+function buildMultiAgentModel(openSearch: import("@opensearch-project/opensearch").Client): ReasoningModel {
+  return new MultiAgentReasoningModel(
+    new MultiAgentRuntime({
+      activityStore: new OpenSearchAgentActivityStore({ openSearch }),
+    }),
+  );
 }
 
 class GoalSystemProvider implements GoalProvider {

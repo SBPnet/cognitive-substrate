@@ -6,4 +6,4 @@ export type {
   ApiRouterPlugin,
 } from "./types.js";
 
-export { loadPluginsFromEnv, type LoadedPlugins } from "./loader.js";
+export { loadPluginsFromEnv, shutdownPlugins, type LoadedPlugins } from "./loader.js";

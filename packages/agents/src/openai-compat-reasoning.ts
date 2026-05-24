@@ -138,27 +138,32 @@ function buildOpenAITools(capabilities: ReadonlyArray<ToolCapability>): OpenAI.C
   if (capabilities.length === 0) return [];
 
   return capabilities.map((cap) => {
-    const properties: Record<string, { type: string; description?: string }> = {};
-    const required: string[] = [];
-
-    for (const param of cap.parameters ?? []) {
-      properties[param.name] = { type: param.type };
-      if (param.required) required.push(param.name);
-    }
+    // Prefer the full JSON Schema when present (e.g. MCP tools) so that
+    // required, enum, and default constraints are preserved.
+    const parameters: Record<string, unknown> = cap.inputSchema
+      ? (cap.inputSchema as Record<string, unknown>)
+      : buildOpenAIParametersFromFlat(cap.parameters ?? []);
 
     return {
       type: "function" as const,
-      function: {
-        name: cap.tool,
-        description: cap.description,
-        parameters: {
-          type: "object",
-          properties,
-          ...(required.length > 0 ? { required } : {}),
-        },
-      },
+      function: { name: cap.tool, description: cap.description, parameters },
     };
   });
+}
+
+function buildOpenAIParametersFromFlat(
+  params: ReadonlyArray<{ name: string; type: string; required?: boolean; description?: string | undefined }>,
+): Record<string, unknown> {
+  const properties: Record<string, { type: string; description?: string }> = {};
+  const required: string[] = [];
+  for (const param of params) {
+    properties[param.name] = {
+      type: param.type,
+      ...(param.description !== undefined ? { description: param.description } : {}),
+    };
+    if (param.required) required.push(param.name);
+  }
+  return { type: "object", properties, ...(required.length > 0 ? { required } : {}) };
 }
 
 // ---------------------------------------------------------------------------

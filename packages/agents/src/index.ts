@@ -3,6 +3,7 @@ export * from "./session.js";
 export * from "./reasoning.js";
 export * from "./llm-reasoning.js";
 export * from "./openai-compat-reasoning.js";
+export * from "./gemini-reasoning.js";
 export * from "./loop.js";
 export * from "./specialized-agents.js";
 export * from "./arbitration.js";
