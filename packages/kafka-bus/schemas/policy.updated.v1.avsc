@@ -1,0 +1,20 @@
+{
+  "namespace": "io.cognitive-substrate",
+  "type": "record",
+  "name": "PolicyUpdateEvent",
+  "doc": "A single policy update event. delta fields are serialized as JSON string since Partial<PolicyState> is open-ended. Mirrors packages/core-types/src/policy.ts PolicyUpdateEvent.",
+  "fields": [
+    { "name": "policyId", "type": "string" },
+    { "name": "timestamp", "type": "string" },
+    { "name": "previousVersion", "type": "string" },
+    { "name": "nextVersion", "type": "string" },
+    {
+      "name": "delta",
+      "type": "string",
+      "doc": "JSON-serialized Partial<Omit<PolicyState,'version'|'timestamp'>>"
+    },
+    { "name": "rewardDelta", "type": "double" },
+    { "name": "sourceExperienceId", "type": "string" },
+    { "name": "sourceClusterId", "type": ["null", "string"], "default": null }
+  ]
+}

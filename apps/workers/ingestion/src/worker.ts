@@ -18,7 +18,11 @@ import {
   createKafkaClient,
   ensureKafkaTopics,
   kafkaConfigFromEnv,
+  schemaRegistryConfigFromEnv,
 } from "@cognitive-substrate/kafka-bus";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import {
   createOpenSearchClient,
   ensureIndexes,
@@ -59,6 +63,7 @@ export async function startWorker(): Promise<void> {
   await ensureKafkaTopics(kafkaConfig);
 
   const kafka = createKafkaClient(kafkaConfig);
+  const schemaRegistryConfig = schemaRegistryConfigFromEnv();
   const openSearchClient = createOpenSearchClient(opensearchConfigFromEnv());
   const objectStore = createObjectStore();
 
@@ -92,12 +97,43 @@ export async function startWorker(): Promise<void> {
 
   const workerMetrics = new IngestionMetrics();
 
-  const producer = new CognitiveProducer({ kafka, enableAuditMirror: true });
+  const producer = new CognitiveProducer({
+    kafka,
+    enableAuditMirror: true,
+    ...(schemaRegistryConfig ? { schemaRegistry: schemaRegistryConfig } : {}),
+  });
   await producer.connect();
+
+  // Register schemas once at startup when Schema Registry is configured.
+  // schemaId is undefined when SCHEMA_REGISTRY_URL is absent (JSON fallback).
+  const schemasDir = join(fileURLToPath(import.meta.url), "../../../../packages/kafka-bus/schemas");
+  let experienceRawSchemaId: number | undefined;
+  let experienceEnrichedSchemaId: number | undefined;
+  let memoryIndexedSchemaId: number | undefined;
+  if (schemaRegistryConfig) {
+    const loadSchema = (filename: string): object =>
+      JSON.parse(readFileSync(join(schemasDir, filename), "utf-8")) as object;
+    experienceRawSchemaId = await producer.registerSchema(
+      "experience.raw-value",
+      loadSchema("experience.raw.v1.avsc"),
+    );
+    experienceEnrichedSchemaId = await producer.registerSchema(
+      "experience.enriched-value",
+      loadSchema("experience.enriched.v1.avsc"),
+    );
+    memoryIndexedSchemaId = await producer.registerSchema(
+      "memory.indexed-value",
+      loadSchema("memory.indexed.v1.avsc"),
+    );
+    log(
+      `Schema Registry: experience.raw=${experienceRawSchemaId} enriched=${experienceEnrichedSchemaId} indexed=${memoryIndexedSchemaId}`,
+    );
+  }
 
   const consumer = new CognitiveConsumer({
     kafka,
     groupId: process.env["KAFKA_GROUP_ID"] ?? "ingestion-workers",
+    ...(schemaRegistryConfig ? { schemaRegistry: schemaRegistryConfig } : {}),
   });
   await consumer.connect();
 
@@ -123,6 +159,8 @@ export async function startWorker(): Promise<void> {
           producer,
           onEmbeddingDuration: (ms) => workerMetrics.embeddingDurationMs.record(ms, attrs),
           onWriteDuration: (ms) => workerMetrics.opensearchWriteDurationMs.record(ms, attrs),
+          ...(experienceEnrichedSchemaId !== undefined ? { experienceEnrichedSchemaId } : {}),
+          ...(memoryIndexedSchemaId !== undefined ? { memoryIndexedSchemaId } : {}),
         });
 
         workerMetrics.importanceScore.record(enriched.importanceScore, attrs);

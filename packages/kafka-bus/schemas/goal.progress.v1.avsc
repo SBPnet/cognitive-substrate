@@ -1,0 +1,14 @@
+{
+  "namespace": "io.cognitive-substrate",
+  "type": "record",
+  "name": "GoalProgressEvent",
+  "doc": "Goal system progress update. Mirrors packages/core-types/src/goal.ts GoalProgressEvent.",
+  "fields": [
+    { "name": "goalId", "type": "string" },
+    { "name": "timestamp", "type": "string" },
+    { "name": "progressDelta", "type": "double" },
+    { "name": "completedSubgoals", "type": { "type": "array", "items": "string" } },
+    { "name": "nextAction", "type": ["null", "string"], "default": null },
+    { "name": "sourceExperienceId", "type": ["null", "string"], "default": null }
+  ]
+}

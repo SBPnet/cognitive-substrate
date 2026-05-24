@@ -7,6 +7,7 @@
 import { Kafka, type SASLOptions, type KafkaConfig, logLevel } from "kafkajs";
 import type { ConnectionOptions } from "node:tls";
 import { TOPIC_CONFIGS, type TopicName } from "./topics.js";
+import type { SchemaRegistryConfig } from "./schema-registry.js";
 
 export interface KafkaClientConfig {
   /** Comma-separated broker addresses, e.g. "broker1:9092,broker2:9092" */
@@ -131,6 +132,16 @@ export async function ensureKafkaTopics(
   } finally {
     await admin.disconnect();
   }
+}
+
+/**
+ * Builds a SchemaRegistryConfig from SCHEMA_REGISTRY_URL.
+ * Returns undefined when the variable is not set, which disables Avro encoding.
+ */
+export function schemaRegistryConfigFromEnv(): SchemaRegistryConfig | undefined {
+  const url = process.env["SCHEMA_REGISTRY_URL"];
+  if (!url) return undefined;
+  return { url };
 }
 
 function topicReplicationFactor(

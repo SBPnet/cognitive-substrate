@@ -175,6 +175,31 @@ services:
         condition: service_healthy
 
   # ---------------------------------------------------------------------------
+  # Schema Registry (Karapace -- Apache 2.0, Confluent SR API compatible)
+  # ---------------------------------------------------------------------------
+  schema-registry:
+    image: ghcr.io/aiven/karapace:latest
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      KARAPACE_BOOTSTRAP_URI: kafka:29092
+      KARAPACE_HOST: 0.0.0.0
+      KARAPACE_PORT: "8081"
+      KARAPACE_REGISTRY: "true"
+      KARAPACE_REST: "false"
+      KARAPACE_LOG_LEVEL: WARNING
+    depends_on:
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8081/subjects"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ---------------------------------------------------------------------------
   # Kafka UI: browse topics and messages at http://localhost:8080
   # ---------------------------------------------------------------------------
   kafka-ui:
@@ -185,8 +210,11 @@ services:
     environment:
       KAFKA_CLUSTERS_0_NAME: smoke
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+      KAFKA_CLUSTERS_0_SCHEMAREGISTRY: http://schema-registry:8081
     depends_on:
       kafka:
+        condition: service_healthy
+      schema-registry:
         condition: service_healthy
 
 volumes:

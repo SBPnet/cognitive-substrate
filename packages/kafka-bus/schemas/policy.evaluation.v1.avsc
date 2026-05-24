@@ -1,0 +1,17 @@
+{
+  "namespace": "io.cognitive-substrate",
+  "type": "record",
+  "name": "ReinforcementSignal",
+  "doc": "Multi-factor input to the reinforcement scoring function. Mirrors packages/core-types/src/reinforcement.ts ReinforcementSignal.",
+  "fields": [
+    { "name": "importance", "type": "double" },
+    { "name": "usageFrequency", "type": "double" },
+    { "name": "goalRelevance", "type": "double" },
+    { "name": "novelty", "type": "double" },
+    { "name": "predictionAccuracy", "type": "double" },
+    { "name": "emotionalWeight", "type": "double" },
+    { "name": "contradictionRisk", "type": "double" },
+    { "name": "policyAlignment", "type": "double" },
+    { "name": "toolUsefulness", "type": ["null", "double"], "default": null }
+  ]
+}

@@ -64,6 +64,10 @@ export interface PipelineConfig {
   readonly onEmbeddingDuration?: (ms: number) => void;
   /** Called with OpenSearch write wall-clock time in ms after each index step. */
   readonly onWriteDuration?: (ms: number) => void;
+  /** Avro schema ID for experience.enriched-value. Undefined falls back to JSON. */
+  readonly experienceEnrichedSchemaId?: number;
+  /** Avro schema ID for memory.indexed-value. Undefined falls back to JSON. */
+  readonly memoryIndexedSchemaId?: number;
 }
 
 /** Enriched event payload emitted to `experience.enriched`. */
@@ -222,9 +226,11 @@ export async function processEvent(
       await config.producer.publish(
         Topics.EXPERIENCE_ENRICHED,
         enrichedPayload,
-        traceContextForPublish
-          ? { key: rawEvent.eventId, traceContext: traceContextForPublish }
-          : { key: rawEvent.eventId },
+        {
+          key: rawEvent.eventId,
+          ...(traceContextForPublish ? { traceContext: traceContextForPublish } : {}),
+          ...(config.experienceEnrichedSchemaId !== undefined ? { schemaId: config.experienceEnrichedSchemaId } : {}),
+        },
       );
 
       // Step 8: Emit to `memory.indexed`.
@@ -236,6 +242,7 @@ export async function processEvent(
       };
       await config.producer.publish(Topics.MEMORY_INDEXED, indexedPayload, {
         key: rawEvent.eventId,
+        ...(config.memoryIndexedSchemaId !== undefined ? { schemaId: config.memoryIndexedSchemaId } : {}),
       });
 
       span.setAttribute(CogAttributes.MEMORY_INDEX, "experience_events");

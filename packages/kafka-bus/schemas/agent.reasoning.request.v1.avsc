@@ -1,0 +1,41 @@
+{
+  "namespace": "io.cognitive-substrate",
+  "type": "record",
+  "name": "AgentReasoningRequest",
+  "doc": "Reasoning task dispatched to a multi-agent pool. AgentContext fields are inlined; composite objects serialized as JSON strings to avoid deep nesting.",
+  "fields": [
+    { "name": "sessionId", "type": "string" },
+    { "name": "traceId", "type": "string" },
+    {
+      "name": "input",
+      "type": "string",
+      "doc": "JSON-serialized ExperienceEvent"
+    },
+    {
+      "name": "memories",
+      "type": "string",
+      "doc": "JSON-serialized ReadonlyArray<MemoryReference>"
+    },
+    {
+      "name": "goals",
+      "type": "string",
+      "doc": "JSON-serialized ReadonlyArray<Goal>"
+    },
+    {
+      "name": "policy",
+      "type": "string",
+      "doc": "JSON-serialized PolicyState"
+    },
+    {
+      "name": "capabilities",
+      "type": "string",
+      "doc": "JSON-serialized ReadonlyArray<ToolCapability>"
+    },
+    {
+      "name": "toolResult",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "JSON-serialized { tool: string; output: string } from previous step"
+    }
+  ]
+}

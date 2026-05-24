@@ -3,6 +3,12 @@
 name: Deep Smoke
 
 on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "packages/kafka-bus/schemas/**"
+      - "packages/kafka-bus/src/**"
+      - "docker-compose.smoke.yml"
   workflow_dispatch:
   schedule:
     - cron: "0 8 * * 1"
@@ -12,6 +18,49 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  schema-compat-check:
+    name: Avro schema compatibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Start Kafka and Schema Registry
+        run: docker compose -f docker-compose.smoke.yml up -d kafka schema-registry
+
+      - name: Wait for Schema Registry
+        run: |
+          timeout 60 bash -c 'until curl -sf http://localhost:8081/subjects; do sleep 2; done'
+
+      - name: Register baseline schemas from main
+        env:
+          SCHEMA_REGISTRY_URL: http://localhost:8081
+          SCHEMA_BASELINE_REF: origin/main
+        run: pnpm tsx scripts/smoke/register-baseline-schemas.ts
+
+      - name: Check schema compatibility
+        env:
+          SCHEMA_REGISTRY_URL: http://localhost:8081
+        run: pnpm tsx scripts/smoke/check-schema-compat.ts
+
+      - name: Tear down
+        if: always()
+        run: docker compose -f docker-compose.smoke.yml down -v
+
   smoke-deep:
     name: Deep smoke baseline
     runs-on: ubuntu-latest

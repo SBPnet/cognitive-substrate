@@ -1,0 +1,35 @@
+{
+  "namespace": "io.cognitive-substrate",
+  "type": "record",
+  "name": "AgentReasoningResponse",
+  "doc": "Multi-agent debate result: the winning AgentResult plus ArbitrationDecision metadata.",
+  "fields": [
+    { "name": "sessionId", "type": "string" },
+    { "name": "traceId", "type": "string" },
+    { "name": "timestamp", "type": "string" },
+    { "name": "agentId", "type": "string" },
+    {
+      "name": "agentType",
+      "type": {
+        "type": "enum",
+        "name": "AgentType",
+        "symbols": ["planner", "executor", "critic", "memory", "world_model", "meta_cognition"]
+      }
+    },
+    { "name": "proposal", "type": "string" },
+    { "name": "reasoning", "type": ["null", "string"], "default": null },
+    { "name": "confidence", "type": "double" },
+    { "name": "riskScore", "type": "double" },
+    { "name": "retrievedMemories", "type": { "type": "array", "items": "string" } },
+    { "name": "score", "type": ["null", "double"], "default": null },
+    { "name": "selected", "type": ["null", "boolean"], "default": null },
+    { "name": "critique", "type": ["null", "string"], "default": null },
+    { "name": "embedding", "type": ["null", { "type": "array", "items": "double" }], "default": null },
+    {
+      "name": "arbitration",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "JSON-serialized ArbitrationDecision"
+    }
+  ]
+}

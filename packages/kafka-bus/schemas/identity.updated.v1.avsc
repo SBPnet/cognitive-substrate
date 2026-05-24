@@ -1,0 +1,37 @@
+{
+  "namespace": "io.cognitive-substrate",
+  "type": "record",
+  "name": "IdentityUpdateEvent",
+  "doc": "Identity drift event emitted after narrative stabilization. Mirrors packages/core-types/src/policy.ts IdentityUpdateEvent.",
+  "fields": [
+    { "name": "identityId", "type": "string" },
+    { "name": "timestamp", "type": "string" },
+    {
+      "name": "previous",
+      "type": {
+        "type": "record",
+        "name": "IdentityState",
+        "fields": [
+          { "name": "identityId", "type": "string" },
+          { "name": "timestamp", "type": "string" },
+          { "name": "curiosity", "type": "double" },
+          { "name": "caution", "type": "double" },
+          { "name": "verbosity", "type": "double" },
+          { "name": "toolDependence", "type": "double" },
+          { "name": "explorationPreference", "type": "double" },
+          { "name": "stabilityScore", "type": "double" }
+        ]
+      }
+    },
+    { "name": "next", "type": "IdentityState" },
+    {
+      "name": "delta",
+      "type": "string",
+      "doc": "JSON-serialized Partial<Omit<IdentityState,'identityId'|'timestamp'>>"
+    },
+    { "name": "coherenceScore", "type": "double" },
+    { "name": "driftMagnitude", "type": "double" },
+    { "name": "narrativeSummary", "type": "string" },
+    { "name": "sourceMemoryIds", "type": { "type": "array", "items": "string" } }
+  ]
+}

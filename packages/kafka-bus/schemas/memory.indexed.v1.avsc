@@ -1,0 +1,30 @@
+{
+  "namespace": "io.cognitive-substrate",
+  "type": "record",
+  "name": "MemoryIndexedEvent",
+  "doc": "Confirmation event published after an ExperienceEvent is indexed into OpenSearch and written to object storage.",
+  "fields": [
+    { "name": "eventId", "type": "string" },
+    { "name": "timestamp", "type": "string" },
+    {
+      "name": "index",
+      "type": {
+        "type": "enum",
+        "name": "MemoryIndex",
+        "symbols": [
+          "experience_events",
+          "memory_semantic",
+          "policy_state",
+          "agent_activity",
+          "world_model_predictions",
+          "goal_system",
+          "identity_state",
+          "self_modifications",
+          "memory_links",
+          "retrieval_feedback"
+        ]
+      }
+    },
+    { "name": "objectStorageKey", "type": ["null", "string"], "default": null }
+  ]
+}

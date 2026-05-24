@@ -1,0 +1,17 @@
+{
+  "namespace": "io.cognitive-substrate",
+  "type": "record",
+  "name": "WorldModelPrediction",
+  "doc": "Forward simulation produced by the world-model engine. Mirrors packages/core-types/src/world-model.ts WorldModelPrediction.",
+  "fields": [
+    { "name": "predictionId", "type": "string" },
+    { "name": "timestamp", "type": "string" },
+    { "name": "currentStateSummary", "type": "string" },
+    { "name": "actionSummary", "type": "string" },
+    { "name": "predictedOutcome", "type": "string" },
+    { "name": "riskScore", "type": "double" },
+    { "name": "confidence", "type": "double" },
+    { "name": "actualOutcomeReference", "type": ["null", "string"], "default": null },
+    { "name": "predictionAccuracy", "type": ["null", "double"], "default": null }
+  ]
+}

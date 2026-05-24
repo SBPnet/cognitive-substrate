@@ -1,0 +1,37 @@
+{
+  "namespace": "io.cognitive-substrate",
+  "type": "record",
+  "name": "MemoryCritiqueEvent",
+  "doc": "Structured critique emitted by an agent when it disagrees with a retrieved memory. Mirrors packages/core-types/src/memory-critique.ts MemoryCritiqueEvent.",
+  "fields": [
+    { "name": "critiqueId", "type": "string" },
+    { "name": "timestamp", "type": "string" },
+    { "name": "sessionId", "type": "string" },
+    { "name": "agentId", "type": "string" },
+    { "name": "memoryId", "type": ["null", "string"], "default": null },
+    { "name": "clusterCentroid", "type": ["null", "string"], "default": null },
+    {
+      "name": "critiqueType",
+      "type": {
+        "type": "enum",
+        "name": "CritiqueType",
+        "symbols": [
+          "contradiction",
+          "outdated",
+          "overgeneralized",
+          "missing_context",
+          "high_confidence_error"
+        ]
+      }
+    },
+    { "name": "confidenceScore", "type": "double" },
+    { "name": "explanation", "type": ["null", "string"], "default": null },
+    { "name": "suggestedReplacement", "type": ["null", "string"], "default": null },
+    {
+      "name": "abstractionLevel",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "One of: experience | pattern | concept | principle | worldview"
+    }
+  ]
+}

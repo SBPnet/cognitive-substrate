@@ -1,0 +1,146 @@
+{
+  "namespace": "io.cognitive-substrate",
+  "type": "record",
+  "name": "ExperienceEvent",
+  "doc": "Atomic unit of cognitive experience. Mirrors packages/core-types/src/experience.ts ExperienceEvent.",
+  "fields": [
+    { "name": "eventId", "type": "string" },
+    { "name": "timestamp", "type": "string" },
+    {
+      "name": "type",
+      "type": {
+        "type": "enum",
+        "name": "EventType",
+        "symbols": [
+          "user_input",
+          "tool_result",
+          "system_event",
+          "agent_action",
+          "environmental_observation",
+          "consolidation_output"
+        ]
+      }
+    },
+    {
+      "name": "context",
+      "type": {
+        "type": "record",
+        "name": "EventContext",
+        "fields": [
+          { "name": "sessionId", "type": "string" },
+          { "name": "source", "type": ["null", "string"], "default": null },
+          { "name": "userId", "type": ["null", "string"], "default": null },
+          { "name": "goalId", "type": ["null", "string"], "default": null },
+          { "name": "policyVersion", "type": ["null", "string"], "default": null },
+          { "name": "agentId", "type": ["null", "string"], "default": null },
+          { "name": "traceId", "type": ["null", "string"], "default": null },
+          { "name": "spanId", "type": ["null", "string"], "default": null }
+        ]
+      }
+    },
+    {
+      "name": "input",
+      "type": {
+        "type": "record",
+        "name": "EventInput",
+        "fields": [
+          { "name": "text", "type": "string" },
+          { "name": "embedding", "type": { "type": "array", "items": "double" } },
+          {
+            "name": "structured",
+            "type": ["null", "string"],
+            "default": null,
+            "doc": "JSON-serialized Record<string,unknown>"
+          }
+        ]
+      }
+    },
+    {
+      "name": "internalState",
+      "type": [
+        "null",
+        {
+          "type": "record",
+          "name": "InternalState",
+          "fields": [
+            { "name": "workingMemorySnapshot", "type": ["null", "string"], "default": null },
+            { "name": "confidence", "type": "double" },
+            { "name": "activePlan", "type": ["null", "string"], "default": null },
+            {
+              "name": "emotionalVector",
+              "type": ["null", "string"],
+              "default": null,
+              "doc": "JSON-serialized Record<string,number>"
+            }
+          ]
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "action",
+      "type": [
+        "null",
+        {
+          "type": "record",
+          "name": "EventAction",
+          "fields": [
+            { "name": "tool", "type": ["null", "string"], "default": null },
+            {
+              "name": "parameters",
+              "type": ["null", "string"],
+              "default": null,
+              "doc": "JSON-serialized Record<string,unknown>"
+            },
+            { "name": "reasoning", "type": ["null", "string"], "default": null }
+          ]
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "result",
+      "type": [
+        "null",
+        {
+          "type": "record",
+          "name": "EventResult",
+          "fields": [
+            { "name": "output", "type": "string" },
+            { "name": "success", "type": "boolean" },
+            { "name": "latencyMs", "type": ["null", "double"], "default": null },
+            { "name": "errorCode", "type": ["null", "string"], "default": null },
+            {
+              "name": "content",
+              "type": ["null", "string"],
+              "default": null,
+              "doc": "JSON-serialized ReadonlyArray<ContentBlock>"
+            },
+            { "name": "isError", "type": ["null", "boolean"], "default": null }
+          ]
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "evaluation",
+      "type": [
+        "null",
+        {
+          "type": "record",
+          "name": "EventEvaluation",
+          "fields": [
+            { "name": "rewardScore", "type": "double" },
+            { "name": "userFeedback", "type": ["null", "string"], "default": null },
+            { "name": "selfAssessedQuality", "type": "double" },
+            { "name": "hallucinated", "type": ["null", "boolean"], "default": null }
+          ]
+        }
+      ],
+      "default": null
+    },
+    { "name": "objectStorageKey", "type": ["null", "string"], "default": null },
+    { "name": "importanceScore", "type": "double" },
+    { "name": "tags", "type": { "type": "array", "items": "string" } }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "namespace": "io.cognitive-substrate",
+  "type": "record",
+  "name": "RetrievalFeedback",
+  "doc": "Feedback record capturing whether a retrieval was helpful. Mirrors packages/core-types/src/memory.ts RetrievalFeedback. Note: the memory.feedback topic carries MemoryCritiqueEvent (in memory.feedback.v1.avsc) as its primary event; RetrievalFeedback is the secondary feedback shape written by the RetrievalFeedbackWriter pipeline.",
+  "fields": [
+    { "name": "feedbackId", "type": "string" },
+    { "name": "timestamp", "type": "string" },
+    { "name": "querySummary", "type": "string" },
+    { "name": "retrievedMemoryId", "type": "string" },
+    { "name": "usedInResponse", "type": "boolean" },
+    { "name": "helpfulnessScore", "type": "double" },
+    { "name": "hallucinationDetected", "type": "boolean" },
+    { "name": "futureWeightAdjustment", "type": "double" }
+  ]
+}

@@ -18,6 +18,7 @@
     "clean": "rm -rf dist *.tsbuildinfo"
   },
   "dependencies": {
+    "avsc": "^5.7.9",
     "kafkajs": "^2.2.4"
   },
   "devDependencies": {

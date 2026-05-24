@@ -1,0 +1,14 @@
+{
+  "namespace": "io.cognitive-substrate",
+  "type": "record",
+  "name": "ConsolidationRequest",
+  "doc": "Request to the consolidation worker to run a sleep-cycle synthesis pass. Mirrors packages/consolidation-engine/src/types.ts ConsolidationRequest.",
+  "fields": [
+    { "name": "requestId", "type": "string" },
+    { "name": "timestamp", "type": "string" },
+    { "name": "maxAge", "type": "string", "doc": "ISO-8601 lower bound on timestamp for replay candidate selection" },
+    { "name": "size", "type": ["null", "int"], "default": null },
+    { "name": "minImportance", "type": ["null", "double"], "default": null },
+    { "name": "requiredTags", "type": ["null", { "type": "array", "items": "string" }], "default": null }
+  ]
+}

@@ -6,10 +6,12 @@
 import { Kafka, Consumer, EachMessagePayload } from "kafkajs";
 import { extractTraceContext, type TraceContext } from "./propagation.js";
 import type { TopicName } from "./topics.js";
+import { SchemaRegistryClient, type SchemaRegistryConfig } from "./schema-registry.js";
 
 export interface CognitiveConsumerConfig {
   readonly kafka: Kafka;
   readonly groupId: string;
+  readonly schemaRegistry?: SchemaRegistryConfig;
 }
 
 export interface TypedMessage<T> {
@@ -30,8 +32,12 @@ export type MessageHandler<T> = (message: TypedMessage<T>) => Promise<void>;
  */
 export class CognitiveConsumer {
   private readonly consumer: Consumer;
+  private readonly registry: SchemaRegistryClient | undefined;
 
   constructor(config: CognitiveConsumerConfig) {
+    this.registry = config.schemaRegistry
+      ? new SchemaRegistryClient(config.schemaRegistry)
+      : undefined;
     this.consumer = config.kafka.consumer({
       groupId: config.groupId,
       // 5 min session timeout accommodates slow handlers (two LLM round-trips
@@ -81,10 +87,19 @@ export class CognitiveConsumer {
     return async (payload: EachMessagePayload): Promise<void> => {
       const { topic, partition, message } = payload;
       if (!message.value) return;
-      const value = JSON.parse(message.value.toString()) as T;
+      const raw = message.value as Buffer;
+      const value = (await this.deserialize(raw)) as T;
       const key = message.key ? message.key.toString() : null;
       const traceContext = extractTraceContext(message.headers ?? undefined);
       await handler({ topic, partition, offset: message.offset, timestamp: message.timestamp, key, value, traceContext });
     };
+  }
+
+  private async deserialize(raw: Buffer): Promise<unknown> {
+    if (this.registry && raw[0] === 0x00 && raw.length > 5) {
+      const { value } = await this.registry.decode(raw);
+      return value;
+    }
+    return JSON.parse(raw.toString()) as unknown;
   }
 }

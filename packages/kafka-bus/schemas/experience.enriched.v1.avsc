@@ -1,0 +1,14 @@
+{
+  "namespace": "io.cognitive-substrate",
+  "type": "record",
+  "name": "EnrichedEventPayload",
+  "doc": "Slim enrichment confirmation published to experience.enriched by the ingestion worker after indexing. Mirrors apps/workers/ingestion/src/pipeline.ts EnrichedEventPayload.",
+  "fields": [
+    { "name": "eventId", "type": "string" },
+    { "name": "timestamp", "type": "string" },
+    { "name": "importanceScore", "type": "double" },
+    { "name": "embeddingDimension", "type": "int" },
+    { "name": "objectStorageKey", "type": "string" },
+    { "name": "tags", "type": { "type": "array", "items": "string" } }
+  ]
+}

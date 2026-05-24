@@ -1,0 +1,20 @@
+{
+  "namespace": "io.cognitive-substrate",
+  "type": "record",
+  "name": "SemanticMemory",
+  "doc": "Consolidated semantic memory output from a consolidation cycle. Mirrors packages/core-types/src/memory.ts SemanticMemory.",
+  "fields": [
+    { "name": "memoryId", "type": "string" },
+    { "name": "createdAt", "type": "string" },
+    { "name": "summary", "type": "string" },
+    { "name": "generalization", "type": "string" },
+    { "name": "embedding", "type": { "type": "array", "items": "double" } },
+    { "name": "sourceEventIds", "type": { "type": "array", "items": "string" } },
+    { "name": "importanceScore", "type": "double" },
+    { "name": "stabilityScore", "type": "double" },
+    { "name": "contradictionScore", "type": "double" },
+    { "name": "semanticCluster", "type": ["null", "string"], "default": null },
+    { "name": "usageFrequency", "type": "double" },
+    { "name": "lastRetrieved", "type": ["null", "string"], "default": null }
+  ]
+}

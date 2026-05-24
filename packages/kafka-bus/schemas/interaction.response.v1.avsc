@@ -1,0 +1,44 @@
+{
+  "namespace": "io.cognitive-substrate",
+  "type": "record",
+  "name": "InteractionResponseEvent",
+  "doc": "Published by the orchestrator after each CognitiveLoop cycle. Complex nested fields (retrievedMemories, policySnapshot, agentResult, session) are JSON-serialized strings. Mirrors packages/core-types/src/interaction.ts InteractionResponseEvent.",
+  "fields": [
+    { "name": "eventId", "type": "string" },
+    { "name": "sessionId", "type": "string" },
+    { "name": "traceId", "type": "string" },
+    { "name": "timestamp", "type": "string" },
+    {
+      "name": "status",
+      "type": {
+        "type": "enum",
+        "name": "InteractionStatus",
+        "symbols": ["processing", "complete", "partial", "failed"]
+      }
+    },
+    { "name": "responseText", "type": "string" },
+    { "name": "confidence", "type": "double" },
+    { "name": "riskScore", "type": "double" },
+    {
+      "name": "retrievedMemories",
+      "type": "string",
+      "doc": "JSON-serialized ReadonlyArray<MemoryReference>"
+    },
+    {
+      "name": "policySnapshot",
+      "type": "string",
+      "doc": "JSON-serialized PolicyState"
+    },
+    {
+      "name": "agentResult",
+      "type": "string",
+      "doc": "JSON-serialized AgentResult"
+    },
+    {
+      "name": "session",
+      "type": "string",
+      "doc": "JSON-serialized CognitiveSession"
+    },
+    { "name": "errorMessage", "type": ["null", "string"], "default": null }
+  ]
+}

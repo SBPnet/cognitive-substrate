@@ -1,0 +1,38 @@
+{
+  "namespace": "io.cognitive-substrate",
+  "type": "record",
+  "name": "SelfModificationValidated",
+  "doc": "A SelfModificationProposal after validation review — approved field set to final decision.",
+  "fields": [
+    { "name": "mutationId", "type": "string" },
+    { "name": "timestamp", "type": "string" },
+    {
+      "name": "mutationType",
+      "type": {
+        "type": "enum",
+        "name": "ProposalKindValidated",
+        "symbols": [
+          "parameter_tune",
+          "plugin_register",
+          "plugin_update",
+          "index_mapping",
+          "metric_capture"
+        ]
+      }
+    },
+    { "name": "description", "type": "string" },
+    { "name": "expectedGain", "type": "double" },
+    { "name": "stabilityRisk", "type": "double" },
+    { "name": "approved", "type": "boolean" },
+    { "name": "rollbackAvailable", "type": "boolean" },
+    {
+      "name": "payload",
+      "type": "string",
+      "doc": "JSON-serialized ProposalPayload"
+    },
+    { "name": "observedGain", "type": ["null", "double"], "default": null },
+    { "name": "validatedAt", "type": ["null", "string"], "default": null },
+    { "name": "validatorId", "type": ["null", "string"], "default": null },
+    { "name": "rejectionReason", "type": ["null", "string"], "default": null }
+  ]
+}
