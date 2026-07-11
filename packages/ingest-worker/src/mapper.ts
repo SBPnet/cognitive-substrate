@@ -108,6 +108,16 @@ interface SeriesNavClickEvent extends TelemetryEventBase {
   payload: { fromSlug: string; toSlug: string; direction: "prev" | "next" };
 }
 
+interface TimeOnPageEvent extends TelemetryEventBase {
+  type: "time_on_page";
+  payload: { path: string; title?: string; seconds: number; completed?: boolean };
+}
+
+interface SearchResultClickEvent extends TelemetryEventBase {
+  type: "search_result_click";
+  payload: { query: string; slug: string; position: number };
+}
+
 export type TelemetryEvent =
   | PageViewEvent
   | ArticleCompleteEvent
@@ -122,7 +132,9 @@ export type TelemetryEvent =
   | OutboundLinkEvent
   | NavClickEvent
   | TagClickEvent
-  | SeriesNavClickEvent;
+  | SeriesNavClickEvent
+  | TimeOnPageEvent
+  | SearchResultClickEvent;
 
 // ---------------------------------------------------------------------------
 // Importance scoring
@@ -171,6 +183,16 @@ function importanceScore(event: TelemetryEvent): number {
     case "series_nav_click":
       // Progressing through a series is a strong deep-engagement signal
       return 0.45;
+
+    case "time_on_page":
+      // Longer dwell is a stronger engagement signal; completed reads score higher.
+      return Math.min(
+        0.15 + (event.payload.seconds / 180) * 0.35 + (event.payload.completed ? 0.15 : 0),
+        0.70,
+      );
+
+    case "search_result_click":
+      return Math.max(0.45 - event.payload.position * 0.05, 0.20);
 
     case "page_view":
     case "focus_gain":
@@ -226,6 +248,12 @@ function buildSummary(event: TelemetryEvent): string {
 
     case "series_nav_click":
       return `series nav: ${event.payload.direction} from ${event.payload.fromSlug} → ${event.payload.toSlug}`;
+
+    case "time_on_page":
+      return `time on page: ${event.payload.path} (${event.payload.seconds}s${event.payload.completed ? ", completed" : ""})`;
+
+    case "search_result_click":
+      return `search result click: "${event.payload.query}" → ${event.payload.slug} (position ${event.payload.position})`;
   }
 }
 
@@ -269,6 +297,16 @@ function buildTags(event: TelemetryEvent): string[] {
     case "series_nav_click":
       tags.push("engagement:deep");
       break;
+    case "time_on_page":
+      tags.push(
+        event.payload.seconds >= 60 || event.payload.completed
+          ? "engagement:deep"
+          : "engagement:shallow",
+      );
+      break;
+    case "search_result_click":
+      tags.push("engagement:curiosity", `article:${event.payload.slug}`);
+      break;
   }
 
   return tags;
@@ -308,6 +346,8 @@ export function registerBuiltinMappers(registry: IngestMapperRegistry): void {
     "nav_click",
     "tag_click",
     "series_nav_click",
+    "time_on_page",
+    "search_result_click",
   ];
 
   for (const type of builtinTypes) {

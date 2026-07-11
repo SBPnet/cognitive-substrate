@@ -9,7 +9,8 @@ export type RawEvent = { type: string; sessionId: string; [key: string]: unknown
  * `registerBuiltinMappers`; plugin handlers are registered via `registerPlugin`.
  *
  * Duplicate `type` registrations throw loudly — two plugins must not claim
- * the same event type. Unknown event types also throw (no silent drops).
+ * the same event type. Unknown event types return null so a shared topic
+ * (ops logs + blog telemetry) cannot poison the consumer offset.
  */
 export class IngestMapperRegistry {
   private readonly handlers = new Map<
@@ -43,10 +44,10 @@ export class IngestMapperRegistry {
   map(event: RawEvent): ExperienceEvent | null {
     const handler = this.handlers.get(event.type);
     if (handler === undefined) {
-      throw new Error(
-        `[mapper-registry] No handler registered for event type "${event.type}". ` +
-          `Add it to CS_PLUGINS or register it in the built-in mapper.`,
+      console.warn(
+        `[mapper-registry] No handler for event type "${event.type}"; skipping`,
       );
+      return null;
     }
     return handler(event);
   }

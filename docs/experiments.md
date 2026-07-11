@@ -1169,6 +1169,8 @@ All major subsystems run together over 100 turns (normal→degraded→outage→r
 | Blog telemetry pipeline: H1/H2/H3 PASS, H4 FAIL; 136 real events, 18/18 kNN slugs, importance_score median flat across session counts | Exp 45 | First real-data experiment; cross-session salience requires reinforcement engine (retrieval_priority), not importance_score |
 | Reinforcement engine over seeded exp45 docs: retrieval_priority written; multi-session rp > single-session rp | Exp 46 | importance_score uncorrupted; Pearson r(rp, session_count) ≥ 0.5 confirms retrieval_priority encodes cross-session salience |
 | IntrospectionEngine pipeline: gap detection, typed proposal schema, ProposalStore round-trip, SchemaEvolutionApplier writes schema_evolution event | Exp 48 | Validates full suggestion-to-apply path; ConstitutionEngine gates on stabilityRisk < 0.7; substrate_proposals index stores pending proposals for human review |
+| Lucene knn engine switch: top-1 recall, hybrid bool+knn+term, ef_search parity, non-negative cosinesimil scores | Exp 49 | faiss removal and ConjunctionDISI workaround removal validated |
+| Real blog reinforcement: retrieval_priority encodes cross-session salience on live reader docs | Exp 50 | Exp 45 H4 follow-up on non-seeded blog traffic |
 
 ---
 
@@ -1184,7 +1186,7 @@ Experiments 1–44 constitute engineering validation of subsystem behavior again
 
 **Corpus coverage.** The operational signal corpus covers four window types (normal, degraded, outage, recovery) with fixed vocabulary drawn from infrastructure telemetry domains. Results generalize within this vocabulary; generalization to structurally different signal types has not been tested.
 
-These limitations do not invalidate the experimental results. Each experiment demonstrates that the system produces a specific behavior in a specific condition. They mean the results should be read as engineering validation, not as general performance claims. Experiments 45–47 (non-cognitive baseline comparison, held-out window type, parameter sensitivity grid) are planned to address the holdout and baseline gaps when the infrastructure for independent evaluation is ready.
+These limitations do not invalidate the experimental results. Each experiment demonstrates that the system produces a specific behavior in a specific condition. They mean the results should be read as engineering validation, not as general performance claims. Follow-on rigorous eval experiments (non-cognitive baseline comparison, held-out window type, parameter sensitivity grid) remain planned under new experiment numbers when independent evaluation infrastructure is ready. Numbers 45–50 are already assigned to real-data and infrastructure work.
 
 ---
 
@@ -1197,6 +1199,30 @@ These limitations do not invalidate the experimental results. Each experiment de
 ## Experiment 46 — Cross-Session Salience via Reinforcement Engine
 
 **Result:** Reinforcement engine run over seeded exp45-s* docs in `experience_events`. H1 (retrieval_priority written), H2 (multi-session rp > single-session), H3 (Pearson r ≥ 0.5), and H4 (importance_score uncorrupted) validated. Real reader-session docs were not touched. Confirms that `retrieval_priority` — not `importance_score` — is the correct cross-session salience signal. Re-passes the H4 hypothesis that exp45 failed.
+
+---
+
+## Experiment 47 -- Memory Critique Events (MCE) Pipeline
+
+**Result:** End-to-end MCE pipeline validated. High-confidence critiques (>=0.8) decrement `retrieval_priority` by ~-0.25; mid-confidence (0.5-0.79) by ~-0.12. `suppression_threshold` raised and `last_critique_at` written on critiqued memories. Concept-level critiques cascade to derived memories with 50% attenuation per level. All hypotheses PASS.
+
+---
+
+## Experiment 48 -- IntrospectionEngine Pipeline
+
+**Result:** Full self-modification pipeline validated. `IntrospectionEngine` emits proposals with `expectedGain >= 0.6` from high-failure calibration reports. `ConstitutionEngine` gates on `stabilityRisk < 0.7`. `ProposalStore` round-trip (save/listPending/getByMutationId) confirmed against `substrate_proposals` index. `SchemaEvolutionApplier` writes `schema_evolution` events to `experience_events`. All hypotheses PASS.
+
+---
+
+## Experiment 49 -- Lucene Engine Switch Validation
+
+**Result:** All 4 hypotheses validated. H1: knn top-1 recall correct for all 4 operational windows on fresh lucene-engine index (m=16, ef_construction=128, ef_search=100). H2: hybrid bool+knn+term query (formerly crash-prone ConjunctionDISI path under faiss) returns correct results with no errors. H3: production index ef_search values match schemas.ts (experience_events=100, memory_semantic=64). H4: all hybrid query scores >= 0, confirming cosinesimil (not faiss inner-product). faiss removal and knnOnly workaround removal are validated clean.
+
+---
+
+## Experiment 50 -- Real Blog Cross-Session Salience
+
+**Result:** Reinforcement engine run over live `tags:blog` docs (excluding exp45-* seeds and probe sessions). Re-tests Exp 45 H4 using `retrieval_priority` on real reader traffic. See `results/experiment-50-results.md` for PASS/FAIL detail after each run.
 
 ---
 

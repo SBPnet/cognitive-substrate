@@ -1,0 +1,283 @@
+{
+  "experiment": "experiment-50",
+  "runAt": "2026-07-11T01:10:37.277Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 rp written: PASS\nH2 multi>single: PASS (multi=0.5596 single=0.4832)\nH3 Pearson r: PASS (r=0.6781)\nH4 importance intact: PASS (maxDelta=0.000000)",
+  "data": {
+    "totalDocs": 697,
+    "reinforced": 108,
+    "multiSessionCount": 21,
+    "singleSessionCount": 16,
+    "multiMedianRp": 0.5596203798065423,
+    "singleMedianRp": 0.48322675580700386,
+    "pearsonR": 0.6781447097332847,
+    "maxImportanceDelta": 0,
+    "perArticle": [
+      {
+        "articleTag": "article:kip-1150-diskless",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.474632,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:opensearch-semantic-retrieval",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.474632,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:event-streams-memory-formation",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.5005519999999999,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:kafka-why-i-chose-it",
+        "sessionCount": 5,
+        "medianRetrievalPriority": 0.551592,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:cognitive-telemetry-pipeline",
+        "sessionCount": 3,
+        "medianRetrievalPriority": 0.6099119999999999,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:continuous-learning-systems",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.481112,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:self-generated-tasks",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.5005519999999999,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:retrieval-bottleneck",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.5005519999999999,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:cost-of-no-registry",
+        "sessionCount": 2,
+        "medianRetrievalPriority": 0.539032,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:end-of-the-ride",
+        "sessionCount": 2,
+        "medianRetrievalPriority": 0.5131119999999999,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:case-for-self-improving-agents",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.48322675580700386,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:abstraction",
+        "sessionCount": 3,
+        "medianRetrievalPriority": 0.5775119999999999,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:mom-approved",
+        "sessionCount": 4,
+        "medianRetrievalPriority": 0.551592,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:memory-in-conversation",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.474632,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:measuring-agent-improvement",
+        "sessionCount": 3,
+        "medianRetrievalPriority": 0.5596203798065423,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:hey-sis",
+        "sessionCount": 9,
+        "medianRetrievalPriority": 0.5662596730566721,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:glossary",
+        "sessionCount": 8,
+        "medianRetrievalPriority": 0.5596203798065423,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:experience-ingestion",
+        "sessionCount": 9,
+        "medianRetrievalPriority": 0.5596203798065423,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:autonomous-memory-management",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.48322675580700386,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:em-dash-hunting",
+        "sessionCount": 3,
+        "medianRetrievalPriority": 0.5861775528070614,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:narrative",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.5429803950581721,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:constitution-limits",
+        "sessionCount": 3,
+        "medianRetrievalPriority": 0.5596203798065423,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:memory-retrieval",
+        "sessionCount": 4,
+        "medianRetrievalPriority": 0.5662596730566721,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:multi-agent",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.48322675580700386,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:failure-modes",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.48322675580700386,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:arbitration-layer",
+        "sessionCount": 2,
+        "medianRetrievalPriority": 0.5280628610569029,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:real-telemetry-memory",
+        "sessionCount": 5,
+        "medianRetrievalPriority": 0.5662596730566721,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:clickhouse-telemetry",
+        "sessionCount": 2,
+        "medianRetrievalPriority": 0.521423567806773,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:memory-to-intelligence",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.4898660490571336,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:weekly-memory-digest",
+        "sessionCount": 2,
+        "medianRetrievalPriority": 0.521423567806773,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:kafka-raw-problem",
+        "sessionCount": 6,
+        "medianRetrievalPriority": 0.5662596730566721,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:reinforcement",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.48322675580700386,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:schema-registry-intro",
+        "sessionCount": 5,
+        "medianRetrievalPriority": 0.5596203798065423,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:registry-in-practice",
+        "sessionCount": 2,
+        "medianRetrievalPriority": 0.5479807408072922,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:schema-evolution",
+        "sessionCount": 3,
+        "medianRetrievalPriority": 0.5596203798065423,
+        "medianImportanceDelta": 0,
+        "docCount": 3
+      },
+      {
+        "articleTag": "article:scaling-intro",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.474632,
+        "medianImportanceDelta": 0,
+        "docCount": 2
+      },
+      {
+        "articleTag": "article:metacognition",
+        "sessionCount": 1,
+        "medianRetrievalPriority": 0.481112,
+        "medianImportanceDelta": 0,
+        "docCount": 1
+      }
+    ],
+    "h1Pass": true,
+    "h2Pass": true,
+    "h2Skipped": false,
+    "h3Pass": true,
+    "h3Skipped": false,
+    "h4Pass": true
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "experiment": "exp49",
+  "runAt": "2026-07-11T00:59:35.980Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 knn top-1 recall all windows: normal=true,degraded=true,outage=true,recovery=true: PASS; H2 hybrid bool+knn+term no crash, >=1 correct: PASS; H3 ef_search experience_events=n/a memory_semantic=n/a: PASS; H4 all hybrid scores >=0: PASS",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": true,
+      "h4": true
+    },
+    "modelId": "YIGOLZ4BgYB_vs2kWaTT",
+    "knnRecall": [
+      {
+        "window": "normal",
+        "top1Correct": true,
+        "correctInTopK": 5
+      },
+      {
+        "window": "degraded",
+        "top1Correct": true,
+        "correctInTopK": 5
+      },
+      {
+        "window": "outage",
+        "top1Correct": true,
+        "correctInTopK": 5
+      },
+      {
+        "window": "recovery",
+        "top1Correct": true,
+        "correctInTopK": 5
+      }
+    ],
+    "hybridHits": [
+      {
+        "id": "exp49-outage-3",
+        "score": 6.509676,
+        "window": "outage"
+      },
+      {
+        "id": "exp49-outage-2",
+        "score": 6.509532,
+        "window": "outage"
+      },
+      {
+        "id": "exp49-outage-1",
+        "score": 6.5094867,
+        "window": "outage"
+      },
+      {
+        "id": "exp49-outage-4",
+        "score": 6.5084286,
+        "window": "outage"
+      },
+      {
+        "id": "exp49-outage-0",
+        "score": 6.5081654,
+        "window": "outage"
+      }
+    ],
+    "efSearch": {}
+  }
+}

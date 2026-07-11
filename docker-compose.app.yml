@@ -156,6 +156,29 @@ services:
       S3_SECRET_ACCESS_KEY: minioadmin
       S3_FORCE_PATH_STYLE: "true"
 
+  # Blog / plugin telemetry → experience_events (packages/ingest-worker).
+  # Distinct from worker-ingestion, which consumes experience.raw.
+  #
+  # On thor, disable the host unit before starting this service to avoid
+  # consumer-group fights:
+  #   sudo systemctl disable --now ingest-worker.service
+  worker-ingest-telemetry:
+    <<: *worker-common
+    build:
+      context: .
+      dockerfile: packages/ingest-worker/Dockerfile
+    container_name: cs-worker-ingest-telemetry
+    depends_on:
+      - api
+      - otel-collector
+    environment:
+      <<: *worker-env
+      KAFKA_CLIENT_ID: ingest-worker
+      KAFKA_GROUP_ID: ingest-worker-group
+      OTEL_SERVICE_NAME: ingest-worker
+      WRITER_BUFFER_SIZE: "25"
+      WRITER_FLUSH_MS: "2000"
+
   worker-consolidation:
     <<: *worker-common
     build:

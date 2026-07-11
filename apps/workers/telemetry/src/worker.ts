@@ -145,14 +145,21 @@ export async function startWorker(): Promise<void> {
           }
         }
       } else if (message.topic === Topics.TELEMETRY_LOGS_RAW) {
-        const logMessage = message.value as RawLogMessage;
-        experienceBridge?.observeLog(logMessage);
-        workerMetrics.messagesProcessed.add(1, { topic: "logs" });
-        logBatch.push(logMessage);
-        if (logBatch.length >= BATCH_MAX_SIZE) {
-          await flush();
+        // Blog / plugin cognitive events share this topic with ops logs.
+        // ingest-worker maps those into experience_events; skip ClickHouse
+        // log insert so missing `message` fields cannot crash the flush path.
+        if (isCognitiveTelemetryEvent(message.value)) {
+          workerMetrics.messagesProcessed.add(1, { topic: "logs.cognitive" });
         } else {
-          scheduleFlush();
+          const logMessage = message.value as RawLogMessage;
+          experienceBridge?.observeLog(logMessage);
+          workerMetrics.messagesProcessed.add(1, { topic: "logs" });
+          logBatch.push(logMessage);
+          if (logBatch.length >= BATCH_MAX_SIZE) {
+            await flush();
+          } else {
+            scheduleFlush();
+          }
         }
       } else if (message.topic === Topics.TELEMETRY_METADATA_RAW) {
         experienceBridge?.observeMetadata(message.value as RawMetadataMessage);
@@ -182,13 +189,20 @@ export async function startWorker(): Promise<void> {
   log("Worker started. Waiting for messages...");
 }
 
+function isCognitiveTelemetryEvent(value: unknown): boolean {
+  if (value === null || typeof value !== "object") return false;
+  const record = value as Record<string, unknown>;
+  return typeof record["type"] === "string" && typeof record["sessionId"] === "string";
+}
+
 function toLogsRawRow(message: RawLogMessage): LogsRawRow {
+  const text = typeof message.message === "string" ? message.message : "";
   return {
-    timestamp: new Date(message.timestamp),
-    service_id: message.serviceId,
-    service_type: message.serviceType,
-    severity: inferSeverity(message.message),
-    message: message.message,
+    timestamp: new Date(message.timestamp ?? Date.now()),
+    service_id: message.serviceId ?? "unknown",
+    service_type: message.serviceType ?? "unknown",
+    severity: inferSeverity(text),
+    message: text,
     attributes: {
       ...(message.unit ? { unit: message.unit } : {}),
       ...(message.offset ? { offset: message.offset } : {}),
@@ -196,12 +210,12 @@ function toLogsRawRow(message: RawLogMessage): LogsRawRow {
     },
     trace_id: "",
     span_id: "",
-    environment: message.environment,
+    environment: message.environment ?? "production",
   };
 }
 
-function inferSeverity(message: string): string {
-  const lower = message.toLowerCase();
+function inferSeverity(message: string | undefined): string {
+  const lower = (message ?? "").toLowerCase();
   if (lower.includes("error") || lower.includes("exception") || lower.includes("failed")) {
     return "error";
   }

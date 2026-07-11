@@ -1,6 +1,6 @@
 # Package Map
 
-Quick-reference table for every package and app in the monorepo. For implementation status (built vs. drafted vs. entrypoint-only) see `docs/architecture/inventory.md` once it exists; for the cognitive-loop turn flow see `docs/architecture/cognitive-loop.md`.
+Quick-reference table for every package and app in the monorepo. For implementation status (built vs. drafted vs. entrypoint-only) see [`inventory.md`](inventory.md); for the cognitive-loop turn flow see `docs/architecture/cognitive-loop.md`.
 
 ## Core infrastructure
 
@@ -74,7 +74,7 @@ Quick-reference table for every package and app in the monorepo. For implementat
 
 | Package | Stage | One-line purpose | Key entry point |
 |---------|-------|-----------------|-----------------|
-| `@cognitive-substrate/experiment-corpus` | -- | Fixed 9-memory corpus, numbered experiment harness (Exp 1 -- 48+) | `packages/experiment-corpus/src/` |
+| `@cognitive-substrate/experiment-corpus` | -- | Fixed 9-memory corpus, numbered experiment harness (Exp 1 -- 50+) | `packages/experiment-corpus/src/` |
 
 ## Apps
 
