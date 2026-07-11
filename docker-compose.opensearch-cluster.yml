@@ -23,7 +23,7 @@
 #   and set network.host to the node's actual interface address.
 
 x-opensearch-common: &opensearch-common
-  image: opensearchproject/opensearch:3.3.2
+  image: opensearchproject/opensearch:3.6.0
   restart: unless-stopped
   ulimits:
     memlock:
@@ -44,6 +44,8 @@ x-opensearch-common: &opensearch-common
     plugins.ml_commons.jvm_heap_memory_threshold: "0"
     # Pin ML inference to the ml-role node.
     plugins.ml_commons.only_run_on_ml_node: "true"
+    # Docker Desktop volumes often trip the default 5GB free-disk breaker.
+    plugins.ml_commons.disk_free_space_threshold: "100mb"
 
 services:
   # ---------------------------------------------------------------------------
@@ -59,7 +61,7 @@ services:
       <<: *opensearch-env
       node.name: opensearch-node1
       node.roles: cluster_manager,data,ingest
-      OPENSEARCH_JAVA_OPTS: "-Xms1g -Xmx2g"
+      OPENSEARCH_JAVA_OPTS: "-Xms1g -Xmx1g"
     healthcheck:
       test:
         - CMD-SHELL
@@ -84,7 +86,7 @@ services:
       <<: *opensearch-env
       node.name: opensearch-node2
       node.roles: data,ingest
-      OPENSEARCH_JAVA_OPTS: "-Xms1g -Xmx2g"
+      OPENSEARCH_JAVA_OPTS: "-Xms1g -Xmx1g"
     depends_on:
       opensearch-node1:
         condition: service_healthy
@@ -104,8 +106,8 @@ services:
       <<: *opensearch-env
       node.name: opensearch-ml1
       node.roles: ml
-      # ML nodes benefit from more heap for model weights.
-      OPENSEARCH_JAVA_OPTS: "-Xms2g -Xmx4g"
+      # ML nodes need enough heap to load MiniLM TORCH_SCRIPT on Docker Desktop.
+      OPENSEARCH_JAVA_OPTS: "-Xms4g -Xmx4g"
     depends_on:
       opensearch-node1:
         condition: service_healthy
@@ -116,7 +118,7 @@ services:
   # Dashboards — browse cluster state and ML model registry at http://localhost:5601
   # ---------------------------------------------------------------------------
   opensearch-dashboards:
-    image: opensearchproject/opensearch-dashboards:3.3.0
+    image: opensearchproject/opensearch-dashboards:3.6.0
     container_name: opensearch-dashboards
     restart: unless-stopped
     ports:

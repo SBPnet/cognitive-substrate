@@ -3,6 +3,12 @@
 Built vs drafted status for packages and production wiring. Companion to
 [`package-map.md`](package-map.md). Last updated 2026-07-10.
 
+**Lab OpenSearch:** thor and local multi-node compose pin **OpenSearch 3.6.0**
+(+ Dashboards 3.6.0). Smoke compose remains on 2.15 for light CI. Thor rolling
+upgrades must use compose project `docker`
+(`docker compose -p docker -f docker-compose.thor.yml ...`) so existing
+`docker_opensearch-*-data` volumes are reused.
+
 Status legend:
 
 - **built** — package exists, typed, and exercised by experiments or live workers
@@ -15,7 +21,7 @@ Status legend:
 | Package / service | Status | Notes |
 |-------------------|--------|-------|
 | `core-types` | built | Shared schemas and index names |
-| `memory-opensearch` | built / wired | Lucene knn defaults (Exp 49) |
+| `memory-opensearch` | built / wired | Lucene knn defaults (Exp 49); lab cluster OpenSearch **3.6.0** |
 | `memory-objectstore` | built | MinIO on thor |
 | `kafka-bus` | built / wired | Topic registry canonical |
 | `telemetry-otel` | built / wired | OTEL collector → Kafka |

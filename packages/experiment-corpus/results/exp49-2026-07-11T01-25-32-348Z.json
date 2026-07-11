@@ -1,7 +1,7 @@
 {
   "experiment": "exp49",
-  "runAt": "2026-07-11T01:36:00.424Z",
-  "opensearchUrl": "http://thor:9200",
+  "runAt": "2026-07-11T01:25:32.348Z",
+  "opensearchUrl": "http://localhost:9200",
   "observations": "H1 knn top-1 recall all windows: normal=true,degraded=true,outage=true,recovery=true: PASS; H2 hybrid bool+knn+term no crash, >=1 correct: PASS; H3 ef_search experience_events=n/a memory_semantic=n/a: PASS; H4 all hybrid scores >=0: PASS",
   "data": {
     "hypotheses": {
@@ -10,7 +10,7 @@
       "h3": true,
       "h4": true
     },
-    "modelId": "YIGOLZ4BgYB_vs2kWaTT",
+    "modelId": "31zHTp8BiWEegt6RB-YK",
     "knnRecall": [
       {
         "window": "normal",
@@ -46,7 +46,7 @@
       },
       {
         "id": "exp49-outage-1",
-        "score": 6.509487,
+        "score": 6.5094867,
         "window": "outage"
       },
       {

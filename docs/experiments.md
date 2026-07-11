@@ -1,7 +1,7 @@
 # Cognitive Substrate Experiments
 
 Fixed-corpus experiments run against the `thor` OpenSearch cluster
-(`http://thor:9200`). All results are saved to
+(`http://thor:9200`, OpenSearch **3.6.0**). All results are saved to
 `packages/experiment-corpus/results/`.
 
 Each experiment runs via:
@@ -1223,6 +1223,15 @@ These limitations do not invalidate the experimental results. Each experiment de
 ## Experiment 50 -- Real Blog Cross-Session Salience
 
 **Result:** Reinforcement engine run over live `tags:blog` docs (excluding exp45-* seeds and probe sessions). Re-tests Exp 45 H4 using `retrieval_priority` on real reader traffic. See `results/experiment-50-results.md` for PASS/FAIL detail after each run.
+
+---
+
+## Experiment 51 -- Lucene BBQ vs float32 (OpenSearch 3.6)
+
+**Result:** Fresh-index comparison of lucene float32 HNSW vs lucene 1-bit SQ
+(`encoder.sq.bits=1`) on a 100-doc operational-window corpus after the move to
+OpenSearch 3.6.0. H1–H4 ALL PASS (recall parity, hybrid filter OK, store ratio
+1.045). Production indexes not remapped. See `results/experiment-51-results.md`.
 
 ---
 

@@ -20,7 +20,7 @@ services:
   # setting (plugins.ml_commons.only_run_on_ml_node=false).
   # ---------------------------------------------------------------------------
   opensearch:
-    image: opensearchproject/opensearch:2.17.0
+    image: opensearchproject/opensearch:3.6.0
     restart: unless-stopped
     ports:
       - "9200:9200"
@@ -28,7 +28,7 @@ services:
     environment:
       discovery.type: single-node
       DISABLE_SECURITY_PLUGIN: "true"
-      OPENSEARCH_JAVA_OPTS: "-Xms1g -Xmx2g"
+      OPENSEARCH_JAVA_OPTS: "-Xms1g -Xmx1g"
       # Allow ML workloads on non-ML-role nodes (mirrors Aiven ACL setting).
       plugins.ml_commons.only_run_on_ml_node: "false"
       # Allow model registration from remote URLs (needed for HuggingFace).
@@ -61,7 +61,7 @@ services:
   # Browse at http://localhost:5601
   # ---------------------------------------------------------------------------
   dashboards:
-    image: opensearchproject/opensearch-dashboards:2.17.0
+    image: opensearchproject/opensearch-dashboards:3.6.0
     restart: unless-stopped
     ports:
       - "5601:5601"

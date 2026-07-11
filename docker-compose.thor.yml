@@ -21,15 +21,20 @@
 # To blow everything away: docker compose -f docker-compose.thor.yml down -v
 #
 # Usage:
-#   docker compose -f docker-compose.thor.yml up -d
-#   docker compose -f docker-compose.thor.yml --profile dashboards up -d opensearch-dashboards
+#   # Thor live stack was first created with compose project name "docker".
+#   # Always pass -p docker so named volumes (docker_opensearch-*-data) are reused:
+#   docker compose -p docker -f docker-compose.thor.yml up -d
+#   docker compose -p docker -f docker-compose.thor.yml --profile dashboards up -d opensearch-dashboards
 #   DASHBOARDS_URL=http://thor:5601 ./scripts/thor/bootstrap-dashboards.sh
-#   docker compose -f docker-compose.thor.yml logs -f opensearch-node1
-#   docker compose -f docker-compose.thor.yml down          # stop, keep data
-#   docker compose -f docker-compose.thor.yml down -v       # stop, delete data
+#   docker compose -p docker -f docker-compose.thor.yml logs -f opensearch-node1
+#   docker compose -p docker -f docker-compose.thor.yml down          # stop, keep data
+#   docker compose -p docker -f docker-compose.thor.yml down -v       # stop, delete data
+#
+# Rolling upgrade one node (example):
+#   docker compose -p docker -f docker-compose.thor.yml up -d --no-deps --force-recreate opensearch-ml2
 
 x-opensearch-common: &opensearch-common
-  image: opensearchproject/opensearch:3.0.0
+  image: opensearchproject/opensearch:3.6.0
   restart: unless-stopped
   ulimits:
     memlock:
@@ -55,7 +60,7 @@ x-opensearch-common: &opensearch-common
     plugins.ml_commons.only_run_on_ml_node: "true"
     # Allow up to 10 models loaded simultaneously on the ML node.
     plugins.ml_commons.max_model_on_node: "10"
-    # Faiss is the knn engine used by our schemas — ensure the native lib loads.
+    # Lucene is the knn engine used by our schemas (faiss removed after Exp 49).
     knn.algo_param.index_thread_qty: "4"
 
 services:
@@ -179,7 +184,7 @@ services:
   # ---------------------------------------------------------------------------
   opensearch-dashboards:
     profiles: [dashboards]
-    image: opensearchproject/opensearch-dashboards:3.0.0
+    image: opensearchproject/opensearch-dashboards:3.6.0
     container_name: opensearch-dashboards
     restart: unless-stopped
     ports:

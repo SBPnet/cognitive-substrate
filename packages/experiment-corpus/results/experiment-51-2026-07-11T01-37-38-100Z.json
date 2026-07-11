@@ -1,0 +1,60 @@
+{
+  "experiment": "experiment-51",
+  "runAt": "2026-07-11T01:37:38.100Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 float32 top-1: PASS; H2 BBQ top-1: PASS; H3 BBQ hybrid: PASS; H4 BBQ store comparable (ratio=1.045): PASS",
+  "data": {
+    "hypotheses": {
+      "h1": true,
+      "h2": true,
+      "h3": true,
+      "h4": true
+    },
+    "modelId": "YIGOLZ4BgYB_vs2kWaTT",
+    "floatResults": [
+      {
+        "window": "normal",
+        "top1Correct": true
+      },
+      {
+        "window": "degraded",
+        "top1Correct": true
+      },
+      {
+        "window": "outage",
+        "top1Correct": true
+      },
+      {
+        "window": "recovery",
+        "top1Correct": true
+      }
+    ],
+    "bbqResults": [
+      {
+        "window": "normal",
+        "top1Correct": true
+      },
+      {
+        "window": "degraded",
+        "top1Correct": true
+      },
+      {
+        "window": "outage",
+        "top1Correct": true
+      },
+      {
+        "window": "recovery",
+        "top1Correct": true
+      }
+    ],
+    "hybrid": {
+      "ok": true,
+      "correctInTop5": 5
+    },
+    "storeBytes": {
+      "float32": 171003,
+      "bbq": 178738,
+      "ratio": 1.0452331245650661
+    }
+  }
+}

@@ -67,7 +67,8 @@
     "exp47": "node --import tsx/esm src/experiment-47.ts",
     "exp48": "node --import tsx/esm src/experiment-48.ts",
     "exp49": "node --import tsx/esm src/experiment-49.ts",
-    "exp50": "node --import tsx/esm src/experiment-50.ts"
+    "exp50": "node --import tsx/esm src/experiment-50.ts",
+    "exp51": "node --import tsx/esm src/experiment-51.ts"
   },
   "dependencies": {
     "@cognitive-substrate/agents": "workspace:*",
