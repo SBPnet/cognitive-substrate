@@ -222,7 +222,15 @@ export async function fetchKnowledgeGapTopics(client: Client): Promise<string[]>
    
   const buckets: any[] = (result.body as any).aggregations?.tags?.buckets ?? [];
   return buckets
-    .filter((b) => !BLOG_TAG_SET.has(b.key as string) && !(b.key as string).startsWith("source:"))
+    .filter((b) => {
+      const key = b.key as string;
+      if (BLOG_TAG_SET.has(key)) return false;
+      if (key.startsWith("source:")) return false;
+      if (key.startsWith("event:")) return false;
+      if (key.startsWith("engagement:")) return false;
+      if (key.startsWith("article:")) return false;
+      return true;
+    })
     .map((b) => b.key as string)
     .slice(0, 5);
 }
