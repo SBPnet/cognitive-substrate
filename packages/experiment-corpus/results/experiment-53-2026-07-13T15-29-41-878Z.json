@@ -1,0 +1,26 @@
+{
+  "experiment": "experiment-53",
+  "runAt": "2026-07-13T15:29:41.878Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 reranker: PASS (huggingface/cross-encoders/ms-marco-MiniLM-L-6-v2)\nH2 disambiguation: PASS (outageRaw=6.4661 normalRaw=4.7929)\nH3 used FWA: PASS (0.1000)\nH4 unused FWA: FAIL (0.1000)",
+  "data": {
+    "feedbackIndex": "retrieval_feedback",
+    "index": "exp29_events",
+    "field": "embedding_minilm",
+    "reranker": {
+      "id": "bjcSXJ8BApsVNgKs81sB",
+      "name": "huggingface/cross-encoders/ms-marco-MiniLM-L-6-v2",
+      "type": "reranker"
+    },
+    "outageHelp": 1,
+    "normalHelp": 1,
+    "outageRaw": 6.466050925,
+    "normalRaw": 4.79286075,
+    "usedMean": 0.10000000000000002,
+    "unusedMean": 0.10000000000000002,
+    "h1Pass": true,
+    "h2Pass": true,
+    "h3Pass": true,
+    "h4Pass": false
+  }
+}

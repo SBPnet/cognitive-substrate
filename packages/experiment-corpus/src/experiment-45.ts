@@ -33,7 +33,7 @@
  * Prerequisites:
  *   - experience_events index provisioned with neural ingest pipeline
  *   - ≥ 100 events ingested (real or via scripts/smoke/produce-telemetry.ts)
- *   - all-MiniLM-L6-v2 model deployed on the ML node
+ *   - all-mpnet-base-v2 (768-d) model deployed; matches experience_events.embedding
  */
 
 import {
@@ -43,14 +43,15 @@ import {
 import { saveResults } from "./results.js";
 
 const INDEX = "experience_events";
+const EXPECTED_DIM = 768;
 
 type OSClient = ReturnType<typeof createOpenSearchClient>;
 
 // ---------------------------------------------------------------------------
-// ML model discovery + embedding
+// ML model discovery + embedding (mpnet 768 aligns with ingest pipeline)
 // ---------------------------------------------------------------------------
 
-async function discoverMiniLm(client: OSClient): Promise<{ id: string; dim: number }> {
+async function discoverMpnet(client: OSClient): Promise<{ id: string; dim: number }> {
   const response = await client.transport.request({
     method: "POST",
     path: "/_plugins/_ml/models/_search",
@@ -65,10 +66,14 @@ async function discoverMiniLm(client: OSClient): Promise<{ id: string; dim: numb
     };
   };
   const hit = body.hits.hits.find(
-    (h) => h._source.name?.includes("all-MiniLM") && !/_\d+$/.test(h._id),
+    (h) => h._source.name?.includes("all-mpnet") && !/_\d+$/.test(h._id),
   );
-  if (!hit) throw new Error("all-MiniLM model not found in DEPLOYED state");
-  return { id: hit._id, dim: hit._source.model_config.embedding_dimension };
+  if (!hit) throw new Error("all-mpnet model not found in DEPLOYED state");
+  const dim = hit._source.model_config.embedding_dimension;
+  if (dim !== EXPECTED_DIM) {
+    throw new Error(`Expected mpnet dim ${EXPECTED_DIM}, got ${dim}`);
+  }
+  return { id: hit._id, dim };
 }
 
 async function embedText(client: OSClient, modelId: string, text: string): Promise<number[]> {
@@ -373,8 +378,8 @@ async function main(): Promise<void> {
   let h3Skipped = false;
 
   try {
-    ({ id: modelId } = await discoverMiniLm(client));
-    console.log(`  Using model: ${modelId}`);
+    ({ id: modelId } = await discoverMpnet(client));
+    console.log(`  Using model: ${modelId} (mpnet ${EXPECTED_DIM}-d)`);
     knnResults = await knnRecallBySlugs(client, modelId);
 
     if (knnResults.length === 0) {

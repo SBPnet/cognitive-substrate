@@ -5,6 +5,7 @@
 
 import { Client } from "@opensearch-project/opensearch";
 import { INDEX_SCHEMAS, type CognitiveIndex } from "./schemas.js";
+import { ensureExperienceEventsEmbedPipeline } from "./experience-pipeline.js";
 
 export interface OpenSearchConfig {
   readonly node: string;
@@ -67,6 +68,10 @@ export async function ensureIndexes(client: Client): Promise<void> {
       }
     }
   }
+
+  // Attach mpnet 768 ingest pipeline when OPENSEARCH_MODEL_ID is set so
+  // blog/telemetry writers that rely on default_pipeline get embeddings.
+  await ensureExperienceEventsEmbedPipeline(client);
 }
 
 /** Indexes a single document, creating the index if required. */

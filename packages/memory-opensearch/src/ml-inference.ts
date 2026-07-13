@@ -180,13 +180,14 @@ export class OpenSearchMlClient {
     query: string,
     candidates: string[],
   ): Promise<RerankResult[]> {
+    if (candidates.length === 0) return [];
+
     const response = await this.client.transport.request({
       method: "POST",
       path: `/_plugins/_ml/models/${rerankerModelId}/_predict`,
       body: {
-        parameters: {
-          texts: [query, ...candidates],
-        },
+        query_text: query,
+        text_docs: candidates,
       },
     });
 
@@ -194,10 +195,14 @@ export class OpenSearchMlClient {
       Record<string, unknown>
     >;
 
-    return candidates.map((_, index) => ({
-      documentIndex: index,
-      score: ((output[index]?.["output"] as Array<Record<string, number>>)?.[0]?.["data"] ?? 0) as number,
-    }));
+    return candidates.map((_, index) => {
+      const row = output[index];
+      const outputs = row?.["output"] as Array<Record<string, unknown>> | undefined;
+      const sim = outputs?.find((o) => o["name"] === "similarity");
+      const data = sim?.["data"];
+      const score = Array.isArray(data) ? Number(data[0] ?? 0) : Number(data ?? 0);
+      return { documentIndex: index, score };
+    });
   }
 }
 

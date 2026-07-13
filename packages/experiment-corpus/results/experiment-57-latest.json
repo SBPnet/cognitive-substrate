@@ -1,0 +1,48 @@
+{
+  "experiment": "experiment-57",
+  "runAt": "2026-07-13T15:29:48.016Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 holdout size: PASS (n=8)\nH2 recall: PASS (0.875)\nH3 importance: PASS (0.1307)\nH4 not calibration top: PASS",
+  "data": {
+    "holdout": [
+      {
+        "tag": "article:arbitration",
+        "count": 1
+      },
+      {
+        "tag": "article:consolidation",
+        "count": 2
+      },
+      {
+        "tag": "article:metacognition",
+        "count": 2
+      },
+      {
+        "tag": "article:scaling-intro",
+        "count": 2
+      },
+      {
+        "tag": "article:case-for-self-improving-agents",
+        "count": 3
+      },
+      {
+        "tag": "article:multi-agent",
+        "count": 3
+      },
+      {
+        "tag": "article:pipeline-probe",
+        "count": 3
+      },
+      {
+        "tag": "article:failure-modes",
+        "count": 4
+      }
+    ],
+    "recall": 0.875,
+    "meanImp": 0.13072917067135373,
+    "h1Pass": true,
+    "h2Pass": true,
+    "h3Pass": true,
+    "h4Pass": true
+  }
+}

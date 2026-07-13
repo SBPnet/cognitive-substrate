@@ -29,6 +29,7 @@ import {
 import {
   createOpenSearchClient,
   opensearchConfigFromEnv,
+  ensureExperienceEventsEmbedPipeline,
 } from "@cognitive-substrate/memory-opensearch";
 import { loadPluginsFromEnv } from "@cognitive-substrate/plugin-loader";
 import { registerBuiltinMappers } from "./mapper.js";
@@ -55,6 +56,11 @@ async function main(): Promise<void> {
   }
 
   const osClient = createOpenSearchClient(opensearchConfigFromEnv());
+  const pipeline = await ensureExperienceEventsEmbedPipeline(osClient);
+  console.log(
+    `[ingest-worker] experience_events pipeline: attached=${pipeline.attached}` +
+      (pipeline.modelId ? ` model=${pipeline.modelId}` : ""),
+  );
   const writer = new ExperienceWriter({
     client: osClient,
     bufferSize: Number(process.env["WRITER_BUFFER_SIZE"] ?? "50"),

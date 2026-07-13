@@ -23,6 +23,10 @@ import {
   type RecommendationEvent,
   type OutcomeFeedback,
 } from "./outcome-tracker.js";
+import {
+  blogReinforcementIntervalMs,
+  runBlogReinforcementPass,
+} from "./blog-reinforcement.js";
 
 const ENVIRONMENT = process.env["ENVIRONMENT"] ?? "prod";
 
@@ -132,6 +136,17 @@ export async function startWorker(): Promise<void> {
 
   process.on("SIGINT", () => void handleShutdown());
   process.on("SIGTERM", () => void handleShutdown());
+
+  const blogIntervalMs = blogReinforcementIntervalMs();
+  log(`Scheduling blog reinforcement every ${(blogIntervalMs / 3_600_000).toFixed(1)}h`);
+  const runBlogPass = (): void => {
+    void runBlogReinforcementPass(openSearch, log).catch((err: unknown) => {
+      log(`Blog reinforcement failed: ${err instanceof Error ? err.message : String(err)}`);
+    });
+  };
+  // First pass shortly after startup so salience catches up without waiting a full interval.
+  setTimeout(runBlogPass, 30_000);
+  setInterval(runBlogPass, blogIntervalMs);
 
   log("Worker started. Listening for recommendations and policy evaluations...");
 }

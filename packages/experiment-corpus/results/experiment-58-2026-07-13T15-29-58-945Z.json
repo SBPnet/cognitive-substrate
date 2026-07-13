@@ -1,0 +1,49 @@
+{
+  "experiment": "experiment-58",
+  "runAt": "2026-07-13T15:29:58.945Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 countBonus: PASS\nH2 novelty: PASS\nH3 priorWeight: PASS\nH4 grid: PASS (n=5)",
+  "data": {
+    "cells": [
+      {
+        "priorWeight": 0.1,
+        "countBonus": 0.01,
+        "novelty": 0.2,
+        "highRp": 0.553236,
+        "lowRp": 0.38021200000000005
+      },
+      {
+        "priorWeight": 0.1,
+        "countBonus": 0.05,
+        "novelty": 0.2,
+        "highRp": 0.5901037017691971,
+        "lowRp": 0.4100440922655338
+      },
+      {
+        "priorWeight": 0.5,
+        "countBonus": 0.02,
+        "novelty": 0.2,
+        "highRp": 0.3701359999999999,
+        "lowRp": 0.2705120000000001
+      },
+      {
+        "priorWeight": 0.3,
+        "countBonus": 0.02,
+        "novelty": 0.2,
+        "highRp": 0.4730998903543605,
+        "lowRp": 0.33459773246554964
+      },
+      {
+        "priorWeight": 0.3,
+        "countBonus": 0.02,
+        "novelty": 0.8,
+        "highRp": 0.512302870308648,
+        "lowRp": 0.3732662265071828
+      }
+    ],
+    "h1Pass": true,
+    "h2Pass": true,
+    "h3Pass": true,
+    "h4Pass": true
+  }
+}

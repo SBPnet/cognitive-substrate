@@ -1,117 +1,18 @@
 {
-  "experiment": "experiment-45",
-  "runAt": "2026-07-13T15:30:52.237Z",
+  "experiment": "experiment-52",
+  "runAt": "2026-07-13T15:27:58.135Z",
   "opensearchUrl": "http://thor:9200",
-  "observations": "H1 pipeline integrity: PASS (totalDocs=1428, eventTypes=11)\nH2 importance ordering: FAIL (article_complete=-1.0000 page_view=0.1000)\nH3 kNN recall: PASS (19/20 slugs)\nH4 multi-session salience: FAIL (24 multi-session articles)",
+  "observations": "H1 dim contract: PASS (model=768 mapping=768)\nH2 slug recall: PASS (19/20)\nH3 blog hits: PASS",
   "data": {
-    "totalDocs": 1428,
-    "byEventType": [
-      {
-        "eventType": "scroll_depth",
-        "count": 364
-      },
-      {
-        "eventType": "page_view",
-        "count": 171
-      },
-      {
-        "eventType": "nav_click",
-        "count": 158
-      },
-      {
-        "eventType": "time_on_page",
-        "count": 87
-      },
-      {
-        "eventType": "focus_gain",
-        "count": 66
-      },
-      {
-        "eventType": "focus_loss",
-        "count": 66
-      },
-      {
-        "eventType": "search_query",
-        "count": 20
-      },
-      {
-        "eventType": "tag_click",
-        "count": 11
-      },
-      {
-        "eventType": "outbound_link",
-        "count": 5
-      },
-      {
-        "eventType": "series_nav_click",
-        "count": 4
-      },
-      {
-        "eventType": "search_result_click",
-        "count": 3
-      }
-    ],
-    "importanceDist": [
-      {
-        "eventType": "search_query",
-        "meanImportance": 0.6299999922513961,
-        "count": 20
-      },
-      {
-        "eventType": "outbound_link",
-        "meanImportance": 0.550000011920929,
-        "count": 5
-      },
-      {
-        "eventType": "series_nav_click",
-        "meanImportance": 0.44999998807907104,
-        "count": 4
-      },
-      {
-        "eventType": "scroll_depth",
-        "meanImportance": 0.35920330497262243,
-        "count": 364
-      },
-      {
-        "eventType": "focus_loss",
-        "meanImportance": 0.19154955029036058,
-        "count": 66
-      },
-      {
-        "eventType": "tag_click",
-        "meanImportance": 0.1636363687840375,
-        "count": 11
-      },
-      {
-        "eventType": "time_on_page",
-        "meanImportance": 0.1600000038743019,
-        "count": 87
-      },
-      {
-        "eventType": "page_view",
-        "meanImportance": 0.10000000149011612,
-        "count": 171
-      },
-      {
-        "eventType": "focus_gain",
-        "meanImportance": 0.10000000149011612,
-        "count": 66
-      },
-      {
-        "eventType": "nav_click",
-        "meanImportance": 0.05000000074505806,
-        "count": 158
-      },
-      {
-        "eventType": "search_result_click",
-        "meanImportance": 0,
-        "count": 3
-      }
-    ],
+    "modelId": "YYGXOJ4BgYB_vs2klaSo",
+    "dim": 768,
+    "mappingDim": 768,
+    "recallRate": 0.95,
     "knnResults": [
       {
         "slug": "experience-ingestion",
         "pass": true,
+        "hasBlog": true,
         "topTags": [
           "blog",
           "event:focus_gain",
@@ -123,6 +24,7 @@
       {
         "slug": "glossary",
         "pass": false,
+        "hasBlog": true,
         "topTags": [
           "blog",
           "event:nav_click",
@@ -132,6 +34,7 @@
       {
         "slug": "mom-approved",
         "pass": true,
+        "hasBlog": true,
         "topTags": [
           "blog",
           "event:focus_gain",
@@ -141,6 +44,7 @@
       {
         "slug": "real-telemetry-memory",
         "pass": true,
+        "hasBlog": true,
         "topTags": [
           "blog",
           "event:page_view",
@@ -151,6 +55,7 @@
       {
         "slug": "end-of-the-ride",
         "pass": true,
+        "hasBlog": true,
         "topTags": [
           "blog",
           "event:page_view",
@@ -160,6 +65,7 @@
       {
         "slug": "hey-sis",
         "pass": true,
+        "hasBlog": true,
         "topTags": [
           "blog",
           "event:page_view",
@@ -170,8 +76,8 @@
       {
         "slug": "memory-retrieval",
         "pass": true,
+        "hasBlog": true,
         "topTags": [
-          "user_message",
           "blog",
           "event:page_view",
           "article:memory-retrieval"
@@ -180,6 +86,7 @@
       {
         "slug": "abstraction",
         "pass": true,
+        "hasBlog": true,
         "topTags": [
           "blog",
           "event:page_view",
@@ -190,6 +97,7 @@
       {
         "slug": "kafka-raw-problem",
         "pass": true,
+        "hasBlog": true,
         "topTags": [
           "blog",
           "event:page_view",
@@ -199,6 +107,7 @@
       {
         "slug": "constitution-limits",
         "pass": true,
+        "hasBlog": true,
         "topTags": [
           "blog",
           "event:focus_gain",
@@ -209,6 +118,7 @@
       {
         "slug": "schema-registry-intro",
         "pass": true,
+        "hasBlog": true,
         "topTags": [
           "blog",
           "event:page_view",
@@ -218,6 +128,7 @@
       {
         "slug": "kafka-why-i-chose-it",
         "pass": true,
+        "hasBlog": true,
         "topTags": [
           "blog",
           "event:page_view",
@@ -227,6 +138,7 @@
       {
         "slug": "schema-evolution",
         "pass": true,
+        "hasBlog": true,
         "topTags": [
           "blog",
           "event:page_view",
@@ -237,6 +149,7 @@
       {
         "slug": "measuring-agent-improvement",
         "pass": true,
+        "hasBlog": true,
         "topTags": [
           "blog",
           "event:focus_gain",
@@ -247,6 +160,7 @@
       {
         "slug": "arbitration-layer",
         "pass": true,
+        "hasBlog": true,
         "topTags": [
           "blog",
           "event:page_view",
@@ -256,6 +170,7 @@
       {
         "slug": "weekly-memory-digest",
         "pass": true,
+        "hasBlog": true,
         "topTags": [
           "blog",
           "event:focus_gain",
@@ -266,6 +181,7 @@
       {
         "slug": "registry-in-practice",
         "pass": true,
+        "hasBlog": true,
         "topTags": [
           "blog",
           "event:page_view",
@@ -276,99 +192,48 @@
       {
         "slug": "em-dash-hunting",
         "pass": true,
+        "hasBlog": true,
         "topTags": [
           "blog",
           "event:focus_gain",
           "article:em-dash-hunting",
           "event:time_on_page",
           "engagement:shallow",
-          "event:page_view"
+          "event:page_view",
+          "event:scroll_depth"
         ]
       },
       {
         "slug": "clickhouse-telemetry",
         "pass": true,
+        "hasBlog": true,
         "topTags": [
           "blog",
           "event:page_view",
           "article:clickhouse-telemetry",
           "event:focus_gain",
           "event:tag_click",
-          "engagement:curiosity"
+          "engagement:curiosity",
+          "tag:telemetry"
         ]
       },
       {
         "slug": "cognitive-telemetry-pipeline",
         "pass": true,
+        "hasBlog": true,
         "topTags": [
           "blog",
           "event:focus_gain",
           "article:cognitive-telemetry-pipeline",
           "event:time_on_page",
           "engagement:shallow",
-          "event:focus_loss"
+          "event:focus_loss",
+          "engagement:exit"
         ]
       }
     ],
-    "multiSessionCount": 24,
-    "singleSessionCount": 16,
-    "multiSessionArticles": [
-      {
-        "articleTag": "article:experience-ingestion",
-        "sessionCount": 9,
-        "medianImportance": 0.15000000596046448
-      },
-      {
-        "articleTag": "article:glossary",
-        "sessionCount": 8,
-        "medianImportance": 0.10000000149011612
-      },
-      {
-        "articleTag": "article:mom-approved",
-        "sessionCount": 13,
-        "medianImportance": 0.15000000596046448
-      },
-      {
-        "articleTag": "article:real-telemetry-memory",
-        "sessionCount": 5,
-        "medianImportance": 0.16875000670552254
-      },
-      {
-        "articleTag": "article:end-of-the-ride",
-        "sessionCount": 3,
-        "medianImportance": 0.30000001192092896
-      },
-      {
-        "articleTag": "article:hey-sis",
-        "sessionCount": 9,
-        "medianImportance": 0.15777777135372162
-      },
-      {
-        "articleTag": "article:memory-retrieval",
-        "sessionCount": 4,
-        "medianImportance": 0.15000000596046448
-      },
-      {
-        "articleTag": "article:abstraction",
-        "sessionCount": 3,
-        "medianImportance": 0.15000000596046448
-      },
-      {
-        "articleTag": "article:kafka-raw-problem",
-        "sessionCount": 6,
-        "medianImportance": 0.15000000596046448
-      },
-      {
-        "articleTag": "article:constitution-limits",
-        "sessionCount": 3,
-        "medianImportance": 0.15000000596046448
-      }
-    ],
     "h1Pass": true,
-    "h2Pass": false,
-    "h3Pass": true,
-    "h3Skipped": false,
-    "h4Pass": false,
-    "h4Skipped": false
+    "h2Pass": true,
+    "h3Pass": true
   }
 }

@@ -14,6 +14,11 @@
  * chosen so that retrievalBias and toolBias respond fastest to clear
  * positive evidence, while explorationFactor and risk-related dimensions
  * move more slowly.
+ *
+ * Post-incident recovery: when the evaluation looks like a calm recovery
+ * turn (positive reward, low contradiction, solid goal progress) and
+ * explorationFactor has collapsed below the neutral band, a bounded boost
+ * pulls it back toward the default 0.5 (see `applyExplorationRecovery`).
  */
 
 import type { PolicyState } from "@cognitive-substrate/core-types";
@@ -24,7 +29,10 @@ import type {
 } from "./types.js";
 
 /** Maximum absolute change that any single evaluation may apply to a dimension. */
-const MAX_ABSOLUTE_DRIFT = 0.08;
+export const MAX_ABSOLUTE_DRIFT = 0.08;
+
+/** Neutral explorationFactor from createDefaultPolicyState. */
+export const DEFAULT_EXPLORATION_FACTOR = 0.5;
 
 /**
  * Translates a single PolicyEvaluationInput into a sparse, bounded
@@ -87,6 +95,40 @@ export function applyPolicyDelta(
       current.workingMemoryDecayRate,
       delta.workingMemoryDecayRate,
     ),
+  };
+}
+
+/**
+ * After a standard drift step, if the signal looks like post-incident
+ * recovery and explorationFactor is still depressed, nudge it toward the
+ * neutral default by up to MAX_ABSOLUTE_DRIFT.
+ */
+export function applyExplorationRecovery(
+  previous: PolicyState,
+  next: PolicyState,
+  input: PolicyEvaluationInput,
+): PolicyState {
+  const contradictionRisk = input.contradictionRisk ?? 0;
+  const goalProgress = input.goalProgress ?? 0.5;
+  const confidence = input.confidence ?? 0.5;
+  const isRecovery =
+    input.rewardDelta > 0 &&
+    contradictionRisk < 0.25 &&
+    goalProgress >= 0.5 &&
+    confidence >= 0.55;
+
+  if (!isRecovery) return next;
+  if (previous.explorationFactor >= 0.45) return next;
+
+  const boost = Math.min(
+    MAX_ABSOLUTE_DRIFT,
+    DEFAULT_EXPLORATION_FACTOR - next.explorationFactor,
+  );
+  if (boost <= 0) return next;
+
+  return {
+    ...next,
+    explorationFactor: clampUnit(next.explorationFactor + boost),
   };
 }
 

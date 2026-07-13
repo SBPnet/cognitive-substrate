@@ -1,0 +1,20 @@
+{
+  "experiment": "experiment-55",
+  "runAt": "2026-07-13T15:27:52.783Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 completeness: PASS\nH2 diversity: PASS\nH3 phase divergence: PASS\nH4 path: PASS (stub-only)",
+  "data": {
+    "llmPath": "stub-only",
+    "llmSim": 1,
+    "normalModal": "planner",
+    "outageModal": "critic",
+    "distinct": [
+      "planner",
+      "critic"
+    ],
+    "h1Pass": true,
+    "h2Pass": true,
+    "h3Pass": true,
+    "h4Pass": true
+  }
+}

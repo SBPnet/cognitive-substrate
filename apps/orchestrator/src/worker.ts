@@ -65,13 +65,14 @@ export async function startOrchestrator(): Promise<void> {
     plugins.toolExecutors.map((p) => p.create()),
   );
 
-  const loop = await createSocietyLoop({
+  const { loop, policyEngine, hasReranker, reasoningModelName } = await createSocietyLoop({
     openSearchClient,
     producer,
     embedder,
     ...(matchedEngine !== undefined && { pluginReasoningModel: matchedEngine.create() }),
     pluginToolExecutors,
   });
+  log(`Reasoning model: ${reasoningModelName}; hasReranker=${hasReranker}`);
   const agentActionPublisher = new AgentActionPublisher(producer);
   const reflectionEngine = new ReflectionEngine();
   const calibrationMonitor = new CalibrationMonitor();
@@ -102,6 +103,16 @@ export async function startOrchestrator(): Promise<void> {
         log(
           `Processed event ${event.eventId}; action success=${result.actionResult.success}`,
         );
+
+        // Closed-loop policy update (Exp 44 / Exp 54): persist drifted policy
+        // after each turn so explorationFactor can recover post-incident.
+        try {
+          await policyEngine.applyEvaluation(result.policyEvaluation);
+        } catch (policyErr: unknown) {
+          log(
+            `Policy applyEvaluation failed: ${policyErr instanceof Error ? policyErr.message : String(policyErr)}`,
+          );
+        }
 
         // Publish agent_action ExperienceEvent so LLM decisions feed back into
         // the reinforcement and consolidation pipeline (Gap 2).

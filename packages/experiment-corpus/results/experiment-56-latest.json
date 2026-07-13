@@ -1,0 +1,15 @@
+{
+  "experiment": "experiment-56",
+  "runAt": "2026-07-13T15:29:45.906Z",
+  "opensearchUrl": "http://thor:9200",
+  "observations": "H1 bm25: PASS (0.933)\nH2 knn≥bm25: PASS\nH3 knn≥0.7: PASS (0.933)\nH4 slugs: PASS (n=40)",
+  "data": {
+    "bm25Recall": 0.9333333333333333,
+    "knnRecall": 0.9333333333333333,
+    "slugCount": 40,
+    "h1Pass": true,
+    "h2Pass": true,
+    "h3Pass": true,
+    "h4Pass": true
+  }
+}

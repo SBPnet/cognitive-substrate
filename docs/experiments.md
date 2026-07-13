@@ -1235,6 +1235,64 @@ OpenSearch 3.6.0. H1–H4 ALL PASS (recall parity, hybrid filter OK, store ratio
 
 ---
 
+## Experiment 52 -- Live Blog kNN Recall (mpnet 768)
+
+**Result:** Certifies Exp 45 H3 against production `experience_events` after
+aligning probe embeddings with the ingest pipeline (all-mpnet-base-v2, 768-d)
+and attaching `experience-events-embed` as `default_pipeline`. See
+`results/experiment-52-latest.json`.
+
+---
+
+## Experiment 53 -- Live Cross-Encoder Disambiguation + Feedback
+
+**Result:** Deployed `ms-marco-MiniLM-L-6-v2` TEXT_SIMILARITY on thor; production
+retriever wires `hasReranker` via `OPENSEARCH_RERANKER_MODEL_ID`. Overlapping
+outage/normal queries scored through reranker + RetrievalFeedbackWriter. See
+`results/experiment-53-latest.json`.
+
+---
+
+## Experiment 54 -- Policy explorationFactor Recovery
+
+**Result:** `applyExplorationRecovery` raises explorationFactor after outage
+collapse under positive low-contradiction recovery turns. Orchestrator now
+calls `policyEngine.applyEvaluation` after each loop turn. See
+`results/experiment-54-latest.json`.
+
+---
+
+## Experiment 55 -- Phase-Varying Agent Winners
+
+**Result:** Phase-biased MultiAgentRuntime yields distinct modal winners by
+phase (contrast Exp 38). Optional live LLM path when keys/URL present.
+Orchestrator default `CS_ENGINE_ORDER` prefers claude/ollama before stubs. See
+`results/experiment-55-latest.json`.
+
+---
+
+## Experiment 56 -- Non-Cognitive BM25 Baseline
+
+**Result:** BM25-only vs mpnet kNN slug recall on live `tags:blog` corpus
+(independent eval). See `results/experiment-56-latest.json`.
+
+---
+
+## Experiment 57 -- Held-Out Blog Article Recall
+
+**Result:** Low-frequency article holdout set; kNN recall certification outside
+popular calibration slugs. See `results/experiment-57-latest.json`.
+
+---
+
+## Experiment 58 -- Reinforcement Parameter Sensitivity
+
+**Result:** Grid over priorWeight / countBonus / novelty; monotone countBonus
+and novelty effects on retrieval_priority. See
+`results/experiment-58-latest.json`.
+
+---
+
 ## AgentContext Capability Manifest
 
 *Not an experiment — a subsystem addition made alongside experiments 35–44.*

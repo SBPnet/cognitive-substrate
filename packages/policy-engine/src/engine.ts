@@ -12,7 +12,11 @@
 
 import type { PolicyState, PolicyUpdateEvent } from "@cognitive-substrate/core-types";
 import { createDefaultPolicyState } from "./defaults.js";
-import { applyPolicyDelta, computePolicyDelta } from "./drift.js";
+import {
+  applyExplorationRecovery,
+  applyPolicyDelta,
+  computePolicyDelta,
+} from "./drift.js";
 import type {
   PolicyEvaluationInput,
   PolicyStore,
@@ -56,11 +60,12 @@ export class PolicyEngine {
   ): Promise<PolicyUpdateResult> {
     const previous = await this.getCurrentPolicy();
     const delta = computePolicyDelta(input);
-    const next = applyPolicyDelta(
+    const drifted = applyPolicyDelta(
       previous,
       delta,
       this.nextVersion(previous.version),
     );
+    const next = applyExplorationRecovery(previous, drifted, input);
 
     const event: PolicyUpdateEvent = {
       policyId: next.version,

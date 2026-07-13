@@ -122,13 +122,15 @@ services:
       KAFKA_TOPIC_REPLICATION_FACTOR: "1"
       OPENSEARCH_URL: http://opensearch-node1:9200
       OPENSEARCH_MODEL_ID: ${OPENSEARCH_MODEL_ID:-YYGXOJ4BgYB_vs2klaSo}
+      OPENSEARCH_RERANKER_MODEL_ID: ${OPENSEARCH_RERANKER_MODEL_ID:-bjcSXJ8BApsVNgKs81sB}
       EMBEDDING_PROVIDER: opensearch
       EMBEDDING_DIMENSION: "768"
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
-      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL-http://host.docker.internal:11434/v1}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL-}
       OPENAI_BASE_URL: ${OPENAI_BASE_URL:-}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       OPENAI_MODEL: ${OPENAI_MODEL:-qwen2.5:7b}
+      CS_ENGINE_ORDER: ${CS_ENGINE_ORDER:-claude,ollama,openai-compat,gemini,multi-agent}
       OTEL_SERVICE_NAME: orchestrator
       OTEL_EXPORTER_OTLP_ENDPOINT: http://cs-otel-collector:4318
 
@@ -160,8 +162,10 @@ services:
   # Distinct from worker-ingestion, which consumes experience.raw.
   #
   # On thor, disable the host unit before starting this service to avoid
-  # consumer-group fights:
+  # consumer-group fights (requires sudo password on thor):
   #   sudo systemctl disable --now ingest-worker.service
+  # Until then, packages/ingest-worker/dist/index.js is a parked sleep stub;
+  # real entrypoint is index.real.js. Compose alone should own the group.
   worker-ingest-telemetry:
     <<: *worker-common
     build:
