@@ -4,8 +4,11 @@
  */
 
 import type { Client } from "@opensearch-project/opensearch";
+import { BLOG_STATS_TAGS } from "@cognitive-substrate/memory-opensearch";
 
-const BLOG_TAGS = ["source:blog", "source:reader_telemetry"];
+/** Live ingest uses `blog`; legacy aliases kept for older seeds. */
+const BLOG_TAGS: ReadonlyArray<string> = [...BLOG_STATS_TAGS];
+const BLOG_TAG_SET = new Set<string>(BLOG_TAGS);
 
 export interface TagFrequency {
   readonly tag: string;
@@ -76,7 +79,7 @@ export async function fetchWeeklyEvents(
    
   const buckets: any[] = body.aggregations?.tag_frequencies?.buckets ?? [];
   const tags: TagFrequency[] = buckets
-    .filter((b) => !BLOG_TAGS.includes(b.key as string))
+    .filter((b) => !BLOG_TAG_SET.has(b.key as string))
     .map((b) => ({
       tag: b.key as string,
       count: b.doc_count as number,
@@ -187,7 +190,7 @@ export async function fetchBehaviorAnomalies(client: Client): Promise<BehaviorAn
 
   const anomalies: BehaviorAnomaly[] = [];
   for (const [tag, currentCount] of currentMap) {
-    if (BLOG_TAGS.includes(tag)) continue;
+    if (BLOG_TAG_SET.has(tag)) continue;
     const priorCount = priorMap.get(tag) ?? 0;
     if (priorCount === 0 && currentCount < 3) continue;
     const deltaPercent = priorCount === 0
@@ -219,7 +222,7 @@ export async function fetchKnowledgeGapTopics(client: Client): Promise<string[]>
    
   const buckets: any[] = (result.body as any).aggregations?.tags?.buckets ?? [];
   return buckets
-    .filter((b) => !BLOG_TAGS.includes(b.key as string) && !(b.key as string).startsWith("source:"))
+    .filter((b) => !BLOG_TAG_SET.has(b.key as string) && !(b.key as string).startsWith("source:"))
     .map((b) => b.key as string)
     .slice(0, 5);
 }

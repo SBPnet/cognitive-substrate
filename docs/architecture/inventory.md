@@ -21,12 +21,12 @@ Status legend:
 | Package / service | Status | Notes |
 |-------------------|--------|-------|
 | `core-types` | built | Shared schemas and index names |
-| `memory-opensearch` | built / wired | Lucene knn defaults (Exp 49); lab cluster OpenSearch **3.6.0**; `ensureExperienceEventsEmbedPipeline` attaches mpnet 768 `experience-events-embed` |
+| `memory-opensearch` | built / wired | Lucene knn defaults (Exp 49); lab OpenSearch **3.6.0**; mpnet 768 ingest pipeline; `blog-stats` public aggregates for digest + blog reverse feed |
 | `memory-objectstore` | built | MinIO on thor |
 | `kafka-bus` | built / wired | Topic registry canonical |
 | `telemetry-otel` | built / wired | OTEL collector → Kafka |
 | `clickhouse-telemetry` | built / wired | Telemetry worker sink |
-| `ingest-worker` | built / wired | `telemetry.logs.raw` → `experience_events`; compose service `worker-ingest-telemetry` (host `ingest-worker.service` still needs `sudo systemctl disable --now` when password available; dist stub parks the unit) |
+| `ingest-worker` | built / wired | `telemetry.logs.raw` → `experience_events`; compose `worker-ingest-telemetry` sole consumer (host `ingest-worker.service` disabled) |
 
 ## Cognitive engines
 
@@ -56,7 +56,9 @@ Status legend:
 | `cs-worker-pattern` | wired | |
 | `cs-worker-telemetry` | wired | Skips cognitive blog events on logs topic |
 | `cs-worker-memory-critique` | wired | MCE pipeline (Exp 47) |
+| `cs-worker-digest` | wired | Weekly extractive digest; filters `tags:blog` (+ legacy aliases) |
 | `cs-web` | wired | `:3007` |
+| bigpines `/api/substrate/stats` | wired | Blog pulls public-safe `experience_events` aggs (About, post footer, homepage strip) |
 
 ## Production hardening backlog
 
@@ -67,7 +69,8 @@ Status legend:
 | LLM-backed agents / `EnginePlugin` defaults | built / wired | Exp 38, 55 | `CS_ENGINE_ORDER=claude,ollama,...`; plugins via `CS_ENGINE` |
 | Independent eval suite | built | Exp 56–58 | Baseline, holdout, sensitivity grid |
 | Diversity slot in core `MemoryRetriever` | drafted | Exp 35 | Promote experiment `breadth.ts` slot into production retriever |
-| Host systemd → compose migration | planned | Ops 2026-07-10 | `sudo systemctl disable --now ingest-worker.service` (password required on thor) |
+| Host systemd → compose migration | done | Ops 2026-07-13 | `ingest-worker.service` disabled; compose owns the group |
+| Blog reverse metrics feed | built / wired | Product 2026-07-13 | bigpines pulls redacted aggs from `experience_events` |
 | Production 1-bit SQ remap | deferred | Exp 51 | Larger-n size study first |
 
 ## Embedding contract (live blog memory)
@@ -81,3 +84,4 @@ Status legend:
 
 - Introspection proposals live in `substrate_proposals` (Exp 48). Older docs may say `self_modifications`.
 - Blog reader events land in `experience_events` with `tags: blog`, not in `blog_posts_search` (blog catalog only).
+- Public blog metrics (`/api/substrate/stats`) read `experience_events` only; never expose session/reader IDs or search query text.

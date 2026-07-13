@@ -74,6 +74,7 @@ export class ExperienceWriter {
           timestamp:        event.timestamp,
           event_type:       event.type,
           session_id:       event.context.sessionId,
+          ...(event.context.userId !== undefined ? { user_id: event.context.userId } : {}),
           agent_id:         event.context.agentId ?? "ingest-worker",
           summary:          event.input.text,
           importance_score: event.importanceScore,

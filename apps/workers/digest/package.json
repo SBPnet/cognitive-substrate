@@ -11,6 +11,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "start": "node dist/main.js",
     "dev": "node --watch dist/main.js",
+    "editorial-gaps": "node --import tsx/esm src/editorial-gaps.ts",
     "clean": "rm -rf dist *.tsbuildinfo"
   },
   "dependencies": {

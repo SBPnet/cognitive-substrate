@@ -74,7 +74,17 @@ Not all events entering `experience_events` are conversation-bound. `EventContex
 | `"ambient"` | blog telemetry, reader engagement, infrastructure summaries | freestanding memories; not session-windowed |
 | `"system"` | dream-cycle replays, consolidation outputs | internal bookkeeping; excluded from episodic stats |
 
-Producers of ambient and system events use `SystemSessionId` constants (from `@cognitive-substrate/core-types`) for the `sessionId` field so the value is stable, queryable, and not mistaken for a real session UUID. Reader identity (`userId`) is preserved where available (e.g. blog events carry `readerId`), enabling cross-session memory recall per reader without conflating readers into a single session stream.
+Producers of ambient and system events use `SystemSessionId` constants (from `@cognitive-substrate/core-types`) for the `sessionId` field so the value is stable, queryable, and not mistaken for a real session UUID. Reader identity (`userId`) is preserved where available (e.g. blog events carry `readerId`), enabling cross-session memory recall per reader without conflating readers into a single session stream. The ingest `ExperienceWriter` persists consent-gated `readerId` as OpenSearch `user_id` when present (never exposed on public blog stats).
+
+## Editorial loop
+
+Digest knowledge-gap tags (low `importance_score`, ≥5 docs) are queryable via:
+
+```bash
+OPENSEARCH_URL=http://thor.local:9200 pnpm --filter @cognitive-substrate/digest-worker editorial-gaps
+```
+
+Use the printed tags to choose what to write or expand next.
 
 ## Key invariants
 
