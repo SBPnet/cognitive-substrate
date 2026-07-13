@@ -118,6 +118,16 @@ interface SearchResultClickEvent extends TelemetryEventBase {
   payload: { query: string; slug: string; position: number };
 }
 
+interface AdImpressionEvent extends TelemetryEventBase {
+  type: "ad_impression";
+  payload: { slug: string; placement: "post_end"; network: "adsense" };
+}
+
+interface AdClickEvent extends TelemetryEventBase {
+  type: "ad_click";
+  payload: { slug: string; placement: "post_end"; network: "adsense" };
+}
+
 export type TelemetryEvent =
   | PageViewEvent
   | ArticleCompleteEvent
@@ -134,7 +144,9 @@ export type TelemetryEvent =
   | TagClickEvent
   | SeriesNavClickEvent
   | TimeOnPageEvent
-  | SearchResultClickEvent;
+  | SearchResultClickEvent
+  | AdImpressionEvent
+  | AdClickEvent;
 
 // ---------------------------------------------------------------------------
 // Importance scoring
@@ -193,6 +205,12 @@ function importanceScore(event: TelemetryEvent): number {
 
     case "search_result_click":
       return Math.max(0.45 - event.payload.position * 0.05, 0.20);
+
+    case "ad_impression":
+      return 0.15;
+
+    case "ad_click":
+      return 0.55;
 
     case "page_view":
     case "focus_gain":
@@ -254,6 +272,12 @@ function buildSummary(event: TelemetryEvent): string {
 
     case "search_result_click":
       return `search result click: "${event.payload.query}" → ${event.payload.slug} (position ${event.payload.position})`;
+
+    case "ad_impression":
+      return `ad impression: ${event.payload.slug} ${event.payload.placement}`;
+
+    case "ad_click":
+      return `ad click: ${event.payload.slug} ${event.payload.placement}`;
   }
 }
 
@@ -307,6 +331,16 @@ function buildTags(event: TelemetryEvent): string[] {
     case "search_result_click":
       tags.push("engagement:curiosity", `article:${event.payload.slug}`);
       break;
+    case "ad_impression":
+      tags.push("engagement:monetization", `article:${event.payload.slug}`);
+      break;
+    case "ad_click":
+      tags.push(
+        "engagement:monetization",
+        "engagement:conversion",
+        `article:${event.payload.slug}`,
+      );
+      break;
   }
 
   return tags;
@@ -348,6 +382,8 @@ export function registerBuiltinMappers(registry: IngestMapperRegistry): void {
     "series_nav_click",
     "time_on_page",
     "search_result_click",
+    "ad_impression",
+    "ad_click",
   ];
 
   for (const type of builtinTypes) {
