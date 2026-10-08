@@ -1166,7 +1166,7 @@ All major subsystems run together over 100 turns (normal→degraded→outage→r
 | Hybrid α sweep: all α values achieve P@5=1.0; lexical-dominant produces highest raw scores; vector adds no P@5 gain | Exp 42 | 10k corpus is well-separated by BM25 alone; α=0.5 default is near-optimal for this domain |
 | Reranker + feedback closed loop: usedInResponse=true FWA>0; =false FWA=0; helpfulness gap requires live reranker | Exp 43 | Deploy ms-marco cross-encoder to see outage/normal helpfulness differentiation |
 | Full-stack 100-turn: 0 errors, ef monotone 0.809→0.000, 245 feedback records, all 4 goals progress=1.0 | Exp 44 | 2.45× feedback records/turn from multi-doc retrieval; ef does not recover post-incident without positive signal |
-| Blog telemetry pipeline: H1/H2/H3 PASS, H4 FAIL; 136 real events, 18/18 kNN slugs, importance_score median flat across session counts | Exp 45 | First real-data experiment; cross-session salience requires reinforcement engine (retrieval_priority), not importance_score |
+| Paired falsification (persistent − reset): incident apprenticeship + critique/suppress; gaps reported even if null; defaults held (countBonus 0.02, noveltyWeight 0.30, recon every 5) | Exp 45 | Durable consolidate→reinforce→suppress path vs empty/legacy-only reset; suppress keeps get-by-id; do not tune invariants to flip gaps |
 | Reinforcement engine over seeded exp45 docs: retrieval_priority written; multi-session rp > single-session rp | Exp 46 | importance_score uncorrupted; Pearson r(rp, session_count) ≥ 0.5 confirms retrieval_priority encodes cross-session salience |
 | IntrospectionEngine pipeline: gap detection, typed proposal schema, ProposalStore round-trip, SchemaEvolutionApplier writes schema_evolution event | Exp 48 | Validates full suggestion-to-apply path; ConstitutionEngine gates on stabilityRisk < 0.7; substrate_proposals index stores pending proposals for human review |
 | Lucene knn engine switch: top-1 recall, hybrid bool+knn+term, ef_search parity, non-negative cosinesimil scores | Exp 49 | faiss removal and ConjunctionDISI workaround removal validated |
@@ -1186,13 +1186,13 @@ Experiments 1–44 constitute engineering validation of subsystem behavior again
 
 **Corpus coverage.** The operational signal corpus covers four window types (normal, degraded, outage, recovery) with fixed vocabulary drawn from infrastructure telemetry domains. Results generalize within this vocabulary; generalization to structurally different signal types has not been tested.
 
-These limitations do not invalidate the experimental results. Each experiment demonstrates that the system produces a specific behavior in a specific condition. They mean the results should be read as engineering validation, not as general performance claims. Follow-on rigorous eval experiments (non-cognitive baseline comparison, held-out window type, parameter sensitivity grid) remain planned under new experiment numbers when independent evaluation infrastructure is ready. Numbers 45–50 are already assigned to real-data and infrastructure work.
+These limitations do not invalidate the experimental results. Each experiment demonstrates that the system produces a specific behavior in a specific condition. They mean the results should be read as engineering validation, not as general performance claims. Follow-on rigorous eval experiments (non-cognitive baseline comparison, held-out window type, parameter sensitivity grid) continue under later numbers; Exp 45 is the paired persistent-vs-reset falsification protocol, and Numbers 46–50 cover real-data / infrastructure follow-ons (including historical blog-telemetry archives formerly associated with the Exp 45 entrypoint).
 
 ---
 
-## Experiment 45 — Blog Telemetry Pipeline Integrity & Retrieval Quality
+## Experiment 45 — Paired Falsification: Persistent vs Reset Arms
 
-**Result:** First experiment using real data from bigpines.net reader-behaviour events. Pipeline integrity (H1), importance ordering (H2), kNN recall by article slug (H3), and multi-session salience (H4) validated against the live `experience_events` index on thor. H3 and H4 skip gracefully when the ML node is unavailable or the index is still accumulating data.
+**Result:** Scenario A (incident apprenticeship) and Scenario B (critique on contradiction) each run a persistent arm and a reset arm on dedicated `exp45_incident_*` / `exp45_critique_*` indexes (never `memory_semantic`). Persistent − reset gaps are always reported (null gap valid). H1–H6 cover pattern recall, stale-runbook suppression with get-by-id, confidence movement, capacity top-1 replacement, and gap reporting under production defaults. See `results/experiment-45-results.md`. (Historical blog-telemetry Exp 45 JSON archives remain under `results/` for Exp 46/50 context.)
 
 ---
 
