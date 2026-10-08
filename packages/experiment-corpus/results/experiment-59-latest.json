@@ -1,0 +1,96 @@
+{
+  "experiment": "experiment-59",
+  "runAt": "2026-10-08T02:37:20.634Z",
+  "opensearchUrl": "https://cogsub59-bigpines.l.aivencloud.com:25785",
+  "observations": "H1 PASS \u2014 persistent=true reset=false\nH2 PASS \u2014 staleInTop5=false fetchable=true\nH3 PASS \u2014 before=0.65625 after=0.7345867141604971\nH4 PASS \u2014 persistent=mem-cap-new reset=mem-cap-old\nH5 PASS \u2014 fetchable=true\nH6 PASS \u2014 gapA=1 gapB=0",
+  "data": {
+    "mode": "live",
+    "hypotheses": [
+      {
+        "id": "H1",
+        "description": "Persistent A retrieves consolidated pattern in top-5; reset A does not",
+        "pass": true,
+        "detail": "persistent=true reset=false"
+      },
+      {
+        "id": "H2",
+        "description": "Persistent A: stale runbook absent from ordinary top-5; get-by-id succeeds",
+        "pass": true,
+        "detail": "staleInTop5=false fetchable=true"
+      },
+      {
+        "id": "H3",
+        "description": "Pattern confidence moves with outcome on persistent arm only",
+        "pass": true,
+        "detail": "before=0.65625 after=0.7345867141604971"
+      },
+      {
+        "id": "H4",
+        "description": "Persistent B top-1=mem-cap-new; reset B top-1=mem-cap-old",
+        "pass": true,
+        "detail": "persistent=mem-cap-new reset=mem-cap-old"
+      },
+      {
+        "id": "H5",
+        "description": "mem-cap-old remains fetchable by id after suppression",
+        "pass": true,
+        "detail": "fetchable=true"
+      },
+      {
+        "id": "H6",
+        "description": "Gap (persistent hit \u2212 reset hit) reported even if zero",
+        "pass": true,
+        "detail": "gapA=1 gapB=0"
+      }
+    ],
+    "scenarioA": {
+      "persistent": {
+        "arm": "persistent",
+        "top5Ids": [
+          "mem-incident-pattern"
+        ],
+        "patternInTop5": true,
+        "staleInTop5": false,
+        "staleFetchableById": true,
+        "patternConfidenceBefore": 0.65625,
+        "patternConfidenceAfter": 0.7345867141604971,
+        "hit": 1
+      },
+      "reset": {
+        "arm": "reset",
+        "top5Ids": [],
+        "patternInTop5": false,
+        "staleInTop5": false,
+        "staleFetchableById": false,
+        "patternConfidenceBefore": null,
+        "patternConfidenceAfter": null,
+        "hit": 0
+      },
+      "gap": 1
+    },
+    "scenarioB": {
+      "persistent": {
+        "arm": "persistent",
+        "top1Id": "mem-cap-new",
+        "trustBefore": 0.7,
+        "trustAfter": 0.44999999999999996,
+        "oldFetchableById": true,
+        "hit": 1
+      },
+      "reset": {
+        "arm": "reset",
+        "top1Id": "mem-cap-old",
+        "trustBefore": 0.7,
+        "trustAfter": 0.7,
+        "oldFetchableById": true,
+        "hit": 1
+      },
+      "gap": 0
+    },
+    "invariants": {
+      "countBonus": 0.02,
+      "noveltyWeight": 0.3,
+      "reconsolidationIntervalEpochs": 5
+    }
+  }
+}

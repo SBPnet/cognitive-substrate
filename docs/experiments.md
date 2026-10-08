@@ -1171,6 +1171,7 @@ All major subsystems run together over 100 turns (normal→degraded→outage→r
 | IntrospectionEngine pipeline: gap detection, typed proposal schema, ProposalStore round-trip, SchemaEvolutionApplier writes schema_evolution event | Exp 48 | Validates full suggestion-to-apply path; ConstitutionEngine gates on stabilityRisk < 0.7; substrate_proposals index stores pending proposals for human review |
 | Lucene knn engine switch: top-1 recall, hybrid bool+knn+term, ef_search parity, non-negative cosinesimil scores | Exp 49 | faiss removal and ConjunctionDISI workaround removal validated |
 | Real blog reinforcement: retrieval_priority encodes cross-session salience on live reader docs | Exp 50 | Exp 45 H4 follow-up on non-seeded blog traffic |
+| Paired falsification (persistent − reset): incident apprenticeship + critique/suppress; gaps reported even if null; defaults held (countBonus 0.02, noveltyWeight 0.30, recon every 5) | Exp 59 | Durable consolidate→reinforce→suppress path vs empty/legacy-only reset; suppress keeps get-by-id; do not tune invariants to flip gaps |
 
 ---
 
@@ -1290,6 +1291,12 @@ popular calibration slugs. See `results/experiment-57-latest.json`.
 **Result:** Grid over priorWeight / countBonus / novelty; monotone countBonus
 and novelty effects on retrieval_priority. See
 `results/experiment-58-latest.json`.
+
+---
+
+## Experiment 59 — Paired Falsification: Persistent vs Reset Arms
+
+**Result:** Live run on OpenSearch 3.6 — H1–H6 ALL PASS. Scenario A gap=1 (pattern in top-5 only on persistent arm); Scenario B gap=0 (both arms hit their expected top-1: mem-cap-new vs mem-cap-old). Stale/contradicted memories suppressed from ordinary retrieval but still get-by-id. Defaults held (countBonus 0.02, noveltyWeight 0.30, recon every 5). See `results/experiment-59-results.md`.
 
 ---
 

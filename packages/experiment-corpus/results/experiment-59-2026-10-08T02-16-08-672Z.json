@@ -1,0 +1,58 @@
+{
+  "experiment": "experiment-59",
+  "runAt": "2026-10-08T02:16:08.672Z",
+  "opensearchUrl": "(unknown)",
+  "observations": "DRY — no OpenSearch; assertion descriptions written to experiment-59-results.md",
+  "data": {
+    "mode": "dry",
+    "hypotheses": [
+      {
+        "id": "H1",
+        "description": "Persistent A retrieves consolidated pattern in top-5; reset A does not",
+        "pass": null,
+        "detail": "patternInTop5(persistent)=true ∧ patternInTop5(reset)=false"
+      },
+      {
+        "id": "H2",
+        "description": "Persistent A: stale runbook absent from ordinary top-5; get-by-id succeeds",
+        "pass": null,
+        "detail": "staleInTop5=false ∧ staleFetchableById=true"
+      },
+      {
+        "id": "H3",
+        "description": "Pattern confidence moves with outcome on persistent arm only",
+        "pass": null,
+        "detail": "patternConfidenceAfter > patternConfidenceBefore on persistent; reset has nulls"
+      },
+      {
+        "id": "H4",
+        "description": "Persistent B top-1=mem-cap-new; reset B top-1=mem-cap-old",
+        "pass": null,
+        "detail": "top1(persistent)=mem-cap-new ∧ top1(reset)=mem-cap-old"
+      },
+      {
+        "id": "H5",
+        "description": "mem-cap-old remains fetchable by id after suppression",
+        "pass": null,
+        "detail": "get(CRITIQUE_SEMANTIC, mem-cap-old) succeeds on persistent arm"
+      },
+      {
+        "id": "H6",
+        "description": "Gap (persistent hit − reset hit) reported even if zero",
+        "pass": null,
+        "detail": "gapA and gapB always written; defaults countBonus=0.02 noveltyWeight=0.30 recon=5 held"
+      }
+    ],
+    "invariants": {
+      "countBonus": 0.02,
+      "noveltyWeight": 0.3,
+      "reconsolidationIntervalEpochs": 5
+    },
+    "indexes": [
+      "exp59_incident_events",
+      "exp59_incident_semantic",
+      "exp59_critique_events",
+      "exp59_critique_semantic"
+    ]
+  }
+}
