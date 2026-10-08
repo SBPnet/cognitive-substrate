@@ -1303,7 +1303,7 @@ and novelty effects on retrieval_priority. See
 
 ## Experiment 60 — Falsification Set (Twelve Constructed Streams)
 
-**Result:** See `results/experiment-60-results.md`. Twelve constructed streams (incident, no-shared-token, five held-form + five reverted-form shapes) plus fair-reset and critique controls on `exp60_*` indexes. Hypotheses H1–H7 asserted individually; per-stream hits reported including zeros (H7). Production defaults held. Null/FAIL is a valid result — do not tune countBonus / noveltyWeight / recon interval to flip outcomes.
+**Result:** Live run on OpenSearch 3.6 — H1–H7 ALL PASS. Per-stream hits: S1=1 S2=1 S3=0 (fair-reset correctly misses pattern) S4–S8 held/reverted all 1 S9-persistent=1 S9-reset=1. Stale runbook suppressed but get-by-id; critique locality holds (mem-cap-new vs unrelated). Defaults held (countBonus 0.02, noveltyWeight 0.30, recon every 5). See `results/experiment-60-results.md`.
 
 ---
 
