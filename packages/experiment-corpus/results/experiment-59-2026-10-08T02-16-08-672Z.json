@@ -1,8 +1,8 @@
 {
-  "experiment": "experiment-45",
-  "runAt": "2026-10-08T02:06:07.776Z",
+  "experiment": "experiment-59",
+  "runAt": "2026-10-08T02:16:08.672Z",
   "opensearchUrl": "(unknown)",
-  "observations": "DRY — no OpenSearch; assertion descriptions written to experiment-45-results.md",
+  "observations": "DRY — no OpenSearch; assertion descriptions written to experiment-59-results.md",
   "data": {
     "mode": "dry",
     "hypotheses": [
@@ -49,10 +49,10 @@
       "reconsolidationIntervalEpochs": 5
     },
     "indexes": [
-      "exp45_incident_events",
-      "exp45_incident_semantic",
-      "exp45_critique_events",
-      "exp45_critique_semantic"
+      "exp59_incident_events",
+      "exp59_incident_semantic",
+      "exp59_critique_events",
+      "exp59_critique_semantic"
     ]
   }
 }
