@@ -1,0 +1,158 @@
+{
+  "experiment": "experiment-60",
+  "runAt": "2026-10-08T03:05:53.313Z",
+  "opensearchUrl": "(unknown)",
+  "observations": "DRY — no OpenSearch; assertion descriptions written to experiment-60-results.md",
+  "data": {
+    "mode": "dry",
+    "hypotheses": [
+      {
+        "id": "H1",
+        "description": "Fair-reset probe does not return the consolidated pattern id; persistent probe does",
+        "pass": null,
+        "detail": "S1.patternInTop5=true ∧ S3.patternInTop5=false"
+      },
+      {
+        "id": "H2",
+        "description": "No-shared-token probe returns the consolidated pattern on the persistent arm",
+        "pass": null,
+        "detail": "S2.patternInTop5=true (match via generalization only)"
+      },
+      {
+        "id": "H3",
+        "description": "Stale runbook absent from ordinary top-5 after suppress and still fetchable by id",
+        "pass": null,
+        "detail": "S1.staleInTop5=false ∧ S1.staleFetchableById=true"
+      },
+      {
+        "id": "H4",
+        "description": "On all five shapes, held-form confidence increases and reverted-form confidence does not",
+        "pass": null,
+        "detail": "∀ shape: held.confidenceIncreased ∧ ¬reverted.confidenceIncreased"
+      },
+      {
+        "id": "H5",
+        "description": "On all five shapes, the reverted remedy is suppressed and the held remedy is not",
+        "pass": null,
+        "detail": "∀ shape: reverted.suppressed ∧ ¬held.suppressed"
+      },
+      {
+        "id": "H6",
+        "description": "Critique persistent top-1 is mem-cap-new; reset top-1 is mem-cap-old; unrelated memory wins its own probe",
+        "pass": null,
+        "detail": "persistent.top1=mem-cap-new ∧ reset.top1=mem-cap-old ∧ unrelated.top1=mem-unrelated-priority"
+      },
+      {
+        "id": "H7",
+        "description": "Report per-stream hit values, including zeros; do not collapse to a single 6/6 score",
+        "pass": null,
+        "detail": "per-stream table written with hit ∈ {0,1} for each stream"
+      }
+    ],
+    "streams": [
+      {
+        "stream": "S1",
+        "kind": "incident-pair",
+        "hit": 0,
+        "detail": "unevaluated (dry)"
+      },
+      {
+        "stream": "S2",
+        "kind": "no-shared-token",
+        "hit": 0,
+        "detail": "unevaluated (dry)"
+      },
+      {
+        "stream": "S3",
+        "kind": "fair-reset",
+        "hit": 0,
+        "detail": "unevaluated (dry)"
+      },
+      {
+        "stream": "S4-held",
+        "kind": "P_CASCADING_BACKPRESSURE_LOOP/held",
+        "hit": 0,
+        "detail": "unevaluated (dry)"
+      },
+      {
+        "stream": "S4-reverted",
+        "kind": "P_CASCADING_BACKPRESSURE_LOOP/reverted",
+        "hit": 0,
+        "detail": "unevaluated (dry)"
+      },
+      {
+        "stream": "S5-held",
+        "kind": "P_MEMORY_PRESSURE_GC_STORM/held",
+        "hit": 0,
+        "detail": "unevaluated (dry)"
+      },
+      {
+        "stream": "S5-reverted",
+        "kind": "P_MEMORY_PRESSURE_GC_STORM/reverted",
+        "hit": 0,
+        "detail": "unevaluated (dry)"
+      },
+      {
+        "stream": "S6-held",
+        "kind": "P_STRUCTURAL_REBALANCE_STORM/held",
+        "hit": 0,
+        "detail": "unevaluated (dry)"
+      },
+      {
+        "stream": "S6-reverted",
+        "kind": "P_STRUCTURAL_REBALANCE_STORM/reverted",
+        "hit": 0,
+        "detail": "unevaluated (dry)"
+      },
+      {
+        "stream": "S7-held",
+        "kind": "P_CONNECTION_EXHAUSTION_CASCADE/held",
+        "hit": 0,
+        "detail": "unevaluated (dry)"
+      },
+      {
+        "stream": "S7-reverted",
+        "kind": "P_CONNECTION_EXHAUSTION_CASCADE/reverted",
+        "hit": 0,
+        "detail": "unevaluated (dry)"
+      },
+      {
+        "stream": "S8-held",
+        "kind": "P_REPLICATION_LAG_DIVERGENCE/held",
+        "hit": 0,
+        "detail": "unevaluated (dry)"
+      },
+      {
+        "stream": "S8-reverted",
+        "kind": "P_REPLICATION_LAG_DIVERGENCE/reverted",
+        "hit": 0,
+        "detail": "unevaluated (dry)"
+      },
+      {
+        "stream": "S9-persistent",
+        "kind": "critique-persistent",
+        "hit": 0,
+        "detail": "unevaluated (dry)"
+      },
+      {
+        "stream": "S9-reset",
+        "kind": "critique-reset",
+        "hit": 0,
+        "detail": "unevaluated (dry)"
+      }
+    ],
+    "invariants": {
+      "countBonus": 0.02,
+      "noveltyWeight": 0.3,
+      "reconsolidationIntervalEpochs": 5
+    },
+    "indexes": [
+      "exp60_incident_events",
+      "exp60_incident_semantic",
+      "exp60_shape_events",
+      "exp60_shape_semantic",
+      "exp60_critique_events",
+      "exp60_critique_semantic"
+    ]
+  }
+}

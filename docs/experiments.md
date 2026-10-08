@@ -1172,6 +1172,7 @@ All major subsystems run together over 100 turns (normal→degraded→outage→r
 | Lucene knn engine switch: top-1 recall, hybrid bool+knn+term, ef_search parity, non-negative cosinesimil scores | Exp 49 | faiss removal and ConjunctionDISI workaround removal validated |
 | Real blog reinforcement: retrieval_priority encodes cross-session salience on live reader docs | Exp 50 | Exp 45 H4 follow-up on non-seeded blog traffic |
 | Paired falsification (persistent − reset): incident apprenticeship + critique/suppress; gaps reported even if null; defaults held (countBonus 0.02, noveltyWeight 0.30, recon every 5) | Exp 59 | Durable consolidate→reinforce→suppress path vs empty/legacy-only reset; suppress keeps get-by-id; do not tune invariants to flip gaps |
+| Twelve-stream falsification set Exp 59 did not run: fair-reset, no-shared-token, five held/reverted shapes, critique locality; per-stream hits (incl. zeros); defaults held | Exp 60 | Fair-reset must miss consolidated pattern; generalization-only probe; held confidence↑ / reverted suppress; critique winner stays local; null/FAIL valid |
 
 ---
 
@@ -1297,6 +1298,12 @@ and novelty effects on retrieval_priority. See
 ## Experiment 59 — Paired Falsification: Persistent vs Reset Arms
 
 **Result:** Live run on OpenSearch 3.6 — H1–H6 ALL PASS. Scenario A gap=1 (pattern in top-5 only on persistent arm); Scenario B gap=0 (both arms hit their expected top-1: mem-cap-new vs mem-cap-old). Stale/contradicted memories suppressed from ordinary retrieval but still get-by-id. Defaults held (countBonus 0.02, noveltyWeight 0.30, recon every 5). See `results/experiment-59-results.md`.
+
+---
+
+## Experiment 60 — Falsification Set (Twelve Constructed Streams)
+
+**Result:** See `results/experiment-60-results.md`. Twelve constructed streams (incident, no-shared-token, five held-form + five reverted-form shapes) plus fair-reset and critique controls on `exp60_*` indexes. Hypotheses H1–H7 asserted individually; per-stream hits reported including zeros (H7). Production defaults held. Null/FAIL is a valid result — do not tune countBonus / noveltyWeight / recon interval to flip outcomes.
 
 ---
 
