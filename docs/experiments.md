@@ -1296,7 +1296,7 @@ and novelty effects on retrieval_priority. See
 
 ## Experiment 59 — Paired Falsification: Persistent vs Reset Arms
 
-**Result:** Scenario A (incident apprenticeship) and Scenario B (critique on contradiction) each run a persistent arm and a reset arm on dedicated `exp59_incident_*` / `exp59_critique_*` indexes (never `memory_semantic`). Persistent − reset gaps are always reported (null gap valid). H1–H6 cover pattern recall, stale-runbook suppression with get-by-id, confidence movement, capacity top-1 replacement, and gap reporting under production defaults. See `results/experiment-59-results.md`. Numbered 59 because Exp 45 is already assigned to blog telemetry.
+**Result:** Live run on OpenSearch 3.6 — H1–H6 ALL PASS. Scenario A gap=1 (pattern in top-5 only on persistent arm); Scenario B gap=0 (both arms hit their expected top-1: mem-cap-new vs mem-cap-old). Stale/contradicted memories suppressed from ordinary retrieval but still get-by-id. Defaults held (countBonus 0.02, noveltyWeight 0.30, recon every 5). See `results/experiment-59-results.md`.
 
 ---
 

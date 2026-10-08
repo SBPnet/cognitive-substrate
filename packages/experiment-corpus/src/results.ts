@@ -23,16 +23,29 @@ export interface ResultsEnvelope<T> {
   readonly data: T;
 }
 
+/** Strip userinfo from OpenSearch URLs so credentials never land in results files. */
+function redactOpenSearchUrl(url: string): string {
+  try {
+    const parsed = new URL(url);
+    parsed.username = "";
+    parsed.password = "";
+    return parsed.toString().replace(/\/$/, "") || url;
+  } catch {
+    return url.replace(/\/\/([^/@]+)@/, "//***@");
+  }
+}
+
 export function saveResults<T>(
   experimentName: string,
   observations: string,
   data: T,
 ): void {
   const runAt = new Date().toISOString();
+  const rawUrl = process.env["OPENSEARCH_URL"] ?? "(unknown)";
   const envelope: ResultsEnvelope<T> = {
     experiment: experimentName,
     runAt,
-    opensearchUrl: process.env["OPENSEARCH_URL"] ?? "(unknown)",
+    opensearchUrl: rawUrl === "(unknown)" ? rawUrl : redactOpenSearchUrl(rawUrl),
     observations,
     data,
   };
