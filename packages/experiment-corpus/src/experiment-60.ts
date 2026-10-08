@@ -1220,22 +1220,80 @@ function runDry(): void {
   );
 }
 
-async function clusterReachable(url: string): Promise<boolean> {
+/**
+ * Build an OpenSearch client config from OPENSEARCH_URL, optionally with
+ * embedded userinfo (https://user:pass@host:port) and/or
+ * OPENSEARCH_USERNAME / OPENSEARCH_PASSWORD. Aiven TLS requires
+ * rejectUnauthorized=false unless a CA is configured.
+ */
+function clientConfigFromEnv(rawUrl: string): {
+  node: string;
+  auth?: { username: string; password: string };
+  ssl: { rejectUnauthorized: boolean };
+} {
+  const envCfg = (() => {
+    try {
+      return opensearchConfigFromEnv();
+    } catch {
+      return undefined;
+    }
+  })();
+
+  let node = rawUrl;
+  let username = process.env["OPENSEARCH_USERNAME"] ?? envCfg?.auth?.username;
+  let password = process.env["OPENSEARCH_PASSWORD"] ?? envCfg?.auth?.password;
+
   try {
-    const client = createOpenSearchClient({
-      node: url,
-      ssl: { rejectUnauthorized: false },
-    });
-    const ping = await client.ping();
-    return Boolean(ping.body);
+    const parsed = new URL(rawUrl);
+    if (parsed.username) {
+      username = decodeURIComponent(parsed.username);
+      password = decodeURIComponent(parsed.password);
+      parsed.username = "";
+      parsed.password = "";
+      node = parsed.toString().replace(/\/$/, "");
+    }
   } catch {
-    return false;
+    // keep rawUrl
+  }
+
+  const rejectUnauthorized =
+    process.env["OPENSEARCH_TLS_REJECT_UNAUTHORIZED"] !== undefined
+      ? process.env["OPENSEARCH_TLS_REJECT_UNAUTHORIZED"] !== "false"
+      : false; // Aiven / managed TLS default for experiments
+
+  const auth =
+    username && password ? { username, password } : undefined;
+  return auth
+    ? { node, auth, ssl: { rejectUnauthorized } }
+    : { node, ssl: { rejectUnauthorized } };
+}
+
+function redactUrl(url: string): string {
+  try {
+    const parsed = new URL(url);
+    parsed.username = "";
+    parsed.password = "";
+    return parsed.toString().replace(/\/$/, "") || url;
+  } catch {
+    return url.replace(/\/\/([^/@]+)@/, "//***@");
+  }
+}
+
+async function clusterReachable(url: string): Promise<"ok" | "auth" | "down"> {
+  try {
+    const client = createOpenSearchClient(clientConfigFromEnv(url));
+    const ping = await client.ping();
+    return ping.body ? "ok" : "down";
+  } catch (err) {
+    const status = (err as { meta?: { statusCode?: number } })?.meta?.statusCode;
+    if (status === 401 || status === 403) return "auth";
+    return "down";
   }
 }
 
 async function runLive(url: string): Promise<void> {
-  const client = createOpenSearchClient(opensearchConfigFromEnv());
-  console.log(`=== Experiment 60 — Falsification set @ ${url} ===\n`);
+  const client = createOpenSearchClient(clientConfigFromEnv(url));
+  console.log(`=== Experiment 60 — Falsification set @ ${redactUrl(url)} ===\n`);
   console.log(
     `Invariants: countBonus=${COUNT_BONUS} noveltyWeight=${NOVELTY_WEIGHT} reconEvery=${RECON_INTERVAL_EPOCHS}`,
   );
@@ -1450,9 +1508,18 @@ async function main(): Promise<void> {
     runDry();
     return;
   }
-  const ok = await clusterReachable(url);
-  if (!ok) {
-    console.log(`OpenSearch at ${url} unreachable — writing dry assertion description.\n`);
+  const reach = await clusterReachable(url);
+  if (reach === "auth") {
+    console.log(
+      `OpenSearch at ${redactUrl(url)} returned 401/403 — credentials rejected. Writing dry assertion description.\n`,
+    );
+    runDry();
+    return;
+  }
+  if (reach !== "ok") {
+    console.log(
+      `OpenSearch at ${redactUrl(url)} unreachable — writing dry assertion description.\n`,
+    );
     runDry();
     return;
   }
