@@ -26,6 +26,7 @@
  * loosen forgetting without recompiling the engine.
  */
 
+import type { Client } from "@opensearch-project/opensearch";
 import type { MemoryLink } from "@cognitive-substrate/core-types";
 import type {
   CompressionCluster,
@@ -49,6 +50,12 @@ export interface DecayEngineOptions {
   readonly compressAgeDays?: number;
   /** Memory-graph edges below this strength are dropped during pruning. */
   readonly pruneStrengthThreshold?: number;
+  /**
+   * Optional OpenSearch client used by `applySuppress` to persist
+   * `suppressed:true` on the decision write path. Decision-only callers
+   * (`decide` / `planForgetting`) do not require a client.
+   */
+  readonly openSearch?: Client;
 }
 
 export class DecayEngine {
@@ -57,6 +64,7 @@ export class DecayEngine {
   private readonly compressionThreshold: number;
   private readonly compressAgeDays: number;
   private readonly pruneStrengthThreshold: number;
+  private readonly openSearch: Client | undefined;
 
   constructor(options: DecayEngineOptions = {}) {
     this.suppressionThreshold = options.suppressionThreshold ?? 0.28;
@@ -64,6 +72,7 @@ export class DecayEngine {
     this.compressionThreshold = options.compressionThreshold ?? 0.45;
     this.compressAgeDays = options.compressAgeDays ?? 30;
     this.pruneStrengthThreshold = options.pruneStrengthThreshold ?? 0.15;
+    this.openSearch = options.openSearch;
   }
 
   /**
@@ -106,6 +115,50 @@ export class DecayEngine {
       return decision(candidate, "compress", suppressionWeight, retentionScore, "compression_candidate");
     }
     return decision(candidate, "retain", suppressionWeight, retentionScore, "retained");
+  }
+
+  /**
+   * Decide + write path for suppress/retire: keeps the document on disk but
+   * writes `suppressed:true` (and a lowered retrieval_priority) so ordinary
+   * retrieval excludes it while get-by-id still succeeds.
+   *
+   * Requires `openSearch` on the engine. Callers must not inline the index
+   * update — this method owns the write.
+   */
+  async applySuppress(
+    index: string,
+    candidate: ForgettingCandidate,
+  ): Promise<ForgettingDecision> {
+    if (!this.openSearch) {
+      throw new Error("DecayEngine.applySuppress requires openSearch in options");
+    }
+    const decided = this.decide(candidate);
+    // Suppress band (and retire) leave the doc addressable; prune would delete.
+    // When decide returns prune on a borderline candidate, map to suppress write
+    // so auditability (get-by-id) is preserved — matching the forgetting article.
+    const shouldWrite =
+      decided.action === "suppress" ||
+      decided.action === "retire" ||
+      decided.action === "prune";
+    if (!shouldWrite) {
+      return decided;
+    }
+    await this.openSearch.update({
+      index,
+      id: candidate.memory.memoryId,
+      body: {
+        doc: {
+          suppressed: true,
+          suppression_threshold: this.suppressionThreshold,
+          retrieval_priority: 0.05,
+          decay_factor: decided.suppressionWeight,
+        },
+      },
+      refresh: "wait_for",
+    });
+    return decided.action === "prune"
+      ? { ...decided, action: "suppress", reason: `${decided.reason}+suppress_write` }
+      : decided;
   }
 
   /** Drops association-graph edges whose strength is below the threshold. */

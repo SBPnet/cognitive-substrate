@@ -18,7 +18,8 @@
     "clean": "rm -rf dist *.tsbuildinfo"
   },
   "dependencies": {
-    "@cognitive-substrate/core-types": "workspace:*"
+    "@cognitive-substrate/core-types": "workspace:*",
+    "@opensearch-project/opensearch": "^2.7.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

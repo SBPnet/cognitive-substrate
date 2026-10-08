@@ -60,9 +60,16 @@ export class ConsolidationEngine {
   /**
    * Runs one consolidation cycle. Throws when no candidates are eligible,
    * since downstream subscribers expect a non-empty `sourceEventIds` list.
+   *
+   * Index targets default to production `experience_events` /
+   * `memory_semantic`. Callers (including experiments) may override via
+   * `request.eventsIndex` / `request.semanticIndex`.
    */
   async consolidate(request: ConsolidationRequest): Promise<ConsolidationResult> {
-    const candidates = await this.selectReplayCandidates(request);
+    const eventsIndex = request.eventsIndex ?? "experience_events";
+    const semanticIndex = request.semanticIndex ?? "memory_semantic";
+
+    const candidates = await this.selectReplayCandidates(request, eventsIndex);
     if (candidates.length === 0) {
       throw new Error("consolidation requires at least one replay candidate");
     }
@@ -83,9 +90,10 @@ export class ConsolidationEngine {
       usageFrequency: 0,
     };
 
+    const isExperimentIndex = semanticIndex !== "memory_semantic";
     await this.indexMemory(
       this.openSearch,
-      "memory_semantic",
+      semanticIndex as "memory_semantic",
       semanticMemory.memoryId,
       {
         memory_id: semanticMemory.memoryId,
@@ -100,10 +108,20 @@ export class ConsolidationEngine {
         semantic_cluster: semanticMemory.semanticCluster,
         usage_frequency: semanticMemory.usageFrequency,
         decay_factor: 1.0,
+        // Experiment indexes need retrieval ranking + suppress fields; production
+        // memory_semantic mapping does not declare them — leave production payload unchanged.
+        ...(isExperimentIndex
+          ? {
+              retrieval_priority: semanticMemory.importanceScore,
+              pattern_confidence: semanticMemory.stabilityScore,
+              suppressed: false,
+              suppression_threshold: 0,
+            }
+          : {}),
       },
     );
 
-    await this.markCandidatesConsolidated(candidates);
+    await this.markCandidatesConsolidated(candidates, eventsIndex);
 
     return {
       requestId: request.requestId,
@@ -114,12 +132,13 @@ export class ConsolidationEngine {
   }
 
   /**
-   * Queries `experience_events` for replay candidates ordered by decay
+   * Queries the events index for replay candidates ordered by decay
    * factor and importance. The returned shape projects raw hits into the
    * `ReplayCandidate` interface used by the consolidation model.
    */
   async selectReplayCandidates(
     request: ConsolidationRequest,
+    eventsIndex: string = request.eventsIndex ?? "experience_events",
   ): Promise<ReadonlyArray<ReplayCandidate>> {
     const baseQuery = buildReplaySelectionQuery({
       maxAge: request.maxAge,
@@ -144,7 +163,11 @@ export class ConsolidationEngine {
         }
       : baseQuery;
 
-    const hits = await this.searchClient(this.openSearch, "experience_events", query);
+    const hits = await this.searchClient(
+      this.openSearch,
+      eventsIndex as "experience_events",
+      query,
+    );
 
     return hits.map((hit) => {
       const source = hit._source;
@@ -168,12 +191,18 @@ export class ConsolidationEngine {
    */
   private async markCandidatesConsolidated(
     candidates: ReadonlyArray<ReplayCandidate>,
+    eventsIndex: string,
   ): Promise<void> {
     await Promise.all(
       candidates.map((candidate) =>
-        updateDocument(this.openSearch, "experience_events", candidate.memoryId, {
-          retrieval_count: candidate.retrievalCount + 1,
-        }).catch(() => undefined),
+        updateDocument(
+          this.openSearch,
+          eventsIndex as "experience_events",
+          candidate.memoryId,
+          {
+            retrieval_count: candidate.retrievalCount + 1,
+          },
+        ).catch(() => undefined),
       ),
     );
   }

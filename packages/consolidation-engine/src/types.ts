@@ -21,6 +21,17 @@ export interface ConsolidationRequest {
   readonly minImportance?: number;
   /** When provided, only candidates carrying ALL of these tags are selected. */
   readonly requiredTags?: ReadonlyArray<string>;
+  /**
+   * Experience/events index to replay from. Defaults to `experience_events`.
+   * Experiments pass dedicated indexes (e.g. `exp60_incident_events`) so the
+   * engine never touches production `experience_events`.
+   */
+  readonly eventsIndex?: string;
+  /**
+   * Semantic memory index to write into. Defaults to `memory_semantic`.
+   * Experiments pass dedicated indexes (e.g. `exp60_incident_semantic`).
+   */
+  readonly semanticIndex?: string;
 }
 
 /**

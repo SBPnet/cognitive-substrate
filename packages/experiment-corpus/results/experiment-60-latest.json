@@ -1,0 +1,266 @@
+{
+  "experiment": "experiment-60",
+  "runAt": "2026-10-08T03:16:08.496Z",
+  "opensearchUrl": "https://cogsub59-bigpines.l.aivencloud.com:25785",
+  "observations": "H1 PASS — S1.patternInTop5=true S3.patternInTop5=false\nH2 PASS — S2.patternInTop5=true\nH3 PASS — staleInTop5=false fetchable=true\nH4 PASS — P_CASCADING_BACKPRESSURE_LOOP: heldΔ=0.1845867141604971 revΔ=0; P_MEMORY_PRESSURE_GC_STORM: heldΔ=0.1845867141604971 revΔ=0; P_STRUCTURAL_REBALANCE_STORM: heldΔ=0.1845867141604971 revΔ=0; P_CONNECTION_EXHAUSTION_CASCADE: heldΔ=0.1845867141604971 revΔ=0; P_REPLICATION_LAG_DIVERGENCE: heldΔ=0.1845867141604971 revΔ=0\nH5 PASS — P_CASCADING_BACKPRESSURE_LOOP: held.suppressed=false rev.suppressed=true; P_MEMORY_PRESSURE_GC_STORM: held.suppressed=false rev.suppressed=true; P_STRUCTURAL_REBALANCE_STORM: held.suppressed=false rev.suppressed=true; P_CONNECTION_EXHAUSTION_CASCADE: held.suppressed=false rev.suppressed=true; P_REPLICATION_LAG_DIVERGENCE: held.suppressed=false rev.suppressed=true\nH6 PASS — persistent=mem-cap-new reset=mem-cap-old unrelated=mem-unrelated-priority trust 0.7→0.44999999999999996\nH7 PASS — S1=1 S2=1 S3=0 S4-held=1 S4-reverted=1 S5-held=1 S5-reverted=1 S6-held=1 S6-reverted=1 S7-held=1 S7-reverted=1 S8-held=1 S8-reverted=1 S9-persistent=1 S9-reset=1",
+  "data": {
+    "mode": "live",
+    "hypotheses": [
+      {
+        "id": "H1",
+        "description": "Fair-reset probe does not return the consolidated pattern id; persistent probe does",
+        "pass": true,
+        "detail": "S1.patternInTop5=true S3.patternInTop5=false"
+      },
+      {
+        "id": "H2",
+        "description": "No-shared-token probe returns the consolidated pattern on the persistent arm",
+        "pass": true,
+        "detail": "S2.patternInTop5=true"
+      },
+      {
+        "id": "H3",
+        "description": "Stale runbook absent from ordinary top-5 after suppress and still fetchable by id",
+        "pass": true,
+        "detail": "staleInTop5=false fetchable=true"
+      },
+      {
+        "id": "H4",
+        "description": "On all five shapes, held-form confidence increases and reverted-form confidence does not",
+        "pass": true,
+        "detail": "P_CASCADING_BACKPRESSURE_LOOP: heldΔ=0.1845867141604971 revΔ=0; P_MEMORY_PRESSURE_GC_STORM: heldΔ=0.1845867141604971 revΔ=0; P_STRUCTURAL_REBALANCE_STORM: heldΔ=0.1845867141604971 revΔ=0; P_CONNECTION_EXHAUSTION_CASCADE: heldΔ=0.1845867141604971 revΔ=0; P_REPLICATION_LAG_DIVERGENCE: heldΔ=0.1845867141604971 revΔ=0"
+      },
+      {
+        "id": "H5",
+        "description": "On all five shapes, the reverted remedy is suppressed and the held remedy is not",
+        "pass": true,
+        "detail": "P_CASCADING_BACKPRESSURE_LOOP: held.suppressed=false rev.suppressed=true; P_MEMORY_PRESSURE_GC_STORM: held.suppressed=false rev.suppressed=true; P_STRUCTURAL_REBALANCE_STORM: held.suppressed=false rev.suppressed=true; P_CONNECTION_EXHAUSTION_CASCADE: held.suppressed=false rev.suppressed=true; P_REPLICATION_LAG_DIVERGENCE: held.suppressed=false rev.suppressed=true"
+      },
+      {
+        "id": "H6",
+        "description": "Critique persistent top-1 is mem-cap-new; reset top-1 is mem-cap-old; unrelated memory wins its own probe",
+        "pass": true,
+        "detail": "persistent=mem-cap-new reset=mem-cap-old unrelated=mem-unrelated-priority trust 0.7→0.44999999999999996"
+      },
+      {
+        "id": "H7",
+        "description": "Report per-stream hit values, including zeros; do not collapse to a single 6/6 score",
+        "pass": true,
+        "detail": "S1=1 S2=1 S3=0 S4-held=1 S4-reverted=1 S5-held=1 S5-reverted=1 S6-held=1 S6-reverted=1 S7-held=1 S7-reverted=1 S8-held=1 S8-reverted=1 S9-persistent=1 S9-reset=1"
+      }
+    ],
+    "streams": [
+      {
+        "stream": "S1",
+        "kind": "incident-pair",
+        "hit": 1,
+        "detail": "patternInTop5=true top5=[mem-incident-pattern]"
+      },
+      {
+        "stream": "S2",
+        "kind": "no-shared-token",
+        "hit": 1,
+        "detail": "patternInTop5=true top5=[mem-incident-pattern, mem-stale-runbook]"
+      },
+      {
+        "stream": "S3",
+        "kind": "fair-reset",
+        "hit": 0,
+        "detail": "patternInTop5=false staleInTop5=true"
+      },
+      {
+        "stream": "S4-held",
+        "kind": "P_CASCADING_BACKPRESSURE_LOOP/held",
+        "hit": 1,
+        "detail": "conf 0.55→0.7345867141604971 increased=true suppressed=false"
+      },
+      {
+        "stream": "S4-reverted",
+        "kind": "P_CASCADING_BACKPRESSURE_LOOP/reverted",
+        "hit": 1,
+        "detail": "conf 0.55→0.55 increased=false suppressed=true"
+      },
+      {
+        "stream": "S5-held",
+        "kind": "P_MEMORY_PRESSURE_GC_STORM/held",
+        "hit": 1,
+        "detail": "conf 0.55→0.7345867141604971 increased=true suppressed=false"
+      },
+      {
+        "stream": "S5-reverted",
+        "kind": "P_MEMORY_PRESSURE_GC_STORM/reverted",
+        "hit": 1,
+        "detail": "conf 0.55→0.55 increased=false suppressed=true"
+      },
+      {
+        "stream": "S6-held",
+        "kind": "P_STRUCTURAL_REBALANCE_STORM/held",
+        "hit": 1,
+        "detail": "conf 0.55→0.7345867141604971 increased=true suppressed=false"
+      },
+      {
+        "stream": "S6-reverted",
+        "kind": "P_STRUCTURAL_REBALANCE_STORM/reverted",
+        "hit": 1,
+        "detail": "conf 0.55→0.55 increased=false suppressed=true"
+      },
+      {
+        "stream": "S7-held",
+        "kind": "P_CONNECTION_EXHAUSTION_CASCADE/held",
+        "hit": 1,
+        "detail": "conf 0.55→0.7345867141604971 increased=true suppressed=false"
+      },
+      {
+        "stream": "S7-reverted",
+        "kind": "P_CONNECTION_EXHAUSTION_CASCADE/reverted",
+        "hit": 1,
+        "detail": "conf 0.55→0.55 increased=false suppressed=true"
+      },
+      {
+        "stream": "S8-held",
+        "kind": "P_REPLICATION_LAG_DIVERGENCE/held",
+        "hit": 1,
+        "detail": "conf 0.55→0.7345867141604971 increased=true suppressed=false"
+      },
+      {
+        "stream": "S8-reverted",
+        "kind": "P_REPLICATION_LAG_DIVERGENCE/reverted",
+        "hit": 1,
+        "detail": "conf 0.55→0.55 increased=false suppressed=true"
+      },
+      {
+        "stream": "S9-persistent",
+        "kind": "critique-persistent",
+        "hit": 1,
+        "detail": "top1=mem-cap-new unrelatedTop1=mem-unrelated-priority trust 0.7→0.44999999999999996 oldFetchable=true"
+      },
+      {
+        "stream": "S9-reset",
+        "kind": "critique-reset",
+        "hit": 1,
+        "detail": "top1=mem-cap-old"
+      }
+    ],
+    "shapeResults": [
+      {
+        "shapeId": "P_CASCADING_BACKPRESSURE_LOOP",
+        "form": "held",
+        "remedyId": "mem-remedy-held-P_CASCADING_BACKPRESSURE_LOOP",
+        "confidenceBefore": 0.55,
+        "confidenceAfter": 0.7345867141604971,
+        "confidenceIncreased": true,
+        "suppressed": false,
+        "hit": 1
+      },
+      {
+        "shapeId": "P_CASCADING_BACKPRESSURE_LOOP",
+        "form": "reverted",
+        "remedyId": "mem-remedy-reverted-P_CASCADING_BACKPRESSURE_LOOP",
+        "confidenceBefore": 0.55,
+        "confidenceAfter": 0.55,
+        "confidenceIncreased": false,
+        "suppressed": true,
+        "hit": 1
+      },
+      {
+        "shapeId": "P_MEMORY_PRESSURE_GC_STORM",
+        "form": "held",
+        "remedyId": "mem-remedy-held-P_MEMORY_PRESSURE_GC_STORM",
+        "confidenceBefore": 0.55,
+        "confidenceAfter": 0.7345867141604971,
+        "confidenceIncreased": true,
+        "suppressed": false,
+        "hit": 1
+      },
+      {
+        "shapeId": "P_MEMORY_PRESSURE_GC_STORM",
+        "form": "reverted",
+        "remedyId": "mem-remedy-reverted-P_MEMORY_PRESSURE_GC_STORM",
+        "confidenceBefore": 0.55,
+        "confidenceAfter": 0.55,
+        "confidenceIncreased": false,
+        "suppressed": true,
+        "hit": 1
+      },
+      {
+        "shapeId": "P_STRUCTURAL_REBALANCE_STORM",
+        "form": "held",
+        "remedyId": "mem-remedy-held-P_STRUCTURAL_REBALANCE_STORM",
+        "confidenceBefore": 0.55,
+        "confidenceAfter": 0.7345867141604971,
+        "confidenceIncreased": true,
+        "suppressed": false,
+        "hit": 1
+      },
+      {
+        "shapeId": "P_STRUCTURAL_REBALANCE_STORM",
+        "form": "reverted",
+        "remedyId": "mem-remedy-reverted-P_STRUCTURAL_REBALANCE_STORM",
+        "confidenceBefore": 0.55,
+        "confidenceAfter": 0.55,
+        "confidenceIncreased": false,
+        "suppressed": true,
+        "hit": 1
+      },
+      {
+        "shapeId": "P_CONNECTION_EXHAUSTION_CASCADE",
+        "form": "held",
+        "remedyId": "mem-remedy-held-P_CONNECTION_EXHAUSTION_CASCADE",
+        "confidenceBefore": 0.55,
+        "confidenceAfter": 0.7345867141604971,
+        "confidenceIncreased": true,
+        "suppressed": false,
+        "hit": 1
+      },
+      {
+        "shapeId": "P_CONNECTION_EXHAUSTION_CASCADE",
+        "form": "reverted",
+        "remedyId": "mem-remedy-reverted-P_CONNECTION_EXHAUSTION_CASCADE",
+        "confidenceBefore": 0.55,
+        "confidenceAfter": 0.55,
+        "confidenceIncreased": false,
+        "suppressed": true,
+        "hit": 1
+      },
+      {
+        "shapeId": "P_REPLICATION_LAG_DIVERGENCE",
+        "form": "held",
+        "remedyId": "mem-remedy-held-P_REPLICATION_LAG_DIVERGENCE",
+        "confidenceBefore": 0.55,
+        "confidenceAfter": 0.7345867141604971,
+        "confidenceIncreased": true,
+        "suppressed": false,
+        "hit": 1
+      },
+      {
+        "shapeId": "P_REPLICATION_LAG_DIVERGENCE",
+        "form": "reverted",
+        "remedyId": "mem-remedy-reverted-P_REPLICATION_LAG_DIVERGENCE",
+        "confidenceBefore": 0.55,
+        "confidenceAfter": 0.55,
+        "confidenceIncreased": false,
+        "suppressed": true,
+        "hit": 1
+      }
+    ],
+    "critique": {
+      "persistent": {
+        "top1Id": "mem-cap-new",
+        "unrelatedTop1Id": "mem-unrelated-priority",
+        "trustBefore": 0.7,
+        "trustAfter": 0.44999999999999996,
+        "oldFetchableById": true,
+        "hit": 1
+      },
+      "reset": {
+        "top1Id": "mem-cap-old",
+        "hit": 1
+      }
+    },
+    "invariants": {
+      "countBonus": 0.02,
+      "noveltyWeight": 0.3,
+      "reconsolidationIntervalEpochs": 5
+    }
+  }
+}
